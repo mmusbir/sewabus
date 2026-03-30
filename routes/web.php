@@ -1,0 +1,88 @@
+<?php
+
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\Admin\GalleryController;
+use App\Http\Controllers\KatalogController;
+use App\Http\Controllers\PackageController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\RentalPackageController;
+use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\SeoController as AdminSeoController;
+use App\Http\Controllers\Admin\UserManagementController;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
+
+Route::get('/', function () {
+    $galleries = collect();
+    if (Schema::hasTable('galleries')) {
+        $query = \App\Models\Gallery::query()->latest()->take(3);
+        if (Schema::hasColumn('galleries', 'is_active')) {
+            $query->where('is_active', true);
+        }
+        $galleries = $query->get();
+    }
+
+    return view('welcome', compact('galleries'));
+})->name('home');
+
+Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog.index');
+Route::get('/katalog/{gallery}', [KatalogController::class, 'show'])->name('katalog.show');
+Route::get('/paket', [PackageController::class, 'index'])->name('packages.index');
+Route::get('/kontak', [ContactController::class, 'index'])->name('contact.index');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', function () {
+        return auth()->user()?->hasPanelAccess()
+            ? redirect()->route('admin.dashboard')
+            : redirect()->route('home');
+    })->name('dashboard');
+
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+
+    Route::resource('admin/galleries', GalleryController::class)->except(['show'])->names([
+        'index' => 'admin.galleries.index',
+        'create' => 'admin.galleries.create',
+        'store' => 'admin.galleries.store',
+        'edit' => 'admin.galleries.edit',
+        'update' => 'admin.galleries.update',
+        'destroy' => 'admin.galleries.destroy',
+    ]);
+    Route::patch('/admin/galleries/{gallery}/status', [GalleryController::class, 'toggleStatus'])->name('admin.galleries.toggle-status');
+
+    Route::resource('admin/rental-packages', RentalPackageController::class)->parameters([
+        'rental-packages' => 'rentalPackage',
+    ])->except(['show'])->names([
+        'index' => 'admin.rental-packages.index',
+        'create' => 'admin.rental-packages.create',
+        'store' => 'admin.rental-packages.store',
+        'edit' => 'admin.rental-packages.edit',
+        'update' => 'admin.rental-packages.update',
+        'destroy' => 'admin.rental-packages.destroy',
+    ]);
+
+    Route::middleware('admin.settings')->group(function () {
+        Route::get('/admin/settings', [SettingController::class, 'index'])->name('admin.settings.index');
+        Route::post('/admin/settings', [SettingController::class, 'update'])->name('admin.settings.update');
+        Route::get('/admin/settings/seo', [AdminSeoController::class, 'index'])->name('admin.settings.seo.index');
+        Route::post('/admin/settings/seo', [AdminSeoController::class, 'update'])->name('admin.settings.seo.update');
+    });
+
+    Route::middleware('admin.users')->group(function () {
+        Route::get('/admin/settings/users', [UserManagementController::class, 'index'])->name('admin.settings.users.index');
+        Route::get('/admin/settings/users/create', [UserManagementController::class, 'create'])->name('admin.settings.users.create');
+        Route::post('/admin/settings/users', [UserManagementController::class, 'store'])->name('admin.settings.users.store');
+        Route::get('/admin/settings/users/{user}/edit', [UserManagementController::class, 'edit'])->name('admin.settings.users.edit');
+        Route::put('/admin/settings/users/{user}', [UserManagementController::class, 'update'])->name('admin.settings.users.update');
+        Route::delete('/admin/settings/users/{user}', [UserManagementController::class, 'destroy'])->name('admin.settings.users.destroy');
+        Route::post('/admin/settings/users/{user}/reset-password', [UserManagementController::class, 'resetPassword'])->name('admin.settings.users.reset-password');
+    });
+});
+
+require __DIR__.'/auth.php';
