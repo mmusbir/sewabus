@@ -5,8 +5,13 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
+$storagePath = $_ENV['LARAVEL_STORAGE_PATH']
+    ?? $_SERVER['LARAVEL_STORAGE_PATH']
+    ?? getenv('LARAVEL_STORAGE_PATH')
+    ?: __DIR__.'/../storage';
+
 // Determine if the application is in maintenance mode...
-if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
+if (file_exists($maintenance = $storagePath.'/framework/maintenance.php')) {
     require $maintenance;
 }
 
