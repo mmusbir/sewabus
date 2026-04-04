@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "",
+  "buildCommand": "composer install && php artisan config:clear && php artisan cache:clear",
   "outputDirectory": null,
   "functions": {
     "api/index.php": {
