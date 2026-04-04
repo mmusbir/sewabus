@@ -24,6 +24,17 @@ putenv("VIEW_COMPILED_PATH={$compiledViewPath}");
 $_ENV['VIEW_COMPILED_PATH'] = $compiledViewPath;
 $_SERVER['VIEW_COMPILED_PATH'] = $compiledViewPath;
 
+// Clear expired cache files to prevent stale configuration
+$cacheDataPath = $storagePath.'/framework/cache/data';
+if (is_dir($cacheDataPath)) {
+    $now = time();
+    foreach (glob($cacheDataPath.'/*') as $file) {
+        if (is_file($file) && filemtime($file) > 0 && ($now - filemtime($file) > 3600)) {
+            @unlink($file); // Delete cache files older than 1 hour
+        }
+    }
+}
+
 $forwardedProto = strtolower(trim(explode(',', $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')[0] ?? ''));
 $forwardedHost = trim(explode(',', $_SERVER['HTTP_X_FORWARDED_HOST'] ?? '')[0] ?? '');
 
