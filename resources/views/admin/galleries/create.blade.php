@@ -4,9 +4,16 @@
 @section('header_title', 'Tambah Galeri Armada')
 
 @section('content')
+@php
+    $selectedFacilityKeys = collect(old('facility_keys', []))
+        ->map(fn ($key) => (string) $key)
+        ->all();
+    $facilityCustom = old('facility_custom', '');
+@endphp
+
 <div class="mb-6">
     <a href="{{ route('admin.galleries.index') }}" class="text-sm font-semibold text-slate-500 hover:text-primary flex items-center gap-2 w-fit">
-        <span class="material-symbols-outlined text-sm">arrow_back</span>
+        <x-fa-icon name="arrow-left" class="fa-fw text-sm" />
         Kembali
     </a>
 </div>
@@ -20,14 +27,29 @@
             <input type="text" name="title" value="{{ old('title') }}" required class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm">
             @error('title') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
+
+        <div class="space-y-2">
+            <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Nama PO</label>
+            <select name="po_key" required class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm">
+                <option value="">-- Pilih Nama PO --</option>
+                @foreach($poOptions as $poOption)
+                    <option value="{{ $poOption['key'] }}" {{ old('po_key') === $poOption['key'] ? 'selected' : '' }}>
+                        {{ $poOption['label'] }}
+                    </option>
+                @endforeach
+            </select>
+            @error('po_key') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+        </div>
         
         <div class="space-y-2">
             <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Kategori / Ukuran</label>
             <select name="category" required class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm">
                 <option value="">-- Pilih Kategori --</option>
-                <option value="minibus" {{ old('category') == 'minibus' ? 'selected' : '' }}>Minibus (&lt; 20 Kursi)</option>
-                <option value="mediumbus" {{ old('category') == 'mediumbus' ? 'selected' : '' }}>Mediumbus (20-40 Kursi)</option>
-                <option value="bigbus" {{ old('category') == 'bigbus' ? 'selected' : '' }}>Bigbus (&gt; 40 Kursi)</option>
+                @foreach($categories as $category)
+                    <option value="{{ $category['key'] }}" {{ old('category') === $category['key'] ? 'selected' : '' }}>
+                        {{ gallery_category_full_label($category['key']) }}
+                    </option>
+                @endforeach
             </select>
             @error('category') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
@@ -69,17 +91,16 @@
             @error('description') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
 
-        <div class="space-y-2">
-            <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Daftar Fasilitas</label>
-            <textarea name="facilities" rows="4" class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm" placeholder="Tulis satu fasilitas per baris&#10;Contoh:&#10;AC Full&#10;Toilet&#10;USB Charger">{{ old('facilities') }}</textarea>
-            <p class="text-xs text-slate-500">Pisahkan fasilitas dengan baris baru agar tampil rapi di halaman detail.</p>
-            @error('facilities') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-        </div>
+        @include('admin.galleries._facility-selector', [
+            'facilityOptions' => $facilityOptions,
+            'selectedFacilityKeys' => $selectedFacilityKeys,
+            'facilityCustom' => $facilityCustom,
+        ])
     </div>
 
     <div class="flex justify-end pt-8">
         <button type="submit" class="bg-primary hover:bg-primary/90 text-white px-8 py-2.5 rounded-lg font-bold shadow-lg shadow-primary/20 transition-all flex items-center gap-2">
-            <span class="material-symbols-outlined text-sm">save</span> Simpan
+            <x-fa-icon name="floppy-disk" class="fa-fw text-sm" /> Simpan
         </button>
     </div>
 </form>

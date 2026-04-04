@@ -22,4 +22,9 @@ class RentalPackage extends Model
         'is_active' => 'boolean',
         'sort_order' => 'integer',
     ];
+
+    public function getImagePathAttribute(?string $value): ?string
+    {
+        return media_url($value);
+    }
 }

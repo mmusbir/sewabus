@@ -17,6 +17,12 @@ class SettingSeeder extends Seeder
             'favicon' => '/favicon.ico',
             'header_logo_text' => 'BusPariwisata',
             'footer_logo_text' => 'BusPariwisata',
+            'gallery_po_names' => json_encode([
+                [
+                    'key' => 'cahaya-bone',
+                    'label' => 'Cahaya Bone',
+                ],
+            ], JSON_UNESCAPED_UNICODE),
             'footer_description' => 'Penyedia jasa transportasi bus pariwisata dengan pengalaman lebih dari 70 tahun. Mengutamakan keselamatan dan kenyamanan.',
             'hero_title' => 'Sewa Bus Pariwisata Terbaik untuk Perjalanan Anda',
             'hero_subtitle' => 'Armada modern, fasilitas lengkap, dan pengemudi profesional siap menemani perjalanan wisata keluarga atau korporat Anda ke seluruh Indonesia.',

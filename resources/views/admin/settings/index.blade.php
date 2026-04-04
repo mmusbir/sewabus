@@ -4,6 +4,17 @@
 @section('header_title', 'Pengaturan Homepage')
 
 @section('content')
+                @php
+                    $headerLogoImageUrl = media_url($settings['header_logo_image'] ?? null);
+                    $headerLogoImageDarkUrl = media_url($settings['header_logo_image_dark'] ?? null);
+                    $footerLogoImageUrl = media_url($settings['footer_logo_image'] ?? null);
+                    $footerMapImageUrl = media_url($settings['footer_map_image'] ?? null);
+                    $heroImageUrl = media_url($settings['hero_image'] ?? null);
+                    $heroImage1Url = media_url($settings['hero_image_1'] ?? null);
+                    $heroImage2Url = media_url($settings['hero_image_2'] ?? null);
+                    $heroImage3Url = media_url($settings['hero_image_3'] ?? null);
+                    $catalogPdfUrl = media_url($settings['catalog_pdf'] ?? null);
+                @endphp
                 @if($errors->any())
                     <div class="mb-6 p-4 bg-rose-100 text-rose-700 rounded-lg text-sm">
                         <p class="font-bold mb-2">Perubahan gagal disimpan:</p>
@@ -14,13 +25,13 @@
                         </ul>
                     </div>
                 @endif
-                <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
+                <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" class="space-y-8" data-settings-form>
                     @csrf
                     
                     <!-- Section: General -->
                     <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
                         <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
-                            <span class="material-symbols-outlined text-primary">public</span> Umum
+                            <x-fa-icon name="globe" class="fa-fw text-primary" /> Umum
                         </h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2">
@@ -38,13 +49,13 @@
                     <!-- Section: Branding -->
                     <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
                         <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
-                            <span class="material-symbols-outlined text-primary">stylus</span> Branding Navbar & Footer
+                            <x-fa-icon name="pen-ruler" class="fa-fw text-primary" /> Branding Navbar & Footer
                         </h3>
                         <p class="text-xs text-slate-500 mb-6">Atur identitas visual untuk navbar dan footer. Jika logo gambar diisi, teks logo tetap bisa diaktifkan/nonaktifkan sesuai kebutuhan.</p>
                         <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
                             <div class="rounded-xl border border-slate-200 dark:border-slate-800 p-5 space-y-5 bg-slate-50/60 dark:bg-slate-900/40">
                                 <div class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-primary text-base">view_headline</span>
+                                    <x-fa-icon name="heading" class="fa-fw text-primary text-base" />
                                     <h4 class="font-bold text-slate-800 dark:text-slate-100">Navbar Branding</h4>
                                 </div>
                                 <div class="space-y-2">
@@ -69,16 +80,16 @@
                                 <div class="grid grid-cols-2 gap-3">
                                     <div class="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-3">
                                         <p class="text-[11px] font-semibold text-slate-500 mb-2">Preview Siang</p>
-                                        @if(isset($settings['header_logo_image']))
-                                            <img src="{{ $settings['header_logo_image'] }}" class="h-10 object-contain">
+                                        @if($headerLogoImageUrl)
+                                            <img src="{{ $headerLogoImageUrl }}" class="h-10 object-contain">
                                         @else
                                             <p class="text-xs text-slate-400">Belum ada logo</p>
                                         @endif
                                     </div>
                                     <div class="rounded-lg border border-slate-700 bg-slate-900 p-3">
                                         <p class="text-[11px] font-semibold text-slate-400 mb-2">Preview Malam</p>
-                                        @if(isset($settings['header_logo_image_dark']))
-                                            <img src="{{ $settings['header_logo_image_dark'] }}" class="h-10 object-contain">
+                                        @if($headerLogoImageDarkUrl)
+                                            <img src="{{ $headerLogoImageDarkUrl }}" class="h-10 object-contain">
                                         @else
                                             <p class="text-xs text-slate-500">Belum ada logo</p>
                                         @endif
@@ -88,7 +99,7 @@
 
                             <div class="rounded-xl border border-slate-200 dark:border-slate-800 p-5 space-y-5 bg-slate-50/60 dark:bg-slate-900/40">
                                 <div class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-primary text-base">bottom_panel_open</span>
+                                    <x-fa-icon name="panels-stay-open" class="fa-fw text-primary text-base" />
                                     <h4 class="font-bold text-slate-800 dark:text-slate-100">Footer Branding</h4>
                                 </div>
                                 <div class="space-y-2">
@@ -107,8 +118,8 @@
                                 </div>
                                 <div class="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-3">
                                     <p class="text-[11px] font-semibold text-slate-500 mb-2">Preview Footer</p>
-                                    @if(isset($settings['footer_logo_image']))
-                                        <img src="{{ $settings['footer_logo_image'] }}" class="h-10 object-contain">
+                                    @if($footerLogoImageUrl)
+                                        <img src="{{ $footerLogoImageUrl }}" class="h-10 object-contain">
                                     @else
                                         <p class="text-xs text-slate-400">Belum ada logo</p>
                                     @endif
@@ -120,7 +131,7 @@
                     <!-- Section: Hero -->
                     <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
                         <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
-                            <span class="material-symbols-outlined text-primary">branding_watermark</span> Hero Section
+                            <x-fa-icon name="images" class="fa-fw text-primary" /> Hero Section
                         </h3>
                         <div class="space-y-6">
                             <div class="space-y-2">
@@ -144,9 +155,9 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div class="space-y-2">
                                     <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Gambar Hero 1</label>
-                                    @if(isset($settings['hero_image_1']) || isset($settings['hero_image']))
+                                    @if($heroImage1Url || $heroImageUrl)
                                         <div class="mb-2">
-                                            <img src="{{ $settings['hero_image_1'] ?? $settings['hero_image'] }}" class="h-24 w-full object-cover rounded-lg border border-slate-200">
+                                            <img src="{{ $heroImage1Url ?: $heroImageUrl }}" class="h-24 w-full object-cover rounded-lg border border-slate-200">
                                         </div>
                                     @endif
                                     <input type="file" name="hero_image_1" accept="image/png,image/jpeg,image/jpg" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20">
@@ -154,9 +165,9 @@
                                 </div>
                                 <div class="space-y-2">
                                     <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Gambar Hero 2</label>
-                                    @if(isset($settings['hero_image_2']))
+                                    @if($heroImage2Url)
                                         <div class="mb-2">
-                                            <img src="{{ $settings['hero_image_2'] }}" class="h-24 w-full object-cover rounded-lg border border-slate-200">
+                                            <img src="{{ $heroImage2Url }}" class="h-24 w-full object-cover rounded-lg border border-slate-200">
                                         </div>
                                     @endif
                                     <input type="file" name="hero_image_2" accept="image/png,image/jpeg,image/jpg" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20">
@@ -164,9 +175,9 @@
                                 </div>
                                 <div class="space-y-2">
                                     <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Gambar Hero 3</label>
-                                    @if(isset($settings['hero_image_3']))
+                                    @if($heroImage3Url)
                                         <div class="mb-2">
-                                            <img src="{{ $settings['hero_image_3'] }}" class="h-24 w-full object-cover rounded-lg border border-slate-200">
+                                            <img src="{{ $heroImage3Url }}" class="h-24 w-full object-cover rounded-lg border border-slate-200">
                                         </div>
                                     @endif
                                     <input type="file" name="hero_image_3" accept="image/png,image/jpeg,image/jpg" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20">
@@ -180,16 +191,34 @@
                             </div>
                             <div class="space-y-2">
                                 <label class="text-sm font-bold text-slate-700 dark:text-slate-300">PDF Katalog Armada</label>
-                                @if(isset($settings['catalog_pdf']))
+                                @if($catalogPdfUrl)
                                     <div class="mb-2">
-                                        <a href="{{ $settings['catalog_pdf'] }}" target="_blank" class="inline-flex items-center gap-2 text-sm text-primary font-semibold hover:underline">
-                                            <span class="material-symbols-outlined text-sm">description</span>
+                                        <a href="{{ $catalogPdfUrl }}" target="_blank" class="inline-flex items-center gap-2 text-sm text-primary font-semibold hover:underline">
+                                            <x-fa-icon name="file-lines" class="fa-fw text-sm" />
                                             Lihat file PDF saat ini
                                         </a>
                                     </div>
                                 @endif
-                                <input type="file" name="catalog_pdf" accept="application/pdf" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20">
+                                <input
+                                    type="hidden"
+                                    name="catalog_pdf_uploaded_path"
+                                    value="{{ old('catalog_pdf_uploaded_path') }}"
+                                    data-catalog-pdf-path
+                                >
+                                <input
+                                    type="file"
+                                    name="catalog_pdf"
+                                    accept="application/pdf"
+                                    class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                                    data-catalog-pdf-input
+                                    data-direct-upload-url="{{ route('admin.settings.catalog-pdf.upload-url') }}"
+                                    data-max-kb="20480"
+                                >
                                 <p class="text-xs text-slate-500">Format: PDF. Maks 20 MB. File ini dipakai untuk tombol Download PDF Katalog di homepage.</p>
+                                <p class="text-xs text-emerald-600 dark:text-emerald-400" data-catalog-pdf-note>
+                                    Upload PDF besar akan dikirim langsung ke storage agar tidak terkena limit upload Vercel.
+                                </p>
+                                <p class="hidden text-xs font-medium" data-catalog-pdf-status></p>
                             </div>
                         </div>
                     </div>
@@ -197,7 +226,7 @@
                     <!-- Section: Social & Contact -->
                     <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
                         <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
-                            <span class="material-symbols-outlined text-primary">contact_support</span> Kontak & Sosial Media
+                            <x-fa-icon name="headset" class="fa-fw text-primary" /> Kontak & Sosial Media
                         </h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2">
@@ -255,9 +284,9 @@
                                     <div class="mb-2 rounded border border-slate-200 overflow-hidden">
                                         <iframe class="w-full h-48" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="{{ $footerMapSrc }}" allowfullscreen></iframe>
                                     </div>
-                                @elseif(isset($settings['footer_map_image']))
+                                @elseif($footerMapImageUrl)
                                     <div class="mb-2">
-                                        <img src="{{ $settings['footer_map_image'] }}" class="h-32 object-cover rounded border border-slate-200">
+                                        <img src="{{ $footerMapImageUrl }}" class="h-32 object-cover rounded border border-slate-200">
                                     </div>
                                 @endif
                                 <input type="text" name="footer_map_url" value="{{ $settings['footer_map_url'] ?? '' }}" placeholder="Contoh: -6.200000,106.816666 atau https://www.google.com/maps/embed?..." class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm">
@@ -272,4 +301,143 @@
                         </button>
                     </div>
                 </form>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const form = document.querySelector('[data-settings-form]');
+                        const fileInput = document.querySelector('[data-catalog-pdf-input]');
+                        const pathInput = document.querySelector('[data-catalog-pdf-path]');
+                        const statusEl = document.querySelector('[data-catalog-pdf-status]');
+                        const noteEl = document.querySelector('[data-catalog-pdf-note]');
+                        const submitButton = form?.querySelector('button[type="submit"]');
+
+                        if (!form || !fileInput || !pathInput || !statusEl || !submitButton) {
+                            return;
+                        }
+
+                        let isUploading = false;
+                        const originalFileInputName = fileInput.getAttribute('name') || 'catalog_pdf';
+
+                        const showStatus = (message, tone = 'info') => {
+                            statusEl.textContent = message;
+                            statusEl.classList.remove('hidden', 'text-emerald-600', 'dark:text-emerald-400', 'text-rose-600', 'dark:text-rose-400', 'text-slate-500', 'dark:text-slate-400');
+
+                            if (tone === 'success') {
+                                statusEl.classList.add('text-emerald-600', 'dark:text-emerald-400');
+                            } else if (tone === 'error') {
+                                statusEl.classList.add('text-rose-600', 'dark:text-rose-400');
+                            } else {
+                                statusEl.classList.add('text-slate-500', 'dark:text-slate-400');
+                            }
+                        };
+
+                        const resetStatus = () => {
+                            statusEl.textContent = '';
+                            statusEl.classList.add('hidden');
+                        };
+
+                        fileInput.addEventListener('change', () => {
+                            pathInput.value = '';
+
+                            if (fileInput.files?.length) {
+                                showStatus('PDF akan diupload langsung ke storage saat Anda klik Simpan.');
+                            } else {
+                                resetStatus();
+                            }
+                        });
+
+                        form.addEventListener('submit', async (event) => {
+                            const file = fileInput.files?.[0];
+                            const uploadUrl = fileInput.dataset.directUploadUrl;
+                            const maxKb = Number.parseInt(fileInput.dataset.maxKb ?? '0', 10);
+                            const maxBytes = maxKb > 0 ? maxKb * 1024 : 0;
+
+                            if (!file || !uploadUrl || pathInput.value) {
+                                return;
+                            }
+
+                            event.preventDefault();
+
+                            if (isUploading) {
+                                return;
+                            }
+
+                            if (!file.name.toLowerCase().endsWith('.pdf')) {
+                                showStatus('File katalog harus berformat PDF.', 'error');
+                                return;
+                            }
+
+                            if (maxBytes > 0 && file.size > maxBytes) {
+                                showStatus('PDF katalog maksimal 20 MB.', 'error');
+                                return;
+                            }
+
+                            isUploading = true;
+                            submitButton.disabled = true;
+                            submitButton.classList.add('opacity-70', 'cursor-not-allowed');
+                            if (noteEl) {
+                                noteEl.classList.add('hidden');
+                            }
+
+                            try {
+                                showStatus('Mengunggah PDF ke storage...', 'info');
+
+                                const signResponse = await fetch(uploadUrl, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Accept': 'application/json',
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
+                                    },
+                                    body: JSON.stringify({
+                                        filename: file.name,
+                                        size: Math.ceil(file.size / 1024),
+                                        content_type: file.type || 'application/pdf',
+                                    }),
+                                });
+
+                                const signPayload = await signResponse.json().catch(() => ({}));
+
+                                if (!signResponse.ok) {
+                                    throw new Error(signPayload.message || 'Gagal menyiapkan upload PDF.');
+                                }
+
+                                const uploadHeaders = {
+                                    ...(signPayload.headers || {}),
+                                    'Content-Type': 'application/pdf',
+                                };
+
+                                const uploadResponse = await fetch(signPayload.url, {
+                                    method: 'PUT',
+                                    headers: uploadHeaders,
+                                    body: file,
+                                });
+
+                                if (!uploadResponse.ok) {
+                                    throw new Error('Upload PDF ke storage gagal.');
+                                }
+
+                                pathInput.value = signPayload.path;
+                                fileInput.value = '';
+                                fileInput.disabled = true;
+                                fileInput.removeAttribute('name');
+                                fileInput.dataset.originalName = originalFileInputName;
+                                showStatus('PDF berhasil diunggah. Menyimpan pengaturan...', 'success');
+                                HTMLFormElement.prototype.submit.call(form);
+                            } catch (error) {
+                                showStatus(error.message || 'Upload PDF gagal. Silakan coba lagi.', 'error');
+                                submitButton.disabled = false;
+                                submitButton.classList.remove('opacity-70', 'cursor-not-allowed');
+                                fileInput.disabled = false;
+                                if (!fileInput.getAttribute('name')) {
+                                    fileInput.setAttribute('name', fileInput.dataset.originalName || originalFileInputName);
+                                }
+                                if (noteEl) {
+                                    noteEl.classList.remove('hidden');
+                                }
+                                isUploading = false;
+                            }
+                        });
+                    });
+                </script>
 @endsection

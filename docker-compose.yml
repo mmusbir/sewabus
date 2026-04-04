@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  app:
+    image: php:8.2-fpm
+    container_name: sewabus_app
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - db
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=sewabus_db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_SSLMODE=require
+    networks:
+      - sewabus_network
+
+  web:
+    image: nginx:latest
+    container_name: sewabus_web
+    depends_on:
+      - app
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+    ports:
+      - '8000:80'
+    networks:
+      - sewabus_network
+
+  db:
+    image: postgres:15
+    container_name: sewabus_db
+    environment:
+      - POSTGRES_DB=sewabus_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - sewabus_network
+
+networks:
+  sewabus_network:
+    driver: bridge
+
+volumes:
+  db_data:
+    driver: local

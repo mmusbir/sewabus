@@ -7,7 +7,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Arr;
 use Illuminate\View\View;
 
@@ -37,15 +36,15 @@ class ProfileController extends Controller
         }
 
         if ($request->boolean('remove_profile_photo') && $user->profile_photo_path) {
-            Storage::disk('public')->delete($user->profile_photo_path);
+            delete_media($user->getRawOriginal('profile_photo_path'));
             $user->profile_photo_path = null;
         }
 
         if ($request->hasFile('profile_photo')) {
             if ($user->profile_photo_path) {
-                Storage::disk('public')->delete($user->profile_photo_path);
+                delete_media($user->getRawOriginal('profile_photo_path'));
             }
-            $user->profile_photo_path = $request->file('profile_photo')->store('profile-photos', 'public');
+            $user->profile_photo_path = store_media($request->file('profile_photo'), 'profile-photos');
         }
 
         $user->save();

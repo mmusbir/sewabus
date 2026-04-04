@@ -6,7 +6,7 @@
 @section('content')
 <div class="mb-6">
     <a href="{{ route('admin.rental-packages.index') }}" class="text-sm font-semibold text-slate-500 hover:text-primary flex items-center gap-2 w-fit">
-        <span class="material-symbols-outlined text-sm">arrow_back</span>
+        <x-fa-icon name="arrow-left" class="fa-fw text-sm" />
         Kembali
     </a>
 </div>
@@ -18,7 +18,7 @@
 
     <div class="flex justify-end pt-8">
         <button type="submit" class="bg-primary hover:bg-primary/90 text-white px-8 py-2.5 rounded-lg font-bold shadow-lg shadow-primary/20 transition-all flex items-center gap-2">
-            <span class="material-symbols-outlined text-sm">save</span> Simpan
+            <x-fa-icon name="floppy-disk" class="fa-fw text-sm" /> Simpan
         </button>
     </div>
 </form>

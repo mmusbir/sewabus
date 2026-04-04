@@ -4,9 +4,29 @@
 @section('header_title', 'Edit Galeri Armada')
 
 @section('content')
+@php
+    $currentCoverId = old('cover_image_id');
+
+    if ($currentCoverId === null) {
+        $currentCover = $gallery->images->first(function ($image) use ($gallery) {
+            return $image->getRawOriginal('media_path') === $gallery->getRawOriginal('image_path');
+        });
+
+        $currentCoverId = $currentCover?->id ?? $gallery->images->first()?->id;
+    }
+
+    $removeImageIds = collect(old('remove_image_ids', []))
+        ->map(fn ($id) => (string) $id)
+        ->all();
+    $selectedFacilityKeys = collect(old('facility_keys', gallery_selected_catalog_facility_keys($gallery->facilities)))
+        ->map(fn ($key) => (string) $key)
+        ->all();
+    $facilityCustom = old('facility_custom', gallery_custom_facility_text($gallery->facilities));
+@endphp
+
 <div class="mb-6">
     <a href="{{ route('admin.galleries.index') }}" class="text-sm font-semibold text-slate-500 hover:text-primary flex items-center gap-2 w-fit">
-        <span class="material-symbols-outlined text-sm">arrow_back</span>
+        <x-fa-icon name="arrow-left" class="fa-fw text-sm" />
         Kembali
     </a>
 </div>
@@ -21,14 +41,29 @@
             <input type="text" name="title" value="{{ old('title', $gallery->title) }}" required class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm">
             @error('title') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
+
+        <div class="space-y-2">
+            <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Nama PO</label>
+            <select name="po_key" required class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm">
+                <option value="">-- Pilih Nama PO --</option>
+                @foreach($poOptions as $poOption)
+                    <option value="{{ $poOption['key'] }}" {{ old('po_key', $gallery->po_key ?? ($poOptions[0]['key'] ?? '')) === $poOption['key'] ? 'selected' : '' }}>
+                        {{ $poOption['label'] }}
+                    </option>
+                @endforeach
+            </select>
+            @error('po_key') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+        </div>
         
         <div class="space-y-2">
             <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Kategori / Ukuran</label>
             <select name="category" required class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm">
                 <option value="">-- Pilih Kategori --</option>
-                <option value="minibus" {{ old('category', $gallery->category) == 'minibus' ? 'selected' : '' }}>Minibus (&lt; 20 Kursi)</option>
-                <option value="mediumbus" {{ old('category', $gallery->category) == 'mediumbus' ? 'selected' : '' }}>Mediumbus (20-40 Kursi)</option>
-                <option value="bigbus" {{ old('category', $gallery->category) == 'bigbus' ? 'selected' : '' }}>Bigbus (&gt; 40 Kursi)</option>
+                @foreach($categories as $category)
+                    <option value="{{ $category['key'] }}" {{ old('category', $gallery->category) === $category['key'] ? 'selected' : '' }}>
+                        {{ gallery_category_full_label($category['key']) }}
+                    </option>
+                @endforeach
             </select>
             @error('category') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
@@ -52,11 +87,24 @@
         <div class="space-y-2">
             <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Foto Armada (Maks 6)</label>
             @if($gallery->images->count())
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                     @foreach($gallery->images as $image)
-                        <img src="{{ $image->media_path }}" alt="{{ $gallery->title }}" class="h-24 w-full object-cover rounded-lg border border-slate-200">
+                        <div class="rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-50 dark:bg-slate-800/60">
+                            <img src="{{ $image->media_path }}" alt="{{ $gallery->title }}" class="h-32 w-full object-cover">
+                            <div class="p-3 space-y-3">
+                                <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-200">
+                                    <input type="radio" name="cover_image_id" value="{{ $image->id }}" {{ (string) $currentCoverId === (string) $image->id ? 'checked' : '' }} class="border-slate-300 text-primary focus:ring-primary">
+                                    Jadikan sampul galeri
+                                </label>
+                                <label class="flex items-center gap-2 text-xs font-semibold text-rose-600 dark:text-rose-400">
+                                    <input type="checkbox" name="remove_image_ids[]" value="{{ $image->id }}" {{ in_array((string) $image->id, $removeImageIds, true) ? 'checked' : '' }} class="rounded border-rose-300 text-rose-600 focus:ring-rose-500">
+                                    Hapus gambar ini
+                                </label>
+                            </div>
+                        </div>
                     @endforeach
                 </div>
+                <p class="text-xs text-slate-500">Pilih satu foto sebagai sampul. Centang foto yang ingin dihapus saat menyimpan perubahan.</p>
             @endif
             <label class="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
                 <input type="hidden" name="replace_images" value="0">
@@ -67,6 +115,8 @@
             <p class="text-xs text-slate-500 mt-1">Upload tambahan foto atau centang opsi ganti semua foto. Maksimal total 6 foto.</p>
             @error('images') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             @error('images.*') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            @error('remove_image_ids') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            @error('cover_image_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
 
         <div class="space-y-2">
@@ -92,17 +142,16 @@
             @error('description') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
 
-        <div class="space-y-2">
-            <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Daftar Fasilitas</label>
-            <textarea name="facilities" rows="4" class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm" placeholder="Tulis satu fasilitas per baris&#10;Contoh:&#10;AC Full&#10;Toilet&#10;USB Charger">{{ old('facilities', $gallery->facilities) }}</textarea>
-            <p class="text-xs text-slate-500">Pisahkan fasilitas dengan baris baru agar tampil rapi di halaman detail.</p>
-            @error('facilities') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-        </div>
+        @include('admin.galleries._facility-selector', [
+            'facilityOptions' => $facilityOptions,
+            'selectedFacilityKeys' => $selectedFacilityKeys,
+            'facilityCustom' => $facilityCustom,
+        ])
     </div>
 
     <div class="flex justify-end pt-8">
         <button type="submit" class="bg-primary hover:bg-primary/90 text-white px-8 py-2.5 rounded-lg font-bold shadow-lg shadow-primary/20 transition-all flex items-center gap-2">
-            <span class="material-symbols-outlined text-sm">save</span> Perbarui
+            <x-fa-icon name="floppy-disk" class="fa-fw text-sm" /> Perbarui
         </button>
     </div>
 </form>

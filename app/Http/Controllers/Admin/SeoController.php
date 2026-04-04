@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 class SeoController extends Controller
@@ -50,13 +49,11 @@ class SeoController extends Controller
                 }
 
                 $oldValue = $existingSettings[$key] ?? null;
-                if ($oldValue && str_starts_with((string) $oldValue, '/storage/')) {
-                    Storage::disk('public')->delete(substr((string) $oldValue, 9));
-                }
+                delete_media($oldValue);
 
                 try {
-                    $path = $file->store('settings', 'public');
-                    $value = Storage::url($path);
+                    $path = store_media($file, 'settings');
+                    $value = $path;
                 } catch (Throwable) {
                     return back()
                         ->withErrors([$key => 'Gagal menyimpan gambar OG.'])

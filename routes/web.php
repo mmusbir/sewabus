@@ -13,6 +13,12 @@ use App\Http\Controllers\Admin\UserManagementController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 
+Route::get('/up', function () {
+    return response()->json([
+        'status' => 'ok',
+    ]);
+});
+
 Route::get('/', function () {
     $galleries = collect();
     if (Schema::hasTable('galleries')) {
@@ -70,6 +76,13 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::middleware('admin.settings')->group(function () {
         Route::get('/admin/settings', [SettingController::class, 'index'])->name('admin.settings.index');
         Route::post('/admin/settings', [SettingController::class, 'update'])->name('admin.settings.update');
+        Route::get('/admin/settings/categories', [SettingController::class, 'categoryIndex'])->name('admin.settings.categories.index');
+        Route::post('/admin/settings/categories', [SettingController::class, 'categoryUpdate'])->name('admin.settings.categories.update');
+        Route::get('/admin/settings/po', [SettingController::class, 'poIndex'])->name('admin.settings.po.index');
+        Route::post('/admin/settings/po', [SettingController::class, 'poUpdate'])->name('admin.settings.po.update');
+        Route::get('/admin/settings/facilities', [SettingController::class, 'facilityIndex'])->name('admin.settings.facilities.index');
+        Route::post('/admin/settings/facilities', [SettingController::class, 'facilityUpdate'])->name('admin.settings.facilities.update');
+        Route::post('/admin/settings/catalog-pdf/upload-url', [SettingController::class, 'createCatalogPdfUpload'])->name('admin.settings.catalog-pdf.upload-url');
         Route::get('/admin/settings/seo', [AdminSeoController::class, 'index'])->name('admin.settings.seo.index');
         Route::post('/admin/settings/seo', [AdminSeoController::class, 'update'])->name('admin.settings.seo.update');
     });

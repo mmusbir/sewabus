@@ -16,6 +16,11 @@ class GalleryMedia extends Model
         'sort_order',
     ];
 
+    public function getMediaPathAttribute(?string $value): ?string
+    {
+        return media_url($value);
+    }
+
     public function gallery(): BelongsTo
     {
         return $this->belongsTo(Gallery::class);

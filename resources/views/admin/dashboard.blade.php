@@ -9,12 +9,12 @@
         <article class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
             <p class="text-xs uppercase tracking-wide text-slate-500 mb-2">Total Armada</p>
             <p class="text-3xl font-black text-slate-900 dark:text-slate-100">{{ $stats['galleries_total'] }}</p>
-            <p class="text-xs text-slate-500 mt-2">Minibus {{ $stats['galleries_minibus'] }} • Medium {{ $stats['galleries_mediumbus'] }} • Bigbus {{ $stats['galleries_bigbus'] }}</p>
+            <p class="text-xs text-slate-500 mt-2">{{ collect($stats['gallery_breakdown'])->map(fn ($item) => $item['label'] . ' ' . $item['count'])->implode(' | ') }}</p>
         </article>
         <article class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
             <p class="text-xs uppercase tracking-wide text-slate-500 mb-2">Total Paket</p>
             <p class="text-3xl font-black text-slate-900 dark:text-slate-100">{{ $stats['packages_total'] }}</p>
-            <p class="text-xs text-slate-500 mt-2">Aktif {{ $stats['packages_active'] }} • Sewa {{ $stats['packages_sewa'] }} • Liburan {{ $stats['packages_liburan'] }}</p>
+            <p class="text-xs text-slate-500 mt-2">Aktif {{ $stats['packages_active'] }} | Sewa {{ $stats['packages_sewa'] }} | Liburan {{ $stats['packages_liburan'] }}</p>
         </article>
         <article class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
             <p class="text-xs uppercase tracking-wide text-slate-500 mb-2">Akun Pengguna</p>
@@ -49,7 +49,7 @@
                         @forelse($recentGalleries as $gallery)
                             <tr class="border-b border-slate-100 dark:border-slate-800 last:border-0">
                                 <td class="py-3 text-sm font-semibold text-slate-800 dark:text-slate-100">{{ $gallery->title }}</td>
-                                <td class="py-3 text-sm text-slate-600 dark:text-slate-300">{{ ucfirst($gallery->category) }}</td>
+                                <td class="py-3 text-sm text-slate-600 dark:text-slate-300">{{ gallery_category_label($gallery->category, $gallery->category) }}</td>
                                 <td class="py-3 text-sm text-slate-500">{{ $gallery->updated_at?->diffForHumans() }}</td>
                             </tr>
                         @empty
@@ -67,22 +67,22 @@
             <div class="space-y-3">
                 <a href="{{ route('admin.galleries.create') }}" class="w-full inline-flex items-center justify-between rounded-lg border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm font-semibold hover:border-primary hover:text-primary transition-colors">
                     Tambah Armada
-                    <span class="material-symbols-outlined text-base">arrow_forward</span>
+                    <x-fa-icon name="arrow-right" class="fa-fw text-base" />
                 </a>
                 <a href="{{ route('admin.rental-packages.create') }}" class="w-full inline-flex items-center justify-between rounded-lg border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm font-semibold hover:border-primary hover:text-primary transition-colors">
                     Tambah Paket
-                    <span class="material-symbols-outlined text-base">arrow_forward</span>
+                    <x-fa-icon name="arrow-right" class="fa-fw text-base" />
                 </a>
                 @if(auth()->user()->canAccessSettings())
                     <a href="{{ route('admin.settings.index') }}" class="w-full inline-flex items-center justify-between rounded-lg border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm font-semibold hover:border-primary hover:text-primary transition-colors">
                         Lengkapi Pengaturan Homepage
-                        <span class="material-symbols-outlined text-base">arrow_forward</span>
+                        <x-fa-icon name="arrow-right" class="fa-fw text-base" />
                     </a>
                 @endif
                 @if(auth()->user()->canManageUsers())
                     <a href="{{ route('admin.settings.users.index') }}" class="w-full inline-flex items-center justify-between rounded-lg border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm font-semibold hover:border-primary hover:text-primary transition-colors">
                         Manajemen Akun Pengguna
-                        <span class="material-symbols-outlined text-base">arrow_forward</span>
+                        <x-fa-icon name="arrow-right" class="fa-fw text-base" />
                     </a>
                 @endif
             </div>
@@ -92,7 +92,7 @@
                 @forelse($recentPackages as $package)
                     <div class="rounded-lg border border-slate-200 dark:border-slate-800 px-3 py-2">
                         <p class="text-sm font-semibold text-slate-800 dark:text-slate-100">{{ $package->title }}</p>
-                        <p class="text-xs text-slate-500">{{ $package->type === 'liburan' ? 'Liburan' : 'Sewa' }} • {{ $package->updated_at?->diffForHumans() }}</p>
+                        <p class="text-xs text-slate-500">{{ $package->type === 'liburan' ? 'Liburan' : 'Sewa' }} | {{ $package->updated_at?->diffForHumans() }}</p>
                     </div>
                 @empty
                     <p class="text-sm text-slate-500">Belum ada paket terbaru.</p>

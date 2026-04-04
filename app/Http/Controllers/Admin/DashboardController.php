@@ -18,12 +18,37 @@ class DashboardController extends Controller
         $hasPackages = Schema::hasTable('rental_packages');
         $hasSettings = Schema::hasTable('settings');
         $hasUsers = Schema::hasTable('users');
+        $galleryCategoryCounts = $hasGalleries
+            ? Gallery::query()
+                ->selectRaw('category, COUNT(*) as total')
+                ->groupBy('category')
+                ->pluck('total', 'category')
+            : collect();
+        $galleryBreakdown = collect(gallery_category_list())
+            ->map(fn (array $category) => [
+                'key' => $category['key'],
+                'label' => $category['label'],
+                'count' => (int) ($galleryCategoryCounts[$category['key']] ?? 0),
+            ]);
+
+        if ($galleryCategoryCounts instanceof \Illuminate\Support\Collection) {
+            $knownKeys = $galleryBreakdown->pluck('key');
+
+            $galleryBreakdown = $galleryBreakdown->concat(
+                $galleryCategoryCounts
+                    ->reject(fn ($count, $key) => $knownKeys->contains($key))
+                    ->map(fn ($count, $key) => [
+                        'key' => $key,
+                        'label' => gallery_category_label($key, $key),
+                        'count' => (int) $count,
+                    ])
+                    ->values()
+            );
+        }
 
         $stats = [
             'galleries_total' => $hasGalleries ? Gallery::count() : 0,
-            'galleries_minibus' => $hasGalleries ? Gallery::where('category', 'minibus')->count() : 0,
-            'galleries_mediumbus' => $hasGalleries ? Gallery::where('category', 'mediumbus')->count() : 0,
-            'galleries_bigbus' => $hasGalleries ? Gallery::where('category', 'bigbus')->count() : 0,
+            'gallery_breakdown' => $galleryBreakdown->all(),
             'packages_total' => $hasPackages ? RentalPackage::count() : 0,
             'packages_active' => $hasPackages ? RentalPackage::where('is_active', true)->count() : 0,
             'packages_liburan' => $hasPackages ? RentalPackage::where('type', 'liburan')->count() : 0,

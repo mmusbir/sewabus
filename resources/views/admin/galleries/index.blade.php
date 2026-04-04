@@ -7,7 +7,7 @@
 <div class="flex justify-between items-center mb-6">
     <h3 class="text-lg font-bold">Daftar Armada</h3>
     <a href="{{ route('admin.galleries.create') }}" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors shadow-lg shadow-primary/20">
-        <span class="material-symbols-outlined text-sm">add</span>
+        <x-fa-icon name="plus" class="fa-fw text-sm" />
         Tambah Armada
     </a>
 </div>
@@ -18,6 +18,7 @@
             <tr class="border-b border-slate-200 dark:border-slate-700">
                 <th class="py-3 px-4 font-bold text-sm text-slate-500">Gambar</th>
                 <th class="py-3 px-4 font-bold text-sm text-slate-500">Nama Armada</th>
+                <th class="py-3 px-4 font-bold text-sm text-slate-500">PO</th>
                 <th class="py-3 px-4 font-bold text-sm text-slate-500">Kategori</th>
                 <th class="py-3 px-4 font-bold text-sm text-slate-500">Jumlah Unit</th>
                 <th class="py-3 px-4 font-bold text-sm text-slate-500">Status</th>
@@ -31,9 +32,15 @@
                         <img src="{{ $gallery->image_path }}" alt="{{ $gallery->title }}" class="h-16 w-24 object-cover rounded-lg border border-slate-200">
                     </td>
                     <td class="py-3 px-4 font-bold text-sm">{{ $gallery->title }}</td>
+                    <td class="py-3 px-4 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                        {{ gallery_po_label($gallery->po_key, '-') }}
+                    </td>
                     <td class="py-3 px-4">
-                        <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                            {{ ucfirst($gallery->category) }}
+                        <span @class([
+                            'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-white',
+                            gallery_category_badge_class($gallery->category),
+                        ])>
+                            {{ gallery_category_label($gallery->category, $gallery->category) }}
                         </span>
                     </td>
                     <td class="py-3 px-4 text-sm font-semibold text-slate-700 dark:text-slate-200">
@@ -55,13 +62,13 @@
                     <td class="py-3 px-4 text-right">
                         <div class="flex items-center justify-end gap-2">
                             <a href="{{ route('admin.galleries.edit', $gallery) }}" class="p-2 text-secondary hover:bg-secondary/10 rounded-lg transition-colors" title="Edit">
-                                <span class="material-symbols-outlined text-sm">edit</span>
+                                <x-fa-icon name="pen-to-square" class="fa-fw text-sm" />
                             </a>
                             <form action="{{ route('admin.galleries.destroy', $gallery) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus armada ini?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Hapus">
-                                    <span class="material-symbols-outlined text-sm">delete</span>
+                                    <x-fa-icon name="trash" class="fa-fw text-sm" />
                                 </button>
                             </form>
                         </div>
@@ -69,7 +76,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="py-8 text-center text-slate-500 text-sm">Belum ada armada yang ditambahkan.</td>
+                    <td colspan="7" class="py-8 text-center text-slate-500 text-sm">Belum ada armada yang ditambahkan.</td>
                 </tr>
             @endforelse
         </tbody>

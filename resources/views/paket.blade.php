@@ -13,8 +13,7 @@
 <link rel="icon" type="image/x-icon" href="{{ setting('favicon', '/favicon.ico') }}">
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+@include('partials.fontawesome')
 <style>
         :root {
             --color-primary: 225 106 55;
@@ -66,10 +65,10 @@
                     <h2 class="text-xl font-bold mb-2 text-slate-900 dark:text-slate-100">{{ $package->title }}</h2>
                     <div class="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400 mb-4">
                         @if($package->price_label)
-                            <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-base text-primary">payments</span>{{ $package->price_label }}</span>
+                            <span class="inline-flex items-center gap-1"><x-fa-icon name="wallet" class="fa-fw text-base text-primary" />{{ $package->price_label }}</span>
                         @endif
                         @if($package->duration)
-                            <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-base text-primary">schedule</span>{{ $package->duration }}</span>
+                            <span class="inline-flex items-center gap-1"><x-fa-icon name="clock" style="regular" class="fa-fw text-base text-primary" />{{ $package->duration }}</span>
                         @endif
                     </div>
                     <p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-3 mb-4">{{ $package->description ?: 'Deskripsi paket belum tersedia.' }}</p>
@@ -78,7 +77,7 @@
                         <ul class="space-y-1 mb-5">
                             @foreach(array_slice($includeItems, 0, 3) as $includeItem)
                                 <li class="text-sm text-slate-600 dark:text-slate-300 flex items-start gap-2">
-                                    <span class="material-symbols-outlined text-primary text-sm mt-0.5">check_circle</span>
+                                    <x-fa-icon name="circle-check" class="fa-fw text-primary text-sm mt-0.5" />
                                     <span>{{ $includeItem }}</span>
                                 </li>
                             @endforeach
@@ -87,7 +86,7 @@
 
                     <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', setting('social_whatsapp_number', '')) }}?text={{ urlencode('Halo Admin, saya tertarik dengan ' . $package->title) }}" target="_blank" class="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
                         Konsultasi Paket
-                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        <x-fa-icon name="arrow-right" class="fa-fw text-sm" />
                     </a>
                 </div>
             </article>

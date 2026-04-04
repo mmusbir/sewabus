@@ -11,6 +11,7 @@ class Gallery extends Model
     protected $fillable = [
         'title',
         'image_path',
+        'po_key',
         'category',
         'description',
         'facilities',
@@ -22,6 +23,11 @@ class Gallery extends Model
         'unit_count' => 'integer',
         'is_active' => 'boolean',
     ];
+
+    public function getImagePathAttribute(?string $value): ?string
+    {
+        return media_url($value);
+    }
 
     public function media(): HasMany
     {

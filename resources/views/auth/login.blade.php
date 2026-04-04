@@ -7,6 +7,7 @@
     <title>Login - {{ setting('site_name', config('app.name', 'Laravel')) }}</title>
     <link rel="icon" type="image/x-icon" href="{{ setting('favicon', '/favicon.ico') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.fontawesome')
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-size: 14px; }
@@ -44,9 +45,7 @@
                             <div>
                                 <label for="email" class="mb-2 block text-sm font-bold text-slate-900">Username</label>
                                 <div class="flex items-center rounded-xl border border-slate-300 bg-slate-50 px-3">
-                                    <svg class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.75 6.75a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.118a7.5 7.5 0 1 1 15 0A17.933 17.933 0 0 1 12 21.75a17.933 17.933 0 0 1-7.5-1.632Z" />
-                                    </svg>
+                                    <x-fa-icon name="user" class="text-slate-500" />
                                     <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus autocomplete="username" placeholder="Username" class="w-full border-0 bg-transparent px-3 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:ring-0">
                                 </div>
                             </div>
@@ -54,18 +53,11 @@
                             <div>
                                 <label for="password" class="mb-2 block text-sm font-bold text-slate-900">Password</label>
                                 <div class="flex items-center rounded-xl border border-slate-300 bg-slate-50 px-3">
-                                    <svg class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-1.5 0h12a1.5 1.5 0 0 1 1.5 1.5v7.5a1.5 1.5 0 0 1-1.5 1.5H6a1.5 1.5 0 0 1-1.5-1.5V12a1.5 1.5 0 0 1 1.5-1.5Z" />
-                                    </svg>
+                                    <x-fa-icon name="lock" class="text-slate-500" />
                                     <input id="password" name="password" x-bind:type="showPassword ? 'text' : 'password'" required autocomplete="current-password" placeholder="Password" class="w-full border-0 bg-transparent px-3 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:ring-0">
                                     <button type="button" @click="showPassword = !showPassword" class="-mr-1 rounded-lg p-2 text-slate-500 hover:bg-slate-200/70" aria-label="Show password">
-                                        <svg x-show="!showPassword" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5.25 12 5.25S20.268 7.943 21.542 12c-1.274 4.057-5.065 6.75-9.542 6.75S3.732 16.057 2.458 12Z" />
-                                            <circle cx="12" cy="12" r="3" stroke-width="2"></circle>
-                                        </svg>
-                                        <svg x-show="showPassword" x-cloak class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m3 3 18 18M10.585 10.586A2 2 0 0 0 13.414 13.414M9.363 5.365A9.97 9.97 0 0 1 12 5.25c4.477 0 8.268 2.693 9.542 6.75a11.12 11.12 0 0 1-4.03 5.568M6.228 6.228A11.2 11.2 0 0 0 2.458 12c1.274 4.057 5.065 6.75 9.542 6.75a9.96 9.96 0 0 0 5.305-1.522" />
-                                        </svg>
+                                        <x-fa-icon name="eye" class="text-base" x-show="!showPassword" />
+                                        <x-fa-icon name="eye-slash" class="text-base" x-show="showPassword" x-cloak />
                                     </button>
                                 </div>
                             </div>

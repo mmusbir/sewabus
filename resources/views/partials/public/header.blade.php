@@ -24,7 +24,7 @@
 
             @if(setting('header_logo_show_text', true) && !($headerLogoLight || $headerLogoDark))
                 <div class="text-primary mr-3">
-                    <span class="material-symbols-outlined text-4xl">directions_bus</span>
+                    <x-fa-icon name="bus" class="fa-fw text-4xl" />
                 </div>
                 <h2 class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">{{ setting('header_logo_text', 'BusPariwisata') }}</h2>
             @endif
@@ -57,16 +57,16 @@
             <button type="button" class="hidden md:inline-flex items-center" @click="darkMode = !darkMode; applyTheme()" aria-label="Toggle dark mode">
                 <span class="relative inline-flex h-8 w-16 items-center rounded-full border border-slate-200 bg-white shadow-inner transition-colors" :class="darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'">
                     <span class="absolute left-1.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-slate-500" :class="darkMode ? 'text-slate-200' : 'text-slate-500'">
-                        <span class="material-symbols-outlined text-[12px] leading-none">light_mode</span>
+                        <x-fa-icon name="sun" style="regular" class="fa-fw text-[12px] leading-none" />
                     </span>
                     <span class="absolute right-1.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-slate-200" :class="darkMode ? 'text-slate-200' : 'text-slate-400'">
-                        <span class="material-symbols-outlined text-[12px] leading-none">dark_mode</span>
+                        <x-fa-icon name="moon" style="regular" class="fa-fw text-[12px] leading-none" />
                     </span>
                     <span class="inline-block h-6 w-6 transform rounded-full bg-white shadow transition-transform" :class="darkMode ? 'translate-x-8 bg-slate-200' : 'translate-x-1 bg-white'"></span>
                 </span>
             </button>
             <button type="button" class="md:hidden text-slate-900 dark:text-slate-100" @click="open = !open" aria-label="Toggle menu" :aria-expanded="open">
-                <span class="material-symbols-outlined">menu</span>
+                <x-fa-icon name="bars" class="fa-fw" />
             </button>
         </div>
     </div>
@@ -100,16 +100,16 @@
                     <button type="button" class="inline-flex items-center" @click="darkMode = !darkMode; applyTheme()" aria-label="Toggle dark mode">
                         <span class="relative inline-flex h-8 w-16 items-center rounded-full border border-slate-200 bg-white shadow-inner transition-colors" :class="darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'">
                             <span class="absolute left-1.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-slate-500" :class="darkMode ? 'text-slate-200' : 'text-slate-500'">
-                                <span class="material-symbols-outlined text-[12px] leading-none">light_mode</span>
+                                <x-fa-icon name="sun" style="regular" class="fa-fw text-[12px] leading-none" />
                             </span>
                             <span class="absolute right-1.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-slate-200" :class="darkMode ? 'text-slate-200' : 'text-slate-400'">
-                                <span class="material-symbols-outlined text-[12px] leading-none">dark_mode</span>
+                                <x-fa-icon name="moon" style="regular" class="fa-fw text-[12px] leading-none" />
                             </span>
                             <span class="inline-block h-6 w-6 transform rounded-full bg-white shadow transition-transform" :class="darkMode ? 'translate-x-8 bg-slate-200' : 'translate-x-1 bg-white'"></span>
                         </span>
                     </button>
                     <button type="button" class="inline-flex items-center justify-center rounded-full border border-slate-300 dark:border-slate-700 p-3 text-slate-700 dark:text-slate-200" @click="open = false" aria-label="Close menu">
-                        <span class="material-symbols-outlined">close</span>
+                        <x-fa-icon name="xmark" class="fa-fw" />
                     </button>
                 </div>
             </div>

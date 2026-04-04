@@ -10,46 +10,18 @@ class KatalogController extends Controller
 {
     public function index(Request $request)
     {
-        $categoryTabs = [
-            'all' => 'Semua',
-            'minibus' => 'Minibus',
-            'mediumbus' => 'Mediumbus',
-            'bigbus' => 'Bigbus',
-        ];
+        $categoryConfigs = gallery_category_list();
+        $categoryTabs = gallery_category_tabs();
+        $facilityOptions = catalog_facilities();
 
-        $facilityOptions = [
-            'ac_wifi' => [
-                'label' => 'AC & WiFi',
-                'keywords' => ['ac', 'wifi'],
-            ],
-            'toilet' => [
-                'label' => 'Toilet',
-                'keywords' => ['toilet'],
-            ],
-            'entertainment_tv' => [
-                'label' => 'Entertainment (TV)',
-                'keywords' => ['tv', 'entertainment', 'karaoke'],
-            ],
-            'smoking_area' => [
-                'label' => 'Smoking Area',
-                'keywords' => ['smoking', 'merokok'],
-            ],
-        ];
-
-        $seatOptions = [
-            'lt20' => [
-                'label' => '< 20 Kursi',
-                'categories' => ['minibus'],
-            ],
-            'between20_40' => [
-                'label' => '20 - 40 Kursi',
-                'categories' => ['mediumbus'],
-            ],
-            'gt40' => [
-                'label' => '> 40 Kursi',
-                'categories' => ['bigbus'],
-            ],
-        ];
+        $seatOptions = collect($categoryConfigs)
+            ->mapWithKeys(fn (array $category) => [
+                $category['key'] => [
+                    'label' => $category['description'] ?: $category['label'],
+                    'categories' => [$category['key']],
+                ],
+            ])
+            ->all();
 
         $selectedCategory = $request->query('category', 'all');
         if (!array_key_exists($selectedCategory, $categoryTabs)) {

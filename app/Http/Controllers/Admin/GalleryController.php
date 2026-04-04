@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Gallery;
 use App\Models\GalleryMedia;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class GalleryController extends Controller
@@ -25,7 +25,11 @@ class GalleryController extends Controller
      */
     public function create()
     {
-        return view('admin.galleries.create');
+        $categories = gallery_category_list();
+        $poOptions = gallery_po_list();
+        $facilityOptions = catalog_facility_list();
+
+        return view('admin.galleries.create', compact('categories', 'poOptions', 'facilityOptions'));
     }
 
     /**
@@ -35,13 +39,16 @@ class GalleryController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'category' => 'required|string|in:minibus,mediumbus,bigbus',
+            'po_key' => ['required', 'string', Rule::in(gallery_po_keys())],
+            'category' => ['required', 'string', Rule::in(gallery_category_keys())],
             'unit_count' => 'required|integer|min:1|max:999',
             'images' => 'required|array|min:1|max:6',
             'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:4096',
             'video' => 'nullable|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/webm|max:20480',
             'description' => 'nullable|string',
-            'facilities' => 'nullable|string',
+            'facility_keys' => 'nullable|array',
+            'facility_keys.*' => ['string', Rule::in(array_keys(catalog_facilities()))],
+            'facility_custom' => 'nullable|string',
             'is_active' => 'nullable|boolean',
         ], [
             'images.required' => 'Minimal 1 foto armada wajib diunggah.',
@@ -52,6 +59,11 @@ class GalleryController extends Controller
 
         $validated['is_active'] = $request->boolean('is_active', true);
         $validated['image_path'] = '';
+        $validated['facilities'] = combine_gallery_facilities(
+            (array) $request->input('facility_keys', []),
+            $request->input('facility_custom')
+        );
+        unset($validated['facility_keys'], $validated['facility_custom']);
 
         $gallery = Gallery::create($validated);
 
@@ -71,7 +83,11 @@ class GalleryController extends Controller
     public function edit(Gallery $gallery)
     {
         $gallery->load('images', 'video');
-        return view('admin.galleries.edit', compact('gallery'));
+        $categories = gallery_category_list();
+        $poOptions = gallery_po_list();
+        $facilityOptions = catalog_facility_list();
+
+        return view('admin.galleries.edit', compact('gallery', 'categories', 'poOptions', 'facilityOptions'));
     }
 
     /**
@@ -81,15 +97,21 @@ class GalleryController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'category' => 'required|string|in:minibus,mediumbus,bigbus',
+            'po_key' => ['required', 'string', Rule::in(gallery_po_keys())],
+            'category' => ['required', 'string', Rule::in(gallery_category_keys())],
             'unit_count' => 'required|integer|min:1|max:999',
             'images' => 'nullable|array|max:6',
             'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:4096',
             'replace_images' => 'nullable|boolean',
+            'remove_image_ids' => 'nullable|array',
+            'remove_image_ids.*' => 'integer',
+            'cover_image_id' => 'nullable|integer',
             'video' => 'nullable|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/webm|max:20480',
             'remove_video' => 'nullable|boolean',
             'description' => 'nullable|string',
-            'facilities' => 'nullable|string',
+            'facility_keys' => 'nullable|array',
+            'facility_keys.*' => ['string', Rule::in(array_keys(catalog_facilities()))],
+            'facility_custom' => 'nullable|string',
             'is_active' => 'nullable|boolean',
         ], [
             'images.max' => 'Maksimal 6 foto armada.',
@@ -101,16 +123,49 @@ class GalleryController extends Controller
 
         $newImages = $request->file('images', []);
         $replaceImages = (bool) $request->boolean('replace_images');
+        $removeImageIds = collect($request->input('remove_image_ids', []))
+            ->map(fn ($id) => (int) $id)
+            ->filter()
+            ->unique()
+            ->values();
+        $existingImageIds = $gallery->images->pluck('id');
+        $invalidRemoveIds = $removeImageIds->diff($existingImageIds);
+        if ($invalidRemoveIds->isNotEmpty()) {
+            throw ValidationException::withMessages([
+                'remove_image_ids' => 'Ada foto yang tidak valid untuk dihapus.',
+            ]);
+        }
+
+        $coverImageId = $request->filled('cover_image_id') ? (int) $request->input('cover_image_id') : null;
+        if ($coverImageId !== null && ! $existingImageIds->contains($coverImageId)) {
+            throw ValidationException::withMessages([
+                'cover_image_id' => 'Pilihan sampul galeri tidak valid.',
+            ]);
+        }
+
         $existingImageCount = $gallery->images->count();
         $incomingCount = is_array($newImages) ? count($newImages) : 0;
+        $remainingExistingCount = $replaceImages ? 0 : max(0, $existingImageCount - $removeImageIds->count());
+        $finalImageCount = $remainingExistingCount + $incomingCount;
 
-        if (!$replaceImages && ($existingImageCount + $incomingCount) > 6) {
+        if ($finalImageCount > 6) {
             throw ValidationException::withMessages([
                 'images' => 'Total foto melebihi batas maksimal 6. Gunakan mode ganti semua foto atau kurangi jumlah upload.',
             ]);
         }
 
+        if ($finalImageCount < 1) {
+            throw ValidationException::withMessages([
+                'images' => 'Galeri armada minimal harus memiliki 1 foto. Pilih foto yang tetap disimpan atau upload foto baru.',
+            ]);
+        }
+
         $validated['is_active'] = $request->boolean('is_active');
+        $validated['facilities'] = combine_gallery_facilities(
+            (array) $request->input('facility_keys', []),
+            $request->input('facility_custom')
+        );
+        unset($validated['replace_images'], $validated['remove_image_ids'], $validated['cover_image_id'], $validated['remove_video'], $validated['facility_keys'], $validated['facility_custom']);
         $gallery->update($validated);
 
         $this->syncGalleryMedia(
@@ -118,7 +173,9 @@ class GalleryController extends Controller
             newImages: is_array($newImages) ? $newImages : [],
             videoFile: $request->file('video'),
             replaceImages: $replaceImages,
-            removeVideo: (bool) $request->boolean('remove_video')
+            removeVideo: (bool) $request->boolean('remove_video'),
+            removeImageIds: $removeImageIds->all(),
+            coverImageId: $coverImageId
         );
 
         return redirect()->route('admin.galleries.index')->with('success', 'Galeri berhasil diperbarui.');
@@ -132,17 +189,17 @@ class GalleryController extends Controller
         $gallery->load('media');
 
         $pathsToDelete = [];
-        if ($gallery->image_path) {
-            $pathsToDelete[] = str_replace('/storage/', '', $gallery->image_path);
+        if ($gallery->getRawOriginal('image_path')) {
+            $pathsToDelete[] = $gallery->getRawOriginal('image_path');
         }
 
         foreach ($gallery->media as $media) {
-            $pathsToDelete[] = str_replace('/storage/', '', $media->media_path);
+            $pathsToDelete[] = $media->getRawOriginal('media_path');
         }
 
         $pathsToDelete = array_values(array_unique(array_filter($pathsToDelete)));
         if (!empty($pathsToDelete)) {
-            Storage::disk('public')->delete($pathsToDelete);
+            delete_media($pathsToDelete);
         }
 
         $gallery->media()->delete();
@@ -170,14 +227,21 @@ class GalleryController extends Controller
         array $newImages = [],
         mixed $videoFile = null,
         bool $replaceImages = false,
-        bool $removeVideo = false
+        bool $removeVideo = false,
+        array $removeImageIds = [],
+        ?int $coverImageId = null
     ): void {
         $gallery->load('images', 'video');
 
         if ($replaceImages) {
             foreach ($gallery->images as $imageMedia) {
-                $oldPath = str_replace('/storage/', '', $imageMedia->media_path);
-                Storage::disk('public')->delete($oldPath);
+                delete_media($imageMedia->getRawOriginal('media_path'));
+                $imageMedia->delete();
+            }
+            $gallery->unsetRelation('images');
+        } elseif ($removeImageIds !== []) {
+            foreach ($gallery->images->whereIn('id', $removeImageIds) as $imageMedia) {
+                delete_media($imageMedia->getRawOriginal('media_path'));
                 $imageMedia->delete();
             }
             $gallery->unsetRelation('images');
@@ -190,13 +254,13 @@ class GalleryController extends Controller
             if ($currentImageCount >= 6) {
                 break;
             }
-            $imagePath = $imageFile->store('galleries', 'public');
+            $imagePath = store_media($imageFile, 'galleries');
             $sortOrder++;
 
             GalleryMedia::create([
                 'gallery_id' => $gallery->id,
                 'type' => 'image',
-                'media_path' => '/storage/' . $imagePath,
+                'media_path' => $imagePath,
                 'sort_order' => $sortOrder,
             ]);
 
@@ -205,32 +269,41 @@ class GalleryController extends Controller
 
         $existingVideo = $gallery->video()->first();
         if ($removeVideo && $existingVideo) {
-            $oldPath = str_replace('/storage/', '', $existingVideo->media_path);
-            Storage::disk('public')->delete($oldPath);
+            delete_media($existingVideo->getRawOriginal('media_path'));
             $existingVideo->delete();
             $existingVideo = null;
         }
 
         if ($videoFile) {
             if ($existingVideo) {
-                $oldPath = str_replace('/storage/', '', $existingVideo->media_path);
-                Storage::disk('public')->delete($oldPath);
+                delete_media($existingVideo->getRawOriginal('media_path'));
                 $existingVideo->delete();
             }
 
-            $videoPath = $videoFile->store('galleries', 'public');
+            $videoPath = store_media($videoFile, 'galleries');
             GalleryMedia::create([
                 'gallery_id' => $gallery->id,
                 'type' => 'video',
-                'media_path' => '/storage/' . $videoPath,
+                'media_path' => $videoPath,
                 'sort_order' => 0,
             ]);
         }
 
-        $cover = $gallery->images()->orderBy('sort_order')->first();
-        if ($cover) {
-            $gallery->image_path = $cover->media_path;
-            $gallery->save();
+        $cover = null;
+        if (! $replaceImages && $coverImageId !== null && ! in_array($coverImageId, $removeImageIds, true)) {
+            $cover = $gallery->images()->whereKey($coverImageId)->first();
         }
+
+        if (! $cover) {
+            $cover = $gallery->images()->orderBy('sort_order')->first();
+        }
+
+        if ($cover) {
+            $gallery->image_path = $cover->getRawOriginal('media_path');
+        } else {
+            $gallery->image_path = '';
+        }
+
+        $gallery->save();
     }
 }

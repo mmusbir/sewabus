@@ -1,0 +1,97 @@
+name: Laravel CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Run tests on PHP
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: sewabus_test
+        ports:
+          - 5432:5432
+        options: >
+          --health-cmd "pg_isready -U postgres -d sewabus_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v4
+        with:
+          php-version: 8.2
+          extensions: mbstring, pdo_pgsql, tokenizer, xml, bcmath, curl
+          coverage: none
+
+      - name: Verify composer auth
+        run: composer --version
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest --no-interaction
+
+      - name: Copy .env
+        run: cp .env.example .env
+
+      - name: Set database config for testing
+        run: |
+          php -r "file_put_contents('.env', str_replace(['DB_CONNECTION=mysql','DB_HOST=127.0.0.1','DB_PORT=3306','DB_DATABASE=sewabus_db','DB_USERNAME=root','DB_PASSWORD='],['DB_CONNECTION=pgsql','DB_HOST=localhost','DB_PORT=5432','DB_DATABASE=sewabus_test','DB_USERNAME=postgres','DB_PASSWORD=password'], file_get_contents('.env')));"
+
+      - name: Generate key
+        run: php artisan key:generate --ansi
+
+      - name: Run migrations
+        run: php artisan migrate --force --no-interaction
+
+      - name: Run tests
+        run: vendor/bin/phpunit --testdox
+
+  deploy:
+    name: Deploy to Supabase (manual/cron)
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v4
+        with:
+          php-version: 8.2
+          extensions: mbstring, pdo_pgsql, tokenizer, xml, bcmath, curl
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest --no-interaction
+
+      - name: Copy .env
+        run: cp .env.example .env
+
+      - name: Set Supabase database env
+        run: |
+          php -r "file_put_contents('.env', str_replace(['DB_CONNECTION=mysql','DB_HOST=127.0.0.1','DB_PORT=3306','DB_DATABASE=sewabus_db','DB_USERNAME=root','DB_PASSWORD='],['DB_CONNECTION=pgsql','DB_HOST=' . getenv('SUPABASE_DB_HOST'),'DB_PORT=5432','DB_DATABASE=' . getenv('SUPABASE_DB_NAME'),'DB_USERNAME=' . getenv('SUPABASE_DB_USER'),'DB_PASSWORD=' . getenv('SUPABASE_DB_PASSWORD')], file_get_contents('.env')));"
+        env:
+          SUPABASE_DB_HOST: ${{ secrets.SUPABASE_DB_HOST }}
+          SUPABASE_DB_NAME: ${{ secrets.SUPABASE_DB_NAME }}
+          SUPABASE_DB_USER: ${{ secrets.SUPABASE_DB_USER }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+
+      - name: Set APP_KEY
+        run: php artisan key:generate --ansi
+
+      - name: Run migrations on Supabase
+        run: php artisan migrate --force
+
+      - name: Deploy (placeholder)
+        run: echo "Implement deploy to hosting platform (e.g., fly.io, render, etc.)"

@@ -7,7 +7,7 @@
 <div class="flex justify-between items-center mb-6">
     <h3 class="text-lg font-bold">Daftar Paket</h3>
     <a href="{{ route('admin.rental-packages.create') }}" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors shadow-lg shadow-primary/20">
-        <span class="material-symbols-outlined text-sm">add</span>
+        <x-fa-icon name="plus" class="fa-fw text-sm" />
         Tambah Paket
     </a>
 </div>
@@ -56,13 +56,13 @@
                     <td class="py-3 px-4 text-right">
                         <div class="flex items-center justify-end gap-2">
                             <a href="{{ route('admin.rental-packages.edit', $package) }}" class="p-2 text-secondary hover:bg-secondary/10 rounded-lg transition-colors" title="Edit">
-                                <span class="material-symbols-outlined text-sm">edit</span>
+                                <x-fa-icon name="pen-to-square" class="fa-fw text-sm" />
                             </a>
                             <form action="{{ route('admin.rental-packages.destroy', $package) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus paket ini?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Hapus">
-                                    <span class="material-symbols-outlined text-sm">delete</span>
+                                    <x-fa-icon name="trash" class="fa-fw text-sm" />
                                 </button>
                             </form>
                         </div>

@@ -13,8 +13,7 @@
 <link rel="icon" type="image/x-icon" href="{{ setting('favicon', '/favicon.ico') }}">
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+@include('partials.fontawesome')
 <style>
         :root {
             --color-primary: 225 106 55;
@@ -48,7 +47,7 @@
 
         <div>
             <h3 class="font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
-                <span class="material-symbols-outlined text-primary">filter_list</span> Filter
+                <x-fa-icon name="filter" class="fa-fw text-primary" /> Filter
             </h3>
             <p class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3">Fasilitas</p>
             <div class="space-y-2">

@@ -17,7 +17,7 @@
             <p class="text-xs text-slate-500 mt-1">Kelola akun, role, dan reset password sesuai hak akses.</p>
         </div>
         <a href="{{ route('admin.settings.users.create') }}" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors shadow-lg shadow-primary/20">
-            <span class="material-symbols-outlined text-sm">person_add</span>
+            <x-fa-icon name="user-plus" class="fa-fw text-sm" />
             Tambah Akun
         </a>
     </div>
@@ -55,13 +55,13 @@
                         <td class="py-3 px-4">
                             <div class="flex items-center justify-end gap-2">
                                 <a href="{{ route('admin.settings.users.edit', $user) }}" class="p-2 text-secondary hover:bg-secondary/10 rounded-lg transition-colors" title="Edit">
-                                    <span class="material-symbols-outlined text-sm">edit</span>
+                                    <x-fa-icon name="pen-to-square" class="fa-fw text-sm" />
                                 </a>
 
                                 <form action="{{ route('admin.settings.users.reset-password', $user) }}" method="POST" class="inline-block" onsubmit="return confirm('Reset password akun ini? Password baru akan ditampilkan sekali.');">
                                     @csrf
                                     <button type="submit" class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="Reset Password">
-                                        <span class="material-symbols-outlined text-sm">lock_reset</span>
+                                        <x-fa-icon name="key" class="fa-fw text-sm" />
                                     </button>
                                 </form>
 
@@ -69,7 +69,7 @@
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Hapus">
-                                        <span class="material-symbols-outlined text-sm">delete</span>
+                                        <x-fa-icon name="trash" class="fa-fw text-sm" />
                                     </button>
                                 </form>
                             </div>

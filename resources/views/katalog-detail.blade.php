@@ -14,8 +14,7 @@
     <link rel="icon" type="image/x-icon" href="{{ setting('favicon', '/favicon.ico') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    @include('partials.fontawesome')
     <style>
         :root {
             --color-primary: 225 106 55;
@@ -36,18 +35,14 @@
 @php
     $facilityItems = array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $gallery->facilities ?? '')));
     $imageItems = $gallery->images->pluck('media_path')->filter()->values();
-    $coverImage = $imageItems->first() ?? $gallery->image_path ?? '/stitch_img_bus_shd.jpg';
+    $coverImage = $gallery->image_path ?: ($imageItems->first() ?? '/stitch_img_bus_shd.jpg');
+    $thumbnailItems = $imageItems
+        ->reject(fn ($imageItem) => $imageItem === $coverImage)
+        ->prepend($coverImage)
+        ->filter()
+        ->unique()
+        ->values();
     $videoItem = $gallery->video?->media_path;
-    $categoryLabels = [
-        'minibus' => 'Minibus',
-        'mediumbus' => 'Mediumbus',
-        'bigbus' => 'Bigbus',
-    ];
-    $categoryBadgeClasses = [
-        'minibus' => 'bg-emerald-600',
-        'mediumbus' => 'bg-amber-500',
-        'bigbus' => 'bg-rose-600',
-    ];
     $whatsappNumber = preg_replace('/[^0-9]/', '', setting('social_whatsapp_number', ''));
     $whatsappLink = $whatsappNumber
         ? "https://wa.me/{$whatsappNumber}?text=" . urlencode("Halo Admin, saya tertarik dengan {$gallery->title}. Bisa dibantu detail dan harga?")
@@ -57,7 +52,7 @@
 <main x-data="{ previewOpen: false, previewImage: null }" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
     <div class="mb-6">
         <a href="{{ route('katalog.index') }}" class="text-sm font-semibold text-slate-500 hover:text-primary flex items-center gap-2 w-fit">
-            <span class="material-symbols-outlined text-sm">arrow_back</span>
+            <x-fa-icon name="arrow-left" class="fa-fw text-sm" />
             Kembali ke Katalog
         </a>
     </div>
@@ -65,19 +60,24 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
         <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
             <div class="relative aspect-[16/10]">
-                <div class="absolute top-4 left-4 z-10">
+                <div class="absolute top-4 inset-x-4 z-10 flex items-start justify-between gap-2">
                     <span @class([
                         'text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider',
-                        $categoryBadgeClasses[$gallery->category] ?? 'bg-secondary-green',
+                        gallery_category_badge_class($gallery->category),
                     ])>
-                        {{ $categoryLabels[$gallery->category] ?? $gallery->category }}
+                        {{ gallery_category_label($gallery->category, $gallery->category) }}
                     </span>
+                    @if(filled($gallery->po_key))
+                        <span class="bg-slate-950/75 text-white text-[10px] font-bold px-3 py-1 rounded-full tracking-wide backdrop-blur-sm">
+                            PO {{ gallery_po_label($gallery->po_key, $gallery->po_key) }}
+                        </span>
+                    @endif
                 </div>
                 <button type="button" class="w-full h-full bg-cover bg-center cursor-zoom-in" style="background-image: url('{{ $coverImage }}')" @click="previewOpen = true; previewImage = '{{ $coverImage }}'" aria-label="Preview gambar utama armada"></button>
             </div>
-            @if($imageItems->count() > 1)
+            @if($thumbnailItems->count() > 1)
                 <div class="grid grid-cols-3 gap-2 p-3 border-t border-slate-200 dark:border-slate-800">
-                    @foreach($imageItems->take(6) as $imageItem)
+                    @foreach($thumbnailItems->take(6) as $imageItem)
                         <button type="button" class="aspect-[4/3] rounded-lg border border-slate-200 dark:border-slate-700 bg-cover bg-center cursor-zoom-in" style="background-image: url('{{ $imageItem }}')" @click="previewOpen = true; previewImage = '{{ $imageItem }}'" aria-label="Preview gambar armada"></button>
                     @endforeach
                 </div>
@@ -86,18 +86,21 @@
 
         <div>
             <h1 class="text-3xl lg:text-4xl font-black mb-4">{{ $gallery->title }}</h1>
+            @if(filled($gallery->po_key))
+                <p class="text-sm font-semibold text-primary mb-4">PO {{ gallery_po_label($gallery->po_key, $gallery->po_key) }}</p>
+            @endif
             <p class="text-slate-600 dark:text-slate-300 text-base mb-6 whitespace-pre-line">{{ $gallery->description ?? 'Deskripsi lengkap belum tersedia.' }}</p>
 
             <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 mb-6">
                 <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary">checklist</span>
+                    <x-fa-icon name="list-check" class="fa-fw text-primary" />
                     Fasilitas Armada
                 </h2>
                 @if(count($facilityItems))
                     <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700 dark:text-slate-300">
                         @foreach($facilityItems as $facility)
                             <li class="flex items-start gap-2">
-                                <span class="material-symbols-outlined text-primary text-sm mt-0.5">check_circle</span>
+                                <x-fa-icon name="circle-check" class="fa-fw text-primary text-sm mt-0.5" />
                                 <span>{{ $facility }}</span>
                             </li>
                         @endforeach
@@ -110,7 +113,7 @@
             @if($videoItem)
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 mb-6">
                     <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
-                        <span class="material-symbols-outlined text-primary">play_circle</span>
+                        <x-fa-icon name="circle-play" class="fa-fw text-primary" />
                         Video Armada
                     </h2>
                     <video controls class="w-full rounded-xl bg-black">
@@ -122,13 +125,13 @@
             <div class="flex flex-col sm:flex-row gap-4">
                 @if($whatsappLink)
                     <a href="{{ $whatsappLink }}" target="_blank" class="bg-primary text-white px-6 py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
-                        <span class="material-symbols-outlined text-sm">chat</span>
+                        <x-fa-icon name="whatsapp" style="brands" class="fa-fw text-sm" />
                         Pesan via WhatsApp
                     </a>
                 @endif
                 <a href="{{ route('katalog.index') }}" class="bg-white border border-slate-200 text-slate-700 px-6 py-3 rounded-lg font-bold hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2">
                     Lihat Armada Lainnya
-                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    <x-fa-icon name="arrow-right" class="fa-fw text-sm" />
                 </a>
             </div>
         </div>
@@ -144,7 +147,7 @@
             @keydown.escape.window="previewOpen = false"
         >
             <button type="button" class="absolute top-4 right-4 rounded-full bg-white/20 hover:bg-white/30 text-white p-2" @click="previewOpen = false" aria-label="Tutup preview gambar">
-                <span class="material-symbols-outlined">close</span>
+                <x-fa-icon name="xmark" class="fa-fw" />
             </button>
             <img :src="previewImage" alt="Preview Armada" class="max-h-[90vh] max-w-[92vw] rounded-xl border border-white/20 shadow-2xl object-contain">
         </div>

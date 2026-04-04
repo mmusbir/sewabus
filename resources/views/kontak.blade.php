@@ -13,8 +13,7 @@
 <link rel="icon" type="image/x-icon" href="{{ setting('favicon', '/favicon.ico') }}">
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+@include('partials.fontawesome')
 <style>
         :root {
             --color-primary: 225 106 55;
@@ -64,21 +63,21 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <article class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
             <div class="size-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">
-                <span class="material-symbols-outlined">location_on</span>
+                <x-fa-icon name="location-dot" class="fa-fw" />
             </div>
             <h2 class="font-bold text-lg mb-2">Alamat Kantor</h2>
             <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{{ $contactAddress }}</p>
         </article>
         <article class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
             <div class="size-12 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center mb-4">
-                <span class="material-symbols-outlined">call</span>
+                <x-fa-icon name="phone" class="fa-fw" />
             </div>
             <h2 class="font-bold text-lg mb-2">Telepon</h2>
             <p class="text-sm text-slate-600 dark:text-slate-400">{{ $contactPhone }}</p>
         </article>
         <article class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
             <div class="size-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">
-                <span class="material-symbols-outlined">mail</span>
+                <x-fa-icon name="envelope" class="fa-fw" />
             </div>
             <h2 class="font-bold text-lg mb-2">Email</h2>
             <p class="text-sm text-slate-600 dark:text-slate-400">{{ $contactEmail }}</p>
@@ -90,7 +89,7 @@
             <h2 class="text-xl font-bold mb-4">Kontak Cepat</h2>
             <p class="text-sm text-slate-600 dark:text-slate-400 mb-6">Klik tombol berikut untuk langsung terhubung dengan admin via WhatsApp.</p>
             <a href="{{ $whatsappHref }}" target="_blank" class="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors">
-                <span class="material-symbols-outlined text-sm">chat</span>
+                <x-fa-icon name="whatsapp" style="brands" class="fa-fw text-sm" />
                 Chat via WhatsApp
             </a>
         </section>

@@ -11,8 +11,8 @@
     <title>@yield('title', 'Panel Admin')</title>
     <link rel="icon" type="image/x-icon" href="{{ setting('favicon', '/favicon.ico') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.fontawesome')
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     <style>
         :root {
             --color-primary: 1 128 61;
@@ -25,23 +25,6 @@
         body {
             font-family: 'Inter', sans-serif;
             font-size: 14px;
-        }
-        .material-symbols-outlined {
-            font-family: 'Material Symbols Outlined';
-            font-weight: normal;
-            font-style: normal;
-            font-size: 24px;
-            line-height: 1;
-            letter-spacing: normal;
-            text-transform: none;
-            display: inline-block;
-            white-space: nowrap;
-            word-wrap: normal;
-            direction: ltr;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            text-rendering: optimizeLegibility;
-            font-feature-settings: 'liga';
         }
         [x-cloak] { display: none !important; }
     </style>
@@ -83,31 +66,31 @@
                                 <img src="{{ setting('header_logo_image') }}" alt="Logo Header" class="h-9 object-contain max-w-[150px]">
                             @else
                                 <div class="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-white">
-                                    <span class="material-symbols-outlined text-[20px]">directions_bus</span>
+                                    <x-fa-icon name="bus" class="fa-fw text-[20px]" />
                                 </div>
                                 <span class="font-extrabold tracking-tight" x-show="!sidebarCompact" x-cloak>CahayaBone</span>
                             @endif
                         </a>
 
                         <button type="button" class="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200" @click="sidebarOpen = false" aria-label="Tutup sidebar">
-                            <span class="material-symbols-outlined text-[20px]">close</span>
+                            <x-fa-icon name="xmark" class="fa-fw text-[20px]" />
                         </button>
                     </div>
                 </div>
 
                 <nav class="flex-1 min-h-0 overflow-y-auto space-y-1 pr-1">
                     <a href="{{ route('admin.dashboard') }}" @click="closeSidebarOnMobile()" class="{{ $navBase }} {{ request()->routeIs('admin.dashboard') ? $navActive : $navIdle }}" :class="sidebarCompact ? 'justify-center' : 'gap-3'" title="Dashboard">
-                        <span class="material-symbols-outlined text-[20px]">dashboard</span>
+                        <x-fa-icon name="gauge-high" class="fa-fw text-[20px]" />
                         <span x-show="!sidebarCompact" x-cloak>Dashboard</span>
                     </a>
 
                     <a href="{{ route('admin.galleries.index') }}" @click="closeSidebarOnMobile()" class="{{ $navBase }} {{ request()->routeIs('admin.galleries.*') ? $navActive : $navIdle }}" :class="sidebarCompact ? 'justify-center' : 'gap-3'" title="Galeri Armada">
-                        <span class="material-symbols-outlined text-[20px]">collections</span>
+                        <x-fa-icon name="images" class="fa-fw text-[20px]" />
                         <span x-show="!sidebarCompact" x-cloak>Galeri Armada</span>
                     </a>
 
                     <a href="{{ route('admin.rental-packages.index') }}" @click="closeSidebarOnMobile()" class="{{ $navBase }} {{ request()->routeIs('admin.rental-packages.*') ? $navActive : $navIdle }}" :class="sidebarCompact ? 'justify-center' : 'gap-3'" title="Paket Sewa">
-                        <span class="material-symbols-outlined text-[20px]">travel_explore</span>
+                        <x-fa-icon name="route" class="fa-fw text-[20px]" />
                         <span x-show="!sidebarCompact" x-cloak>Paket Sewa</span>
                     </a>
 
@@ -118,19 +101,34 @@
 
                         @if(auth()->user()->canAccessSettings())
                             <a href="{{ route('admin.settings.index') }}" @click="closeSidebarOnMobile()" class="{{ $navBase }} {{ request()->routeIs('admin.settings.index') ? $navActive : $navIdle }}" :class="sidebarCompact ? 'justify-center' : 'gap-3'" title="General">
-                                <span class="material-symbols-outlined text-[20px]">tune</span>
+                                <x-fa-icon name="sliders" class="fa-fw text-[20px]" />
                                 <span x-show="!sidebarCompact" x-cloak>General</span>
                             </a>
 
+                            <a href="{{ route('admin.settings.categories.index') }}" @click="closeSidebarOnMobile()" class="{{ $navBase }} {{ request()->routeIs('admin.settings.categories.*') ? $navActive : $navIdle }}" :class="sidebarCompact ? 'justify-center' : 'gap-3'" title="Kategori">
+                                <x-fa-icon name="tags" class="fa-fw text-[20px]" />
+                                <span x-show="!sidebarCompact" x-cloak>Kategori</span>
+                            </a>
+
+                            <a href="{{ route('admin.settings.po.index') }}" @click="closeSidebarOnMobile()" class="{{ $navBase }} {{ request()->routeIs('admin.settings.po.*') ? $navActive : $navIdle }}" :class="sidebarCompact ? 'justify-center' : 'gap-3'" title="Nama PO">
+                                <x-fa-icon name="building" class="fa-fw text-[20px]" />
+                                <span x-show="!sidebarCompact" x-cloak>Nama PO</span>
+                            </a>
+
+                            <a href="{{ route('admin.settings.facilities.index') }}" @click="closeSidebarOnMobile()" class="{{ $navBase }} {{ request()->routeIs('admin.settings.facilities.*') ? $navActive : $navIdle }}" :class="sidebarCompact ? 'justify-center' : 'gap-3'" title="Fasilitas">
+                                <x-fa-icon name="list-check" class="fa-fw text-[20px]" />
+                                <span x-show="!sidebarCompact" x-cloak>Fasilitas</span>
+                            </a>
+
                             <a href="{{ route('admin.settings.seo.index') }}" @click="closeSidebarOnMobile()" class="{{ $navBase }} {{ request()->routeIs('admin.settings.seo.*') ? $navActive : $navIdle }}" :class="sidebarCompact ? 'justify-center' : 'gap-3'" title="SEO">
-                                <span class="material-symbols-outlined text-[20px]">query_stats</span>
+                                <x-fa-icon name="chart-line" class="fa-fw text-[20px]" />
                                 <span x-show="!sidebarCompact" x-cloak>SEO</span>
                             </a>
                         @endif
 
                         @if(auth()->user()->canManageUsers())
                             <a href="{{ route('admin.settings.users.index') }}" @click="closeSidebarOnMobile()" class="{{ $navBase }} {{ request()->routeIs('admin.settings.users.*') ? $navActive : $navIdle }}" :class="sidebarCompact ? 'justify-center' : 'gap-3'" title="Manajemen Akun">
-                                <span class="material-symbols-outlined text-[20px]">manage_accounts</span>
+                                <x-fa-icon name="users-gear" class="fa-fw text-[20px]" />
                                 <span x-show="!sidebarCompact" x-cloak>Manajemen Akun</span>
                             </a>
                         @endif
@@ -146,7 +144,7 @@
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="w-full {{ $navBase }} text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800" :class="sidebarCompact ? 'justify-center' : 'gap-3'" title="Keluar">
-                            <span class="material-symbols-outlined text-[20px]">logout</span>
+                            <x-fa-icon name="right-from-bracket" class="fa-fw text-[20px]" />
                             <span class="font-semibold" x-show="!sidebarCompact" x-cloak>Keluar</span>
                         </button>
                     </form>
@@ -158,10 +156,11 @@
             <header class="sticky top-0 z-30 h-16 border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
                 <div class="flex items-center gap-2 min-w-0">
                     <button type="button" class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 md:hidden" @click="sidebarOpen = !sidebarOpen" aria-label="Buka sidebar">
-                        <span class="material-symbols-outlined text-[20px]">menu</span>
+                        <x-fa-icon name="bars" class="fa-fw text-[20px]" />
                     </button>
                     <button type="button" class="hidden md:inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800" @click="toggleCompact()" aria-label="Ringkas sidebar">
-                        <span class="material-symbols-outlined text-[20px]" x-text="sidebarCompact ? 'left_panel_open' : 'left_panel_close'"></span>
+                        <x-fa-icon name="angles-right" class="text-[18px]" x-show="sidebarCompact" x-cloak />
+                        <x-fa-icon name="angles-left" class="text-[18px]" x-show="!sidebarCompact" x-cloak />
                     </button>
                     <h2 class="text-base sm:text-lg font-bold truncate">@yield('header_title')</h2>
                 </div>
@@ -179,7 +178,7 @@
                 <div class="mx-auto w-full max-w-[1280px] space-y-6">
                     @if(session('success'))
                         <div class="rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 px-4 py-3 text-sm font-semibold flex items-center gap-2">
-                            <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                            <x-fa-icon name="circle-check" class="fa-fw text-[18px]" />
                             {{ session('success') }}
                         </div>
                     @endif

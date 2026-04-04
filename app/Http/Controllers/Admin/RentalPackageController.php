@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\RentalPackage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class RentalPackageController extends Controller
 {
@@ -26,8 +25,7 @@ class RentalPackageController extends Controller
         $validated = $this->validateData($request);
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('rental-packages', 'public');
-            $validated['image_path'] = '/storage/' . $path;
+            $validated['image_path'] = store_media($request->file('image'), 'rental-packages');
         }
 
         RentalPackage::create($validated);
@@ -47,12 +45,10 @@ class RentalPackageController extends Controller
 
         if ($request->hasFile('image')) {
             if ($rentalPackage->image_path) {
-                $oldPath = str_replace('/storage/', '', $rentalPackage->image_path);
-                Storage::disk('public')->delete($oldPath);
+                delete_media($rentalPackage->getRawOriginal('image_path'));
             }
 
-            $path = $request->file('image')->store('rental-packages', 'public');
-            $validated['image_path'] = '/storage/' . $path;
+            $validated['image_path'] = store_media($request->file('image'), 'rental-packages');
         }
 
         $rentalPackage->update($validated);
@@ -64,8 +60,7 @@ class RentalPackageController extends Controller
     public function destroy(RentalPackage $rentalPackage)
     {
         if ($rentalPackage->image_path) {
-            $oldPath = str_replace('/storage/', '', $rentalPackage->image_path);
-            Storage::disk('public')->delete($oldPath);
+            delete_media($rentalPackage->getRawOriginal('image_path'));
         }
 
         $rentalPackage->delete();

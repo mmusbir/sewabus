@@ -16,9 +16,16 @@
 /public/build
 /public/hot
 /public/storage
+/bootstrap/cache/*.php
+!/bootstrap/cache/packages.php
+!/bootstrap/cache/services.php
+!/bootstrap/cache/.gitignore
 /storage/*.key
 /storage/pail
 /vendor
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+.vercel
+.vercel.production.env

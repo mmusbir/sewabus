@@ -4,12 +4,15 @@
 @section('header_title', 'Pengaturan SEO')
 
 @section('content')
+@php
+    $seoOgImageUrl = media_url($settings['seo_og_image'] ?? null);
+@endphp
 <form action="{{ route('admin.settings.seo.update') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
     @csrf
 
     <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
         <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary">travel_explore</span>
+            <x-fa-icon name="route" class="fa-fw text-primary" />
             SEO Global
         </h3>
 
@@ -31,8 +34,8 @@
             </div>
             <div class="space-y-2">
                 <label class="text-sm font-bold text-slate-700 dark:text-slate-300">OG Image (Share Preview)</label>
-                @if(!empty($settings['seo_og_image']))
-                    <img src="{{ $settings['seo_og_image'] }}" class="h-24 rounded-lg border border-slate-200 dark:border-slate-700 object-cover">
+                @if($seoOgImageUrl)
+                    <img src="{{ $seoOgImageUrl }}" class="h-24 rounded-lg border border-slate-200 dark:border-slate-700 object-cover">
                 @endif
                 <input type="file" name="seo_og_image" accept="image/png,image/jpeg,image/jpg,image/webp" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20">
                 <p class="text-xs text-slate-500">Format PNG/JPG/WEBP. Maks 4 MB.</p>
@@ -42,7 +45,7 @@
 
     <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
         <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary">article</span>
+            <x-fa-icon name="file-lines" class="fa-fw text-primary" />
             SEO Per Halaman
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

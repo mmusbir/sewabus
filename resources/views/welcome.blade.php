@@ -11,8 +11,7 @@
 <link rel="icon" type="image/x-icon" href="{{ setting('favicon', '/favicon.ico') }}">
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+@include('partials.fontawesome')
 <style>
         :root {
             --color-primary: 225 106 55;
@@ -24,9 +23,6 @@
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
     </style>
 </head>
@@ -65,7 +61,7 @@
 <div class="relative z-10 max-w-3xl">
 <span class="inline-block px-4 py-1.5 mb-6 text-xs font-bold uppercase tracking-widest text-white bg-secondary rounded-full">
 <span class="flex items-center gap-2">
-<span class="material-symbols-outlined text-sm">verified</span>
+<x-fa-icon name="circle-check" class="fa-fw text-sm" />
                                     Layanan Terpercaya &amp; Aman
                                 </span>
 </span>
@@ -85,12 +81,12 @@
                                 </a>
 @if($catalogPdf)
     <a href="{{ $catalogPdf }}" target="_blank" download="COMPRO Cahaya Bone.pdf" class="rounded-lg bg-white/10 backdrop-blur-md border border-white/20 px-8 py-4 text-base font-bold text-white hover:bg-white/20 transition-all inline-flex items-center gap-2">
-        <span class="material-symbols-outlined text-base">download</span>
+        <x-fa-icon name="file-arrow-down" class="fa-fw text-base" />
         Download PDF COMPRO
     </a>
 @else
     <button type="button" class="rounded-lg bg-white/10 backdrop-blur-md border border-white/20 px-8 py-4 text-base font-bold text-white/70 cursor-not-allowed inline-flex items-center gap-2" disabled>
-        <span class="material-symbols-outlined text-base">description</span>
+        <x-fa-icon name="file-lines" class="fa-fw text-base" />
         PDF COMPRO Belum Tersedia
     </button>
 @endif
@@ -114,7 +110,7 @@
 <p class="text-slate-600 dark:text-slate-400">Pilih armada yang sesuai dengan kebutuhan kapasitas dan gaya perjalanan Anda. Semua armada kami dalam kondisi prima.</p>
 </div>
 <a class="text-primary font-bold flex items-center gap-2 hover:underline" href="{{ route('katalog.index') }}">
-                            Lihat Semua Armada <span class="material-symbols-outlined">arrow_forward</span>
+                            Lihat Semua Armada <x-fa-icon name="arrow-right" class="fa-fw" />
 </a>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -137,21 +133,21 @@
 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 <div class="bg-white dark:bg-slate-900 p-8 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
 <div class="size-14 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-6">
-<span class="material-symbols-outlined text-3xl">verified_user</span>
+<x-fa-icon name="shield-halved" class="fa-fw text-3xl" />
 </div>
 <h3 class="text-xl font-bold mb-3">Armada Terawat</h3>
 <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Mesin dan kebersihan kabin selalu dipastikan dalam kondisi prima sebelum berangkat demi kenyamanan Anda.</p>
 </div>
 <div class="bg-white dark:bg-slate-900 p-8 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
 <div class="size-14 bg-secondary/10 rounded-xl flex items-center justify-center text-secondary mb-6">
-<span class="material-symbols-outlined text-3xl">payments</span>
+<x-fa-icon name="wallet" class="fa-fw text-3xl" />
 </div>
 <h3 class="text-xl font-bold mb-3">Harga Kompetitif</h3>
 <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Penawaran harga terbaik dengan transparansi biaya tanpa tambahan tersembunyi. Hemat dan berkualitas.</p>
 </div>
 <div class="bg-white dark:bg-slate-900 p-8 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
 <div class="size-14 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-6">
-<span class="material-symbols-outlined text-3xl">badge</span>
+<x-fa-icon name="id-badge" class="fa-fw text-3xl" />
 </div>
 <h3 class="text-xl font-bold mb-3">Driver Profesional</h3>
 <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Tim pengemudi yang ramah, profesional, berlisensi resmi, dan memahami rute perjalanan dengan sangat baik.</p>
@@ -162,7 +158,7 @@
 <section class="px-6 lg:px-20 py-16">
 <div class="max-w-7xl mx-auto bg-primary rounded-2xl p-10 lg:p-20 flex flex-col lg:flex-row items-center justify-between gap-10 text-white relative overflow-hidden">
 <div class="absolute right-0 top-0 opacity-10">
-<span class="material-symbols-outlined text-[200px]">support_agent</span>
+<x-fa-icon name="headset" class="fa-fw text-[200px]" />
 </div>
 <div class="relative z-10 max-w-xl">
 <h2 class="text-3xl lg:text-5xl font-black mb-6">Siap Merencanakan Perjalanan Anda?</h2>
@@ -171,20 +167,20 @@
 <div class="relative z-10 flex flex-col sm:flex-row gap-3">
 @if($whatsappCtaLink)
 <a href="{{ $whatsappCtaLink }}" target="_blank" rel="noopener" class="bg-white text-primary px-6 py-3 rounded-lg font-bold text-base hover:bg-slate-100 transition-colors inline-flex items-center justify-center gap-2 min-w-[220px]">
-<span class="material-symbols-outlined text-[20px]">chat</span> Hubungi via WhatsApp
+<x-fa-icon name="whatsapp" style="brands" class="fa-fw text-[20px]" /> Hubungi via WhatsApp
                         </a>
 @else
 <button type="button" disabled class="bg-white/70 text-primary/70 px-6 py-3 rounded-lg font-bold text-base inline-flex items-center justify-center gap-2 min-w-[220px] cursor-not-allowed">
-<span class="material-symbols-outlined text-[20px]">chat</span> Hubungi via WhatsApp
+<x-fa-icon name="whatsapp" style="brands" class="fa-fw text-[20px]" /> Hubungi via WhatsApp
                         </button>
 @endif
 @if($phoneCtaLink)
 <a href="{{ $phoneCtaLink }}" class="bg-secondary text-white px-6 py-3 rounded-lg font-bold text-base hover:bg-secondary/90 transition-colors inline-flex items-center justify-center gap-2 min-w-[220px]">
-<span class="material-symbols-outlined text-[20px]">call</span> Telepon Langsung
+<x-fa-icon name="phone" class="fa-fw text-[20px]" /> Telepon Langsung
                         </a>
 @else
 <button type="button" disabled class="bg-secondary/70 text-white/70 px-6 py-3 rounded-lg font-bold text-base inline-flex items-center justify-center gap-2 min-w-[220px] cursor-not-allowed">
-<span class="material-symbols-outlined text-[20px]">call</span> Telepon Langsung
+<x-fa-icon name="phone" class="fa-fw text-[20px]" /> Telepon Langsung
                         </button>
 @endif
 </div>
