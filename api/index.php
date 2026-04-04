@@ -1,7 +1,5 @@
 <?php
 
-define('LARAVEL_START', microtime(true));
-
 $storagePath = sys_get_temp_dir().'/sewabus/storage';
 $compiledViewPath = $storagePath.'/framework/views';
 
