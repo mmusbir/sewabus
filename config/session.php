@@ -2,6 +2,14 @@
 
 use Illuminate\Support\Str;
 
+$defaultSessionDriver = env('SESSION_DRIVER');
+
+if (!is_string($defaultSessionDriver) || trim($defaultSessionDriver) === '') {
+    $defaultSessionDriver = env('VERCEL') ? 'cookie' : 'database';
+} elseif (env('VERCEL') && trim($defaultSessionDriver) === 'database') {
+    $defaultSessionDriver = 'cookie';
+}
+
 return [
 
     /*
@@ -18,7 +26,7 @@ return [
     |
     */
 
-    'driver' => env('SESSION_DRIVER', 'database'),
+    'driver' => $defaultSessionDriver,
 
     /*
     |--------------------------------------------------------------------------
