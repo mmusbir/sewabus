@@ -10,6 +10,7 @@ foreach ([
     $storagePath.'/framework/sessions',
     $compiledViewPath,
     $storagePath.'/logs',
+    $storagePath.'/bootstrap/cache',
 ] as $directory) {
     if (!is_dir($directory)) {
         mkdir($directory, 0777, true);
@@ -23,6 +24,17 @@ $_SERVER['LARAVEL_STORAGE_PATH'] = $storagePath;
 putenv("VIEW_COMPILED_PATH={$compiledViewPath}");
 $_ENV['VIEW_COMPILED_PATH'] = $compiledViewPath;
 $_SERVER['VIEW_COMPILED_PATH'] = $compiledViewPath;
+
+$servicesCachePath = $storagePath.'/bootstrap/cache/services.php';
+putenv("APP_SERVICES_CACHE={$servicesCachePath}");
+$_ENV['APP_SERVICES_CACHE'] = $servicesCachePath;
+$_SERVER['APP_SERVICES_CACHE'] = $servicesCachePath;
+
+$packagesCachePath = $storagePath.'/bootstrap/cache/packages.php';
+putenv("APP_PACKAGES_CACHE={$packagesCachePath}");
+$_ENV['APP_PACKAGES_CACHE'] = $packagesCachePath;
+$_SERVER['APP_PACKAGES_CACHE'] = $packagesCachePath;
+
 
 // Clear expired cache files to prevent stale configuration
 $cacheDataPath = $storagePath.'/framework/cache/data';
