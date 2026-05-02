@@ -90,7 +90,7 @@
                 </div>
             </div>
             <div class="border-t border-slate-200 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-xs text-slate-500">&copy; 2026 Cahaya Bone - Sewa Bus Pariwisata. All Rights Reserved.</p>
+                <p class="text-xs text-slate-500">&copy; 2026 Multibus - Sewa Bus Pariwisata. All Rights Reserved.</p>
                 <div class="flex items-center gap-4">
                     @foreach($socialLinks as $social)
                         <a class="text-slate-400 hover:text-primary transition-colors" href="{{ $social['href'] }}" aria-label="{{ $social['label'] }}" {{ $social['href'] !== '#' ? 'target="_blank" rel="noopener"' : '' }}>
@@ -179,7 +179,7 @@
             </div>
         </div>
         <div class="max-w-7xl mx-auto pt-8 mt-10 border-t border-slate-800 text-center text-xs text-slate-500">
-            &copy; 2026 Cahaya Bone - Sewa Bus Pariwisata. All Rights Reserved.
+            &copy; 2026 Multibus - Sewa Bus Pariwisata. All Rights Reserved.
         </div>
     </footer>
 @endif
