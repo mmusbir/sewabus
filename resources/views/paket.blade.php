@@ -32,6 +32,11 @@
 @include('partials.public.header', ['sticky' => false])
 
 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    @if(!empty($databaseUnavailable))
+        <div class="mb-6 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            Data paket sementara tidak dapat dimuat karena koneksi database sedang bermasalah. Halaman tetap ditampilkan dengan data kosong.
+        </div>
+    @endif
     <div class="mb-10">
         <h1 class="text-4xl font-black text-slate-900 dark:text-slate-100 mb-3">Paket Sewa & Liburan</h1>
         <p class="text-slate-600 dark:text-slate-400 max-w-3xl">Pilih paket perjalanan sesuai kebutuhan. Semua paket dapat disesuaikan dengan jumlah peserta, rute, dan fasilitas armada.</p>

@@ -55,6 +55,8 @@ class SettingController extends Controller
                 'original_key' => $poName['key'],
                 'key' => $poName['key'],
                 'label' => $poName['label'],
+                'bg_color' => $poName['bg_color'] ?? null,
+                'text_color' => $poName['text_color'] ?? null,
             ])
             ->all();
 
@@ -85,8 +87,6 @@ class SettingController extends Controller
             'hero_image_2' => 'nullable|image|mimes:png,jpg,jpeg|max:4096',
             'hero_image_3' => 'nullable|image|mimes:png,jpg,jpeg|max:4096',
             'hero_carousel_interval_seconds' => 'nullable|integer|min:1|max:30',
-            'catalog_pdf' => 'nullable|file|mimes:pdf|max:20480',
-            'catalog_pdf_uploaded_path' => ['nullable', 'string', 'starts_with:settings/', 'regex:/\.pdf$/i'],
             'social_facebook_url' => 'nullable|string',
             'social_instagram_url' => 'nullable|string',
             'social_threads_url' => 'nullable|string',
@@ -106,13 +106,9 @@ class SettingController extends Controller
             'hero_image_1.max' => 'Gambar hero 1 maksimal 4 MB.',
             'hero_image_2.max' => 'Gambar hero 2 maksimal 4 MB.',
             'hero_image_3.max' => 'Gambar hero 3 maksimal 4 MB.',
-            'catalog_pdf.max' => 'PDF katalog maksimal 20 MB.',
-            'catalog_pdf.mimes' => 'File katalog harus berformat PDF.',
         ]);
 
         $existingSettings = Setting::allValues();
-        $catalogPdfUploadedPath = $data['catalog_pdf_uploaded_path'] ?? null;
-        unset($data['catalog_pdf_uploaded_path']);
 
         foreach ($data as $key => $value) {
             if ($request->hasFile($key)) {
@@ -145,11 +141,6 @@ class SettingController extends Controller
             if ($value !== null) {
                 Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             }
-        }
-
-        if (is_string($catalogPdfUploadedPath) && $catalogPdfUploadedPath !== '') {
-            $this->deleteOldFileIfExists($existingSettings['catalog_pdf'] ?? null);
-            Setting::updateOrCreate(['key' => 'catalog_pdf'], ['value' => $catalogPdfUploadedPath]);
         }
 
         Setting::clearRuntimeCache();
@@ -242,6 +233,8 @@ class SettingController extends Controller
                     ->map(fn (array $poName) => [
                         'key' => $poName['key'],
                         'label' => $poName['label'],
+                        'bg_color' => $poName['bg_color'],
+                        'text_color' => $poName['text_color'],
                     ])
                     ->values()
                     ->all(),
@@ -253,64 +246,6 @@ class SettingController extends Controller
         Setting::clearRuntimeCache();
 
         return back()->with('success', 'Nama PO armada berhasil diperbarui!');
-    }
-
-    public function createCatalogPdfUpload(Request $request)
-    {
-        $validated = $request->validate([
-            'filename' => ['required', 'string', 'max:255'],
-            'size' => ['required', 'integer', 'min:1', 'max:20480'],
-            'content_type' => ['nullable', 'string', 'max:100'],
-        ], [
-            'size.max' => 'PDF katalog maksimal 20 MB.',
-        ]);
-
-        $extension = strtolower((string) pathinfo($validated['filename'], PATHINFO_EXTENSION));
-
-        if ($extension !== 'pdf') {
-            return response()->json([
-                'message' => 'File katalog harus berformat PDF.',
-            ], 422);
-        }
-
-        $contentType = strtolower((string) ($validated['content_type'] ?? 'application/pdf'));
-
-        if ($contentType !== '' && $contentType !== 'application/pdf') {
-            return response()->json([
-                'message' => 'Tipe file katalog harus PDF.',
-            ], 422);
-        }
-
-        $disk = Storage::disk(media_disk());
-
-        $fileName = pathinfo($validated['filename'], PATHINFO_FILENAME);
-        $safeFileName = Str::slug($fileName) ?: 'katalog-armada';
-        $path = 'settings/catalogs/'.Str::ulid().'-'.$safeFileName.'.pdf';
-        try {
-            $upload = $disk->temporaryUploadUrl($path, now()->addMinutes(10), [
-                'ContentType' => 'application/pdf',
-            ]);
-        } catch (Throwable) {
-            return response()->json([
-                'message' => 'Direct upload belum tersedia pada storage aktif.',
-            ], 409);
-        }
-
-        $headers = collect($upload['headers'] ?? [])
-            ->mapWithKeys(function ($value, $header) {
-                $normalizedValue = is_array($value) ? implode(', ', $value) : $value;
-
-                return [$header => $normalizedValue];
-            })
-            ->reject(fn ($value, $header) => strtolower((string) $header) === 'host')
-            ->all();
-
-        return response()->json([
-            'path' => $path,
-            'url' => $upload['url'],
-            'headers' => $headers,
-            'public_url' => media_url($path),
-        ]);
     }
 
     private function deleteOldFileIfExists(?string $oldValue): void
@@ -367,9 +302,15 @@ class SettingController extends Controller
             'po_keys.*' => 'nullable|string|max:50',
             'po_labels' => 'nullable|array',
             'po_labels.*' => 'nullable|string|max:100',
+            'po_bg_colors' => 'nullable|array',
+            'po_bg_colors.*' => ['nullable', 'string', 'regex:/^#?[A-Fa-f0-9]{6}$/'],
+            'po_text_colors' => 'nullable|array',
+            'po_text_colors.*' => ['nullable', 'string', 'regex:/^#?[A-Fa-f0-9]{6}$/'],
         ], [
             'po_keys.*.max' => 'Kode PO maksimal 50 karakter.',
             'po_labels.*.max' => 'Nama PO maksimal 100 karakter.',
+            'po_bg_colors.*.regex' => 'Warna background PO harus berupa kode hex 6 digit, misalnya #E16A37.',
+            'po_text_colors.*.regex' => 'Warna teks PO harus berupa kode hex 6 digit, misalnya #FFFFFF.',
         ]);
 
         return $this->buildPoRowsFromRequest($request);
@@ -510,7 +451,9 @@ class SettingController extends Controller
         $originalKeys = (array) $request->input('po_original_keys', []);
         $keys = (array) $request->input('po_keys', []);
         $labels = (array) $request->input('po_labels', []);
-        $rowCount = max(count($originalKeys), count($keys), count($labels));
+        $backgroundColors = (array) $request->input('po_bg_colors', []);
+        $textColors = (array) $request->input('po_text_colors', []);
+        $rowCount = max(count($originalKeys), count($keys), count($labels), count($backgroundColors), count($textColors));
 
         $rows = [];
         $errors = [];
@@ -520,8 +463,10 @@ class SettingController extends Controller
             $originalKey = normalize_gallery_po_key((string) ($originalKeys[$index] ?? ''));
             $key = normalize_gallery_po_key((string) ($keys[$index] ?? ''));
             $label = trim((string) ($labels[$index] ?? ''));
+            $backgroundColor = trim((string) ($backgroundColors[$index] ?? ''));
+            $textColor = trim((string) ($textColors[$index] ?? ''));
 
-            if ($originalKey === '' && $key === '' && $label === '') {
+            if ($originalKey === '' && $key === '' && $label === '' && $backgroundColor === '' && $textColor === '') {
                 continue;
             }
 
@@ -545,6 +490,8 @@ class SettingController extends Controller
                 'original_key' => $originalKey !== '' ? $originalKey : null,
                 'key' => $key,
                 'label' => $label,
+                'bg_color' => normalize_hex_color($backgroundColor),
+                'text_color' => normalize_hex_color($textColor),
             ];
         }
 

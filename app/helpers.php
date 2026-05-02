@@ -193,6 +193,8 @@ if (!function_exists('default_gallery_po_names')) {
             [
                 'key' => 'cahaya-bone',
                 'label' => 'Cahaya Bone',
+                'bg_color' => '#E16A37',
+                'text_color' => '#FFFFFF',
             ],
         ];
     }
@@ -210,10 +212,46 @@ if (!function_exists('normalize_gallery_po_key')) {
     }
 }
 
+if (!function_exists('normalize_hex_color')) {
+    function normalize_hex_color(?string $color): ?string
+    {
+        $color = strtoupper(trim((string) $color));
+
+        if ($color === '') {
+            return null;
+        }
+
+        if (($color[0] ?? '') !== '#') {
+            $color = '#' . ltrim($color, '#');
+        }
+
+        if (!preg_match('/^#[0-9A-F]{6}$/', $color)) {
+            return null;
+        }
+
+        return $color;
+    }
+}
+
 if (!function_exists('gallery_po_list')) {
     function gallery_po_list(): array
     {
         $rawPoNames = \App\Models\Setting::getValue('gallery_po_names');
+        $defaultPoNames = collect(default_gallery_po_names())
+            ->mapWithKeys(function (array $poName) {
+                $key = normalize_gallery_po_key((string) ($poName['key'] ?? ''));
+
+                if ($key === '') {
+                    return [];
+                }
+
+                return [$key => [
+                    'label' => trim((string) ($poName['label'] ?? '')),
+                    'bg_color' => normalize_hex_color($poName['bg_color'] ?? null),
+                    'text_color' => normalize_hex_color($poName['text_color'] ?? null),
+                ]];
+            })
+            ->all();
 
         if (is_string($rawPoNames) && trim($rawPoNames) !== '') {
             $decoded = json_decode($rawPoNames, true);
@@ -237,6 +275,7 @@ if (!function_exists('gallery_po_list')) {
 
             $key = normalize_gallery_po_key((string) ($poName['key'] ?? ''));
             $label = trim((string) ($poName['label'] ?? ''));
+            $defaultPo = $defaultPoNames[$key] ?? [];
 
             if ($key === '' || $label === '' || in_array($key, $usedKeys, true)) {
                 continue;
@@ -246,6 +285,8 @@ if (!function_exists('gallery_po_list')) {
             $poNames[] = [
                 'key' => $key,
                 'label' => $label,
+                'bg_color' => normalize_hex_color($poName['bg_color'] ?? null) ?? ($defaultPo['bg_color'] ?? null),
+                'text_color' => normalize_hex_color($poName['text_color'] ?? null) ?? ($defaultPo['text_color'] ?? null),
             ];
         }
 
@@ -283,6 +324,34 @@ if (!function_exists('gallery_po_label')) {
         }
 
         return ucfirst(str_replace('-', ' ', (string) $key));
+    }
+}
+
+if (!function_exists('gallery_po_badge_colors')) {
+    function gallery_po_badge_colors(): array
+    {
+        $colors = [];
+
+        foreach (gallery_po_list() as $poName) {
+            $colors[$poName['key']] = [
+                'bg' => normalize_hex_color($poName['bg_color'] ?? null),
+                'text' => normalize_hex_color($poName['text_color'] ?? null),
+            ];
+        }
+
+        return $colors;
+    }
+}
+
+if (!function_exists('gallery_po_badge_style')) {
+    function gallery_po_badge_style(?string $key, string $fallbackBackground = '#334155', string $fallbackText = '#FFFFFF'): string
+    {
+        $normalizedKey = normalize_gallery_po_key($key);
+        $colors = gallery_po_badge_colors()[$normalizedKey] ?? null;
+        $background = trim((string) ($colors['bg'] ?? $fallbackBackground));
+        $text = trim((string) ($colors['text'] ?? $fallbackText));
+
+        return sprintf('background-color: %s; color: %s;', $background, $text);
     }
 }
 
@@ -532,7 +601,6 @@ if (!function_exists('media_setting_keys')) {
             'hero_image_1',
             'hero_image_2',
             'hero_image_3',
-            'catalog_pdf',
             'seo_og_image',
         ];
     }

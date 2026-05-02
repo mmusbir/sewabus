@@ -21,15 +21,22 @@ Route::get('/up', function () {
 
 Route::get('/', function () {
     $galleries = collect();
-    if (Schema::hasTable('galleries')) {
-        $query = \App\Models\Gallery::query()->latest()->take(3);
-        if (Schema::hasColumn('galleries', 'is_active')) {
-            $query->where('is_active', true);
+    $databaseUnavailable = false;
+
+    try {
+        if (Schema::hasTable('galleries')) {
+            $query = \App\Models\Gallery::query()->latest()->take(3);
+            if (Schema::hasColumn('galleries', 'is_active')) {
+                $query->where('is_active', true);
+            }
+            $galleries = $query->get();
         }
-        $galleries = $query->get();
+    } catch (\Throwable $exception) {
+        report($exception);
+        $databaseUnavailable = true;
     }
 
-    return view('welcome', compact('galleries'));
+    return view('welcome', compact('galleries', 'databaseUnavailable'));
 })->name('home');
 
 Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog.index');
@@ -82,7 +89,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('/admin/settings/po', [SettingController::class, 'poUpdate'])->name('admin.settings.po.update');
         Route::get('/admin/settings/facilities', [SettingController::class, 'facilityIndex'])->name('admin.settings.facilities.index');
         Route::post('/admin/settings/facilities', [SettingController::class, 'facilityUpdate'])->name('admin.settings.facilities.update');
-        Route::post('/admin/settings/catalog-pdf/upload-url', [SettingController::class, 'createCatalogPdfUpload'])->name('admin.settings.catalog-pdf.upload-url');
         Route::get('/admin/settings/seo', [AdminSeoController::class, 'index'])->name('admin.settings.seo.index');
         Route::post('/admin/settings/seo', [AdminSeoController::class, 'update'])->name('admin.settings.seo.update');
     });

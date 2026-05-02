@@ -12,7 +12,10 @@
                 {{ gallery_category_label($gallery->category, $gallery->category) }}
             </span>
             @if(filled($gallery->po_key))
-                <span class="bg-slate-950/75 text-white text-[10px] font-bold px-3 py-1 rounded-full tracking-wide backdrop-blur-sm">
+                <span
+                    class="text-[10px] font-bold px-3 py-1 rounded-full tracking-wide shadow-lg shadow-slate-950/10"
+                    style="{{ gallery_po_badge_style($gallery->po_key) }}"
+                >
                     PO {{ gallery_po_label($gallery->po_key, $gallery->po_key) }}
                 </span>
             @endif

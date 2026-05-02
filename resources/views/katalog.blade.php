@@ -31,6 +31,11 @@
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
 @include('partials.public.header', ['sticky' => false])
 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+@if(!empty($databaseUnavailable))
+<div class="mb-6 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+    Katalog sementara tidak dapat mengambil data terbaru karena koneksi database sedang bermasalah. Halaman tetap ditampilkan dengan data kosong.
+</div>
+@endif
 <div class="mb-8">
 <h2 class="text-4xl font-black text-slate-900 dark:text-slate-100 mb-2">Katalog Semua Armada</h2>
 <p class="text-slate-600 dark:text-slate-400 max-w-2xl">Temukan pilihan armada bus pariwisata terbaik dengan berbagai kapasitas dan fasilitas untuk menunjang kenyamanan perjalanan Anda.</p>

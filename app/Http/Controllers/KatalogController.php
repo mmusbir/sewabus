@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Gallery;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Schema;
+use Throwable;
 
 class KatalogController extends Controller
 {
@@ -13,6 +15,7 @@ class KatalogController extends Controller
         $categoryConfigs = gallery_category_list();
         $categoryTabs = gallery_category_tabs();
         $facilityOptions = catalog_facilities();
+        $databaseUnavailable = false;
 
         $seatOptions = collect($categoryConfigs)
             ->mapWithKeys(fn (array $category) => [
@@ -40,39 +43,54 @@ class KatalogController extends Controller
 
         $searchTerm = trim((string) $request->query('q', ''));
 
-        $query = Gallery::with('images')->latest();
-        if (Schema::hasColumn('galleries', 'is_active')) {
-            $query->where('is_active', true);
-        }
+        try {
+            $query = Gallery::with('images')->latest();
+            if (Schema::hasColumn('galleries', 'is_active')) {
+                $query->where('is_active', true);
+            }
 
-        if ($selectedCategory !== 'all') {
-            $query->where('category', $selectedCategory);
-        }
+            if ($selectedCategory !== 'all') {
+                $query->where('category', $selectedCategory);
+            }
 
-        if ($selectedSeats) {
-            $query->whereIn('category', $seatOptions[$selectedSeats]['categories']);
-        }
+            if ($selectedSeats) {
+                $query->whereIn('category', $seatOptions[$selectedSeats]['categories']);
+            }
 
-        if ($searchTerm !== '') {
-            $query->where(function ($subQuery) use ($searchTerm) {
-                $subQuery->where('title', 'like', "%{$searchTerm}%")
-                    ->orWhere('description', 'like', "%{$searchTerm}%")
-                    ->orWhere('facilities', 'like', "%{$searchTerm}%")
-                    ->orWhere('category', 'like', "%{$searchTerm}%");
-            });
-        }
+            if ($searchTerm !== '') {
+                $query->where(function ($subQuery) use ($searchTerm) {
+                    $subQuery->where('title', 'like', "%{$searchTerm}%")
+                        ->orWhere('description', 'like', "%{$searchTerm}%")
+                        ->orWhere('facilities', 'like', "%{$searchTerm}%")
+                        ->orWhere('category', 'like', "%{$searchTerm}%");
+                });
+            }
 
-        foreach ($selectedFacilities as $facilityKey) {
-            $keywords = $facilityOptions[$facilityKey]['keywords'];
-            $query->where(function ($subQuery) use ($keywords) {
-                foreach ($keywords as $keyword) {
-                    $subQuery->orWhere('facilities', 'like', "%{$keyword}%")
-                        ->orWhere('description', 'like', "%{$keyword}%");
-                }
-            });
-        }
+            foreach ($selectedFacilities as $facilityKey) {
+                $keywords = $facilityOptions[$facilityKey]['keywords'];
+                $query->where(function ($subQuery) use ($keywords) {
+                    foreach ($keywords as $keyword) {
+                        $subQuery->orWhere('facilities', 'like', "%{$keyword}%")
+                            ->orWhere('description', 'like', "%{$keyword}%");
+                    }
+                });
+            }
 
-        $galleries = $query->paginate(9)->withQueryString();
+            $galleries = $query->paginate(9)->withQueryString();
+        } catch (Throwable $exception) {
+            report($exception);
+            $databaseUnavailable = true;
+            $galleries = new LengthAwarePaginator(
+                items: [],
+                total: 0,
+                perPage: 9,
+                currentPage: max(1, (int) $request->query('page', 1)),
+                options: [
+                    'path' => $request->url(),
+                    'query' => $request->query(),
+                ]
+            );
+        }
 
         return view('katalog', compact(
             'galleries',
@@ -82,7 +100,8 @@ class KatalogController extends Controller
             'selectedCategory',
             'selectedFacilities',
             'selectedSeats',
-            'searchTerm'
+            'searchTerm',
+            'databaseUnavailable'
         ));
     }
 

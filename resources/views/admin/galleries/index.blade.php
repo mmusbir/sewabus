@@ -32,8 +32,13 @@
                         <img src="{{ $gallery->image_path }}" alt="{{ $gallery->title }}" class="h-16 w-24 object-cover rounded-lg border border-slate-200">
                     </td>
                     <td class="py-3 px-4 font-bold text-sm">{{ $gallery->title }}</td>
-                    <td class="py-3 px-4 text-sm font-semibold text-slate-700 dark:text-slate-200">
-                        {{ gallery_po_label($gallery->po_key, '-') }}
+                    <td class="py-3 px-4">
+                        <span
+                            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wide"
+                            style="{{ filled($gallery->po_key) ? gallery_po_badge_style($gallery->po_key) : 'background-color: #64748B; color: #FFFFFF;' }}"
+                        >
+                            {{ gallery_po_label($gallery->po_key, '-') }}
+                        </span>
                     </td>
                     <td class="py-3 px-4">
                         <span @class([

@@ -68,7 +68,10 @@
                         {{ gallery_category_label($gallery->category, $gallery->category) }}
                     </span>
                     @if(filled($gallery->po_key))
-                        <span class="bg-slate-950/75 text-white text-[10px] font-bold px-3 py-1 rounded-full tracking-wide backdrop-blur-sm">
+                        <span
+                            class="text-[10px] font-bold px-3 py-1 rounded-full tracking-wide shadow-lg shadow-slate-950/10"
+                            style="{{ gallery_po_badge_style($gallery->po_key) }}"
+                        >
                             PO {{ gallery_po_label($gallery->po_key, $gallery->po_key) }}
                         </span>
                     @endif
@@ -87,7 +90,14 @@
         <div>
             <h1 class="text-3xl lg:text-4xl font-black mb-4">{{ $gallery->title }}</h1>
             @if(filled($gallery->po_key))
-                <p class="text-sm font-semibold text-primary mb-4">PO {{ gallery_po_label($gallery->po_key, $gallery->po_key) }}</p>
+                <div class="mb-4">
+                    <span
+                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wide"
+                        style="{{ gallery_po_badge_style($gallery->po_key) }}"
+                    >
+                        PO {{ gallery_po_label($gallery->po_key, $gallery->po_key) }}
+                    </span>
+                </div>
             @endif
             <p class="text-slate-600 dark:text-slate-300 text-base mb-6 whitespace-pre-line">{{ $gallery->description ?? 'Deskripsi lengkap belum tersedia.' }}</p>
 
