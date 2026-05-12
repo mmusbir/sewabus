@@ -1,5 +1,6 @@
 @php
     $coverImage = $gallery->image_path ?: ($gallery->images->first()->media_path ?? '/stitch_img_bus_shd.jpg');
+    $coverThumbnail = media_thumbnail_url($coverImage, 640, 75) ?? $coverImage;
 @endphp
 
 <div class="group bg-white dark:bg-slate-900/50 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:shadow-xl transition-all">
@@ -20,7 +21,13 @@
                 </span>
             @endif
         </div>
-        <div class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="{{ $gallery->title }}" style="background-image: url('{{ $coverImage }}')"></div>
+        <img
+            src="{{ $coverThumbnail }}"
+            alt="{{ $gallery->title }}"
+            loading="lazy"
+            decoding="async"
+            class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+        >
     </div>
     <div class="p-5">
         <h3 class="text-lg font-bold mb-1 text-slate-900 dark:text-slate-100">{{ $gallery->title }}</h3>

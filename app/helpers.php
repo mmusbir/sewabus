@@ -691,10 +691,107 @@ if (!function_exists('media_url')) {
     }
 }
 
+if (!function_exists('media_thumbnail_path')) {
+    function media_thumbnail_path(?string $path): ?string
+    {
+        $storedPath = stored_media_path($path);
+
+        if (!is_string($storedPath) || $storedPath === '' || is_external_media_path($storedPath) || str_starts_with($storedPath, '/')) {
+            return null;
+        }
+
+        $extension = pathinfo($storedPath, PATHINFO_EXTENSION);
+        $base = $extension !== ''
+            ? substr($storedPath, 0, -strlen($extension) - 1)
+            : $storedPath;
+
+        return $base.'_thumb.jpg';
+    }
+}
+
+if (!function_exists('media_thumbnail_url')) {
+    function media_thumbnail_url($path, int $width = 640, int $quality = 75): ?string
+    {
+        $url = media_url($path);
+
+        if (!is_string($url) || trim($url) === '') {
+            return null;
+        }
+
+        $url = trim($url);
+        $width = max(1, min(2500, $width));
+        $quality = max(20, min(100, $quality));
+
+        // Supabase image transform endpoint.
+        if (str_contains($url, '/storage/v1/object/public/')) {
+            $renderUrl = str_replace('/storage/v1/object/public/', '/storage/v1/render/image/public/', $url);
+
+            $parts = parse_url($renderUrl);
+            $query = [];
+            if (isset($parts['query'])) {
+                parse_str($parts['query'], $query);
+            }
+            $query['width'] = $width;
+            $query['quality'] = $quality;
+            $query['resize'] = $query['resize'] ?? 'cover';
+
+            $base = ($parts['scheme'] ?? 'https').'://'.($parts['host'] ?? '');
+            if (isset($parts['port'])) {
+                $base .= ':'.$parts['port'];
+            }
+
+            return $base.($parts['path'] ?? '').'?'.http_build_query($query);
+        }
+
+        return $url;
+    }
+}
+
 if (!function_exists('store_media')) {
     function store_media($file, string $directory): string
     {
-        return $file->store($directory, media_disk());
+        if (!($file instanceof \Illuminate\Http\UploadedFile)) {
+            return $file->store($directory, media_disk());
+        }
+
+        $mime = strtolower((string) $file->getMimeType());
+        $extension = strtolower((string) $file->getClientOriginalExtension());
+        $isRasterImage = str_starts_with($mime, 'image/')
+            && !in_array($extension, ['svg', 'ico'], true)
+            && !str_contains($mime, 'svg');
+
+        if (!$isRasterImage) {
+            return $file->store($directory, media_disk());
+        }
+
+        try {
+            $source = @file_get_contents($file->getRealPath());
+            if ($source === false) {
+                return $file->store($directory, media_disk());
+            }
+
+            $image = @imagecreatefromstring($source);
+            if (!is_resource($image) && !($image instanceof \GdImage)) {
+                return $file->store($directory, media_disk());
+            }
+
+            ob_start();
+            imagewebp($image, null, 78);
+            $binary = ob_get_clean();
+            imagedestroy($image);
+
+            if ($binary === false || $binary === '') {
+                return $file->store($directory, media_disk());
+            }
+
+            $filename = pathinfo($file->hashName(), PATHINFO_FILENAME).'.webp';
+            $path = trim($directory, '/').'/'.$filename;
+            \Illuminate\Support\Facades\Storage::disk(media_disk())->put($path, $binary);
+
+            return $path;
+        } catch (\Throwable) {
+            return $file->store($directory, media_disk());
+        }
     }
 }
 

@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Gallery;
 use App\Models\GalleryMedia;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -195,6 +197,10 @@ class GalleryController extends Controller
 
         foreach ($gallery->media as $media) {
             $pathsToDelete[] = $media->getRawOriginal('media_path');
+            $thumbnailPath = media_thumbnail_path($media->getRawOriginal('media_path'));
+            if (is_string($thumbnailPath) && $thumbnailPath !== '') {
+                $pathsToDelete[] = $thumbnailPath;
+            }
         }
 
         $pathsToDelete = array_values(array_unique(array_filter($pathsToDelete)));
@@ -235,13 +241,23 @@ class GalleryController extends Controller
 
         if ($replaceImages) {
             foreach ($gallery->images as $imageMedia) {
-                delete_media($imageMedia->getRawOriginal('media_path'));
+                $paths = [$imageMedia->getRawOriginal('media_path')];
+                $thumbnailPath = media_thumbnail_path($imageMedia->getRawOriginal('media_path'));
+                if (is_string($thumbnailPath) && $thumbnailPath !== '') {
+                    $paths[] = $thumbnailPath;
+                }
+                delete_media($paths);
                 $imageMedia->delete();
             }
             $gallery->unsetRelation('images');
         } elseif ($removeImageIds !== []) {
             foreach ($gallery->images->whereIn('id', $removeImageIds) as $imageMedia) {
-                delete_media($imageMedia->getRawOriginal('media_path'));
+                $paths = [$imageMedia->getRawOriginal('media_path')];
+                $thumbnailPath = media_thumbnail_path($imageMedia->getRawOriginal('media_path'));
+                if (is_string($thumbnailPath) && $thumbnailPath !== '') {
+                    $paths[] = $thumbnailPath;
+                }
+                delete_media($paths);
                 $imageMedia->delete();
             }
             $gallery->unsetRelation('images');
@@ -255,6 +271,7 @@ class GalleryController extends Controller
                 break;
             }
             $imagePath = store_media($imageFile, 'galleries');
+            $this->createImageThumbnail($imageFile, $imagePath);
             $sortOrder++;
 
             GalleryMedia::create([
@@ -299,11 +316,76 @@ class GalleryController extends Controller
         }
 
         if ($cover) {
-            $gallery->image_path = $cover->getRawOriginal('media_path');
+            $coverPath = $cover->getRawOriginal('media_path');
+            $coverThumbPath = media_thumbnail_path($coverPath);
+            if (is_string($coverThumbPath) && $coverThumbPath !== '' && Storage::disk(media_disk())->exists($coverThumbPath)) {
+                $gallery->image_path = $coverThumbPath;
+            } else {
+                $gallery->image_path = $coverPath;
+            }
         } else {
             $gallery->image_path = '';
         }
 
         $gallery->save();
+    }
+
+    private function createImageThumbnail(UploadedFile $imageFile, string $storedImagePath): void
+    {
+        $thumbnailPath = media_thumbnail_path($storedImagePath);
+        if (!is_string($thumbnailPath) || $thumbnailPath === '') {
+            return;
+        }
+
+        try {
+            $source = @file_get_contents($imageFile->getRealPath());
+            if ($source === false) {
+                return;
+            }
+
+            $image = @imagecreatefromstring($source);
+            if (!is_resource($image) && !($image instanceof \GdImage)) {
+                return;
+            }
+
+            $sourceWidth = imagesx($image);
+            $sourceHeight = imagesy($image);
+            if ($sourceWidth < 1 || $sourceHeight < 1) {
+                imagedestroy($image);
+                return;
+            }
+
+            $targetWidth = 640;
+            $targetHeight = (int) max(1, round(($sourceHeight / $sourceWidth) * $targetWidth));
+
+            $thumb = imagecreatetruecolor($targetWidth, $targetHeight);
+            imagecopyresampled(
+                $thumb,
+                $image,
+                0,
+                0,
+                0,
+                0,
+                $targetWidth,
+                $targetHeight,
+                $sourceWidth,
+                $sourceHeight
+            );
+
+            ob_start();
+            imagejpeg($thumb, null, 75);
+            $jpegBinary = ob_get_clean();
+
+            imagedestroy($thumb);
+            imagedestroy($image);
+
+            if ($jpegBinary === false || $jpegBinary === '') {
+                return;
+            }
+
+            Storage::disk(media_disk())->put($thumbnailPath, $jpegBinary);
+        } catch (\Throwable) {
+            // Skip thumbnail generation when image processing is unavailable.
+        }
     }
 }
