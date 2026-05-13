@@ -724,6 +724,12 @@ if (!function_exists('media_thumbnail_url')) {
 
         // Supabase image transform endpoint.
         if (str_contains($url, '/storage/v1/object/public/')) {
+            // Some Supabase projects reject render endpoint with 403.
+            // Keep original public object URL unless explicitly enabled.
+            if (!config('filesystems.supabase_image_render', false)) {
+                return $url;
+            }
+
             $renderUrl = str_replace('/storage/v1/object/public/', '/storage/v1/render/image/public/', $url);
 
             $parts = parse_url($renderUrl);
