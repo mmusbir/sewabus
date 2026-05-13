@@ -101,7 +101,8 @@ return [
             'search_path' => 'public',
             'sslmode' => $env('DB_SSLMODE', 'prefer'),
             'options' => extension_loaded('pdo_pgsql') ? array_filter([
-                \PDO::ATTR_EMULATE_PREPARES => true,
+                // Native prepared statements keep boolean bindings compatible with PostgreSQL.
+                \PDO::ATTR_EMULATE_PREPARES => false,
             ]) : [],
         ],
 
