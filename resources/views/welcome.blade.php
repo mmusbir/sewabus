@@ -58,7 +58,7 @@
                 <section class="px-6 lg:px-20 pt-6">
                     <div
                         class="max-w-7xl mx-auto rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                        Data armada sementara tidak dapat dimuat karena koneksi database sedang bermasalah. Konten utama
+                        Data armada dan paket sementara tidak dapat dimuat karena koneksi database sedang bermasalah. Konten utama
                         tetap tersedia dan Anda bisa mencoba lagi beberapa saat lagi.
                     </div>
                 </section>
@@ -128,6 +128,59 @@
                             <div class="col-span-full text-center py-12">
                                 <p class="text-slate-500 dark:text-slate-400">Belum ada armada yang ditambahkan ke galeri.
                                 </p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </section>
+            <section class="px-6 lg:px-20 py-16 bg-background-light dark:bg-background-dark/40">
+                <div class="max-w-7xl mx-auto">
+                    <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+                        <div class="max-w-2xl">
+                            <h2 class="text-3xl font-extrabold text-slate-900 dark:text-slate-100 mb-4">Paket Liburan
+                                Pilihan</h2>
+                            <p class="text-slate-600 dark:text-slate-400">Lihat rekomendasi paket liburan dengan armada
+                                nyaman yang siap disesuaikan dengan rute perjalanan rombongan Anda.</p>
+                        </div>
+                        <a class="text-primary font-bold flex items-center gap-2 hover:underline"
+                            href="{{ route('packages.index', ['type' => 'liburan']) }}">
+                            Lihat Semua Paket Liburan <x-fa-icon name="arrow-right" class="fa-fw" />
+                        </a>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        @forelse($liburanPackages ?? [] as $package)
+                            @php
+                                $packageImage = $package->image_path ?: '/stitch_img_bus_shd.jpg';
+                                $packageThumbnail = media_thumbnail_url($packageImage, 640, 75) ?? $packageImage;
+                            @endphp
+                            <article
+                                class="group bg-white dark:bg-slate-900/60 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:shadow-xl transition-all">
+                                <div class="relative h-52 overflow-hidden">
+                                    <span
+                                        class="absolute top-3 left-3 z-10 bg-amber-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                                        Paket Liburan
+                                    </span>
+                                    <img
+                                        src="{{ $packageThumbnail }}"
+                                        alt="{{ $package->title }}"
+                                        loading="lazy"
+                                        decoding="async"
+                                        class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    >
+                                </div>
+                                <div class="p-5">
+                                    <h3 class="text-lg font-bold mb-2 text-slate-900 dark:text-slate-100">{{ $package->title }}</h3>
+                                    <p class="text-slate-500 dark:text-slate-400 text-sm mb-4 line-clamp-2">{{ $package->description ?: 'Deskripsi paket belum tersedia.' }}</p>
+                                    <a href="{{ route('packages.index', ['type' => 'liburan']) }}"
+                                        class="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+                                        Lihat Paket
+                                        <x-fa-icon name="arrow-right" class="fa-fw text-sm" />
+                                    </a>
+                                </div>
+                            </article>
+                        @empty
+                            <div class="col-span-full text-center py-12 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+                                <p class="text-slate-500 dark:text-slate-400">Belum ada paket liburan aktif yang tersedia.</p>
                             </div>
                         @endforelse
                     </div>

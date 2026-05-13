@@ -21,6 +21,7 @@ Route::get('/up', function () {
 
 Route::get('/', function () {
     $galleries = collect();
+    $liburanPackages = collect();
     $databaseUnavailable = false;
 
     try {
@@ -36,7 +37,30 @@ Route::get('/', function () {
         $databaseUnavailable = true;
     }
 
-    return view('welcome', compact('galleries', 'databaseUnavailable'));
+    try {
+        if (Schema::hasTable('rental_packages')) {
+            $query = \App\Models\RentalPackage::query()->latest()->take(3);
+
+            if (Schema::hasColumn('rental_packages', 'is_active')) {
+                $query->where('is_active', true);
+            }
+
+            if (Schema::hasColumn('rental_packages', 'type')) {
+                $query->where('type', 'liburan');
+            }
+
+            if (Schema::hasColumn('rental_packages', 'sort_order')) {
+                $query->orderBy('sort_order');
+            }
+
+            $liburanPackages = $query->get();
+        }
+    } catch (\Throwable $exception) {
+        report($exception);
+        $databaseUnavailable = true;
+    }
+
+    return view('welcome', compact('galleries', 'liburanPackages', 'databaseUnavailable'));
 })->name('home');
 
 Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog.index');
