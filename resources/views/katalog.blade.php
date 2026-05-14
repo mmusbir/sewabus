@@ -13,9 +13,8 @@
 <title>{{ $seoTitle }}</title>
 @include('partials.public.seo-meta', ['seoTitle' => $seoTitle, 'seoDescription' => $seoDescription, 'seoKeywords' => $seoKeywords, 'seoCanonical' => $seoCanonical])
 <link rel="icon" type="image/x-icon" href="{{ setting('favicon', '/favicon.ico') }}">
-@vite(['resources/css/app.css', 'resources/js/app.js'])
+@vite(['resources/css/app.css', 'resources/js/public.js'])
 @include('partials.public.plus-jakarta-fonts')
-@include('partials.fontawesome')
 <style>
         :root {
             --color-primary: 225 106 55;
@@ -43,12 +42,12 @@
 <p class="text-slate-600 dark:text-slate-400 max-w-2xl">Temukan pilihan armada bus pariwisata terbaik dengan berbagai kapasitas dan fasilitas untuk menunjang kenyamanan perjalanan Anda.</p>
 </div>
 <div class="flex flex-col lg:flex-row gap-8">
-<aside class="w-full lg:w-72 flex-shrink-0" x-data="{ showFilter: false }">
+<aside class="w-full lg:w-72 flex-shrink-0">
     <button
         type="button"
+        data-filter-toggle
         class="lg:hidden mb-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-sm font-bold text-slate-800 dark:text-slate-100"
-        @click="showFilter = !showFilter"
-        :aria-expanded="showFilter"
+        aria-expanded="false"
         aria-controls="katalog-filter-panel"
     >
         <x-fa-icon name="sliders" class="fa-fw text-primary" />
@@ -58,8 +57,8 @@
         method="GET"
         action="{{ route('katalog.index') }}"
         id="katalog-filter-panel"
+        data-filter-panel
         class="hidden lg:block bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200 dark:border-slate-800 lg:sticky lg:top-24 space-y-6"
-        :class="showFilter ? '!block' : ''"
     >
         @if($selectedCategory !== 'all')
             <input type="hidden" name="category" value="{{ $selectedCategory }}">

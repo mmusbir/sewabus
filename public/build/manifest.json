@@ -1,4 +1,8 @@
 {
+  "_preload-helper-I4rgV-VL.js": {
+    "file": "assets/preload-helper-I4rgV-VL.js",
+    "name": "preload-helper"
+  },
   "node_modules/@vercel/analytics/dist/index.mjs": {
     "file": "assets/index-Zt4BwSlo.js",
     "name": "index",
@@ -6,7 +10,7 @@
     "isDynamicEntry": true
   },
   "resources/css/app.css": {
-    "file": "assets/app-0UHrwkeX.css",
+    "file": "assets/app-H55vwH4N.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -15,10 +19,25 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-DydME1V4.js",
+    "file": "assets/app-XoPrC7-j.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
+    "imports": [
+      "_preload-helper-I4rgV-VL.js"
+    ],
+    "dynamicImports": [
+      "node_modules/@vercel/analytics/dist/index.mjs"
+    ]
+  },
+  "resources/js/public.js": {
+    "file": "assets/public-BI2HVRX3.js",
+    "name": "public",
+    "src": "resources/js/public.js",
+    "isEntry": true,
+    "imports": [
+      "_preload-helper-I4rgV-VL.js"
+    ],
     "dynamicImports": [
       "node_modules/@vercel/analytics/dist/index.mjs"
     ]

@@ -13,9 +13,8 @@
     <title>{{ $seoTitle }}</title>
     @include('partials.public.seo-meta', ['seoTitle' => $seoTitle, 'seoDescription' => $seoDescription, 'seoKeywords' => $seoKeywords, 'seoCanonical' => $seoCanonical, 'seoImage' => $seoImage])
     <link rel="icon" type="image/x-icon" href="{{ setting('favicon', '/favicon.ico') }}">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/public.js'])
     @include('partials.public.plus-jakarta-fonts')
-    @include('partials.fontawesome')
     <style>
         :root {
             --color-primary: 225 106 55;
@@ -51,7 +50,7 @@
     $southSulawesiAreas = south_sulawesi_service_areas();
 @endphp
 
-<main x-data="{ previewOpen: false, previewImage: null }" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
     <div class="mb-6">
         <a href="{{ route('katalog.index') }}" class="text-sm font-semibold text-slate-500 hover:text-primary flex items-center gap-2 w-fit">
             <x-fa-icon name="arrow-left" class="fa-fw text-sm" />
@@ -78,12 +77,12 @@
                         </span>
                     @endif
                 </div>
-                <button type="button" class="w-full h-full bg-cover bg-center cursor-zoom-in" style="background-image: url('{{ $coverImage }}')" @click="previewOpen = true; previewImage = '{{ $coverImage }}'" aria-label="Preview gambar utama armada"></button>
+                <button type="button" class="w-full h-full bg-cover bg-center cursor-zoom-in" style="background-image: url('{{ $coverImage }}')" data-preview-src="{{ $coverImage }}" aria-label="Preview gambar utama armada"></button>
             </div>
             @if($thumbnailItems->count() > 1)
                 <div class="grid grid-cols-3 gap-2 p-3 border-t border-slate-200 dark:border-slate-800">
                     @foreach($thumbnailItems->take(6) as $imageItem)
-                        <button type="button" class="aspect-[4/3] rounded-lg border border-slate-200 dark:border-slate-700 bg-cover bg-center cursor-zoom-in" style="background-image: url('{{ $imageItem }}')" @click="previewOpen = true; previewImage = '{{ $imageItem }}'" aria-label="Preview gambar armada"></button>
+                        <button type="button" class="aspect-[4/3] rounded-lg border border-slate-200 dark:border-slate-700 bg-cover bg-center cursor-zoom-in" style="background-image: url('{{ $imageItem }}')" data-preview-src="{{ $imageItem }}" aria-label="Preview gambar armada"></button>
                     @endforeach
                 </div>
             @endif
@@ -155,21 +154,15 @@
         </div>
     </div>
 
-    <template x-teleport="body">
-        <div
-            x-cloak
-            x-show="previewOpen"
-            x-transition.opacity
-            class="fixed inset-0 z-[10000] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
-            @click.self="previewOpen = false"
-            @keydown.escape.window="previewOpen = false"
-        >
-            <button type="button" class="absolute top-4 right-4 rounded-full bg-white/20 hover:bg-white/30 text-white p-2" @click="previewOpen = false" aria-label="Tutup preview gambar">
-                <x-fa-icon name="xmark" class="fa-fw" />
-            </button>
-            <img :src="previewImage" alt="Preview Armada" class="max-h-[90vh] max-w-[92vw] rounded-xl border border-white/20 shadow-2xl object-contain">
-        </div>
-    </template>
+    <div
+        data-preview-modal
+        class="fixed inset-0 z-[10000] hidden bg-black/80 backdrop-blur-sm items-center justify-center p-4"
+    >
+        <button type="button" data-preview-close class="absolute top-4 right-4 rounded-full bg-white/20 hover:bg-white/30 text-white p-2" aria-label="Tutup preview gambar">
+            <x-fa-icon name="xmark" class="fa-fw" />
+        </button>
+        <img data-preview-image src="" alt="Preview Armada" class="max-h-[90vh] max-w-[92vw] rounded-xl border border-white/20 shadow-2xl object-contain">
+    </div>
 </main>
 
 @include('partials.public.footer')

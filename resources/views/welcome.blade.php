@@ -60,9 +60,8 @@
         >
     @endif
     <link rel="icon" type="image/x-icon" href="{{ setting('favicon', '/favicon.ico') }}">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/public.js'])
     @include('partials.public.plus-jakarta-fonts')
-    @include('partials.fontawesome')
     <style>
         :root {
             --color-primary: 225 106 55;
