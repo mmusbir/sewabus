@@ -183,16 +183,18 @@
                         </details>
                     @endif
 
-                    @if($whatsappNumber)
-                        <a href="https://wa.me/{{ $whatsappNumber }}?text={{ urlencode('Halo Admin, saya tertarik dengan ' . $package->title) }}" target="_blank" rel="noopener" class="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
-                            Konsultasi Paket
+                    <div class="grid grid-cols-1 gap-2">
+                        <a href="{{ route('packages.show', $package) }}" class="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+                            Lihat Detail Paket
                             <x-fa-icon name="arrow-right" class="fa-fw text-sm" />
                         </a>
-                    @else
-                        <button type="button" disabled class="w-full bg-primary/70 text-white/70 font-bold py-3 rounded-lg cursor-not-allowed flex items-center justify-center gap-2">
-                            Kontak Belum Tersedia
-                        </button>
-                    @endif
+                        @if($whatsappNumber)
+                            <a href="https://wa.me/{{ $whatsappNumber }}?text={{ urlencode('Halo Admin, saya tertarik dengan ' . $package->title) }}" target="_blank" rel="noopener" class="w-full border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-lg hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2">
+                                Konsultasi Paket
+                                <x-fa-icon name="whatsapp" style="brands" class="fa-fw text-sm" />
+                            </a>
+                        @endif
+                    </div>
                 </div>
             </article>
         @empty

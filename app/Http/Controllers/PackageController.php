@@ -50,4 +50,25 @@ class PackageController extends Controller
 
         return view('paket', compact('packages', 'typeTabs', 'selectedType', 'databaseUnavailable'));
     }
+
+    public function show(RentalPackage $rentalPackage)
+    {
+        if (!$rentalPackage->is_active) {
+            abort(404);
+        }
+
+        $relatedPackages = RentalPackage::query()
+            ->where('is_active', true)
+            ->where('type', $rentalPackage->type)
+            ->whereKeyNot($rentalPackage->id)
+            ->orderBy('sort_order')
+            ->latest()
+            ->take(3)
+            ->get();
+
+        return view('paket-detail', [
+            'package' => $rentalPackage,
+            'relatedPackages' => $relatedPackages,
+        ]);
+    }
 }

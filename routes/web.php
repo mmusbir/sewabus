@@ -83,6 +83,28 @@ Route::get('/sitemap.xml', function () {
         report($exception);
     }
 
+    try {
+        if (Schema::hasTable('rental_packages')) {
+            $query = \App\Models\RentalPackage::query();
+            if (Schema::hasColumn('rental_packages', 'is_active')) {
+                $query->where('is_active', true);
+            }
+
+            $query->latest('updated_at')
+                ->get(['id', 'updated_at'])
+                ->each(function (\App\Models\RentalPackage $package) use ($entries) {
+                    $entries->push([
+                        'loc' => route('packages.show', $package),
+                        'lastmod' => optional($package->updated_at)->toAtomString() ?? now()->toAtomString(),
+                        'changefreq' => 'weekly',
+                        'priority' => '0.7',
+                    ]);
+                });
+        }
+    } catch (\Throwable $exception) {
+        report($exception);
+    }
+
     return response()
         ->view('sitemap', ['entries' => $entries], 200)
         ->header('Content-Type', 'application/xml');
@@ -168,6 +190,7 @@ Route::get('/', function () {
 Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog.index');
 Route::get('/katalog/{gallery}', [KatalogController::class, 'show'])->name('katalog.show');
 Route::get('/paket', [PackageController::class, 'index'])->name('packages.index');
+Route::get('/paket/{rentalPackage}', [PackageController::class, 'show'])->name('packages.show');
 Route::get('/kontak', [ContactController::class, 'index'])->name('contact.index');
 
 Route::middleware('auth')->group(function () {

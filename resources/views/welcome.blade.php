@@ -214,9 +214,9 @@
                                         </p>
                                     @endif
                                     <p class="text-slate-500 dark:text-slate-400 text-sm mb-4 line-clamp-2">{{ $package->description ?: 'Deskripsi paket belum tersedia.' }}</p>
-                                    <a href="{{ route('packages.index', ['type' => 'liburan']) }}"
+                                    <a href="{{ route('packages.show', $package) }}"
                                         class="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
-                                        Lihat Paket
+                                        Lihat Detail
                                         <x-fa-icon name="arrow-right" class="fa-fw text-sm" />
                                     </a>
                                 </div>
@@ -281,9 +281,9 @@
                                         </p>
                                     @endif
                                     <p class="text-slate-500 dark:text-slate-400 text-sm mb-4 line-clamp-2">{{ $package->description ?: 'Deskripsi paket belum tersedia.' }}</p>
-                                    <a href="{{ route('packages.index', ['type' => 'sewa']) }}"
+                                    <a href="{{ route('packages.show', $package) }}"
                                         class="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
-                                        Lihat Paket
+                                        Lihat Detail
                                         <x-fa-icon name="arrow-right" class="fa-fw text-sm" />
                                     </a>
                                 </div>
