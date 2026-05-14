@@ -57,6 +57,8 @@
         ? "https://wa.me/{$whatsappNumber}?text=" . urlencode("Halo Admin, saya tertarik dengan {$gallery->title}. Bisa dibantu detail dan harga?")
         : null;
     $southSulawesiAreas = south_sulawesi_service_areas();
+    $highlightedServiceAreas = array_slice($southSulawesiAreas, 0, 4);
+    $remainingServiceAreas = array_slice($southSulawesiAreas, 4);
 @endphp
 
 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -202,7 +204,29 @@
                 </a>
             </div>
             <div class="mt-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-4">
-                <p class="text-sm text-slate-600 dark:text-slate-300 leading-6">
+                <div class="sm:hidden">
+                    <p class="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">Area Layanan</p>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($highlightedServiceAreas as $serviceArea)
+                            <span class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                                {{ $serviceArea }}
+                            </span>
+                        @endforeach
+                    </div>
+                    @if(count($remainingServiceAreas))
+                        <details class="mt-2 group">
+                            <summary class="cursor-pointer list-none text-xs font-semibold text-primary">Lihat semua area</summary>
+                            <div class="mt-2 flex flex-wrap gap-2">
+                                @foreach($remainingServiceAreas as $serviceArea)
+                                    <span class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                                        {{ $serviceArea }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        </details>
+                    @endif
+                </div>
+                <p class="hidden sm:block text-sm text-slate-600 dark:text-slate-300 leading-6">
                     Armada ini siap melayani perjalanan di semua kabupaten/kota Sulawesi Selatan, termasuk
                     {{ implode(', ', array_slice($southSulawesiAreas, 0, 8)) }}, dan wilayah lainnya sesuai kebutuhan rute Anda.
                 </p>
