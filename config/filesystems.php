@@ -7,8 +7,9 @@ $env = static fn (string $key, mixed $default = null): mixed => is_string($value
 return [
 
     'media_disk' => $env('MEDIA_DISK', 'public'),
-    // Keep disabled by default because some Supabase projects return 403 on image transforms.
-    'supabase_image_render' => filter_var($env('SUPABASE_IMAGE_RENDER', false), FILTER_VALIDATE_BOOLEAN),
+    // Enabled by default to reduce transfer size via Supabase image transformations.
+    // Set SUPABASE_IMAGE_RENDER=false if your project blocks render endpoint.
+    'supabase_image_render' => filter_var($env('SUPABASE_IMAGE_RENDER', true), FILTER_VALIDATE_BOOLEAN),
 
     /*
     |--------------------------------------------------------------------------

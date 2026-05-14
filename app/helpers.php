@@ -741,6 +741,121 @@ if (!function_exists('media_thumbnail_path')) {
     }
 }
 
+if (!function_exists('supabase_render_url')) {
+    function supabase_render_url(string $url, int $width, int $quality): ?string
+    {
+        if (!str_contains($url, '/storage/v1/object/public/')) {
+            return null;
+        }
+
+        $renderUrl = str_replace('/storage/v1/object/public/', '/storage/v1/render/image/public/', $url);
+        $parts = parse_url($renderUrl);
+
+        if (!is_array($parts) || empty($parts['host']) || empty($parts['path'])) {
+            return null;
+        }
+
+        $query = [];
+        if (isset($parts['query'])) {
+            parse_str($parts['query'], $query);
+        }
+
+        $query['width'] = $width;
+        $query['quality'] = $quality;
+        $query['resize'] = $query['resize'] ?? 'cover';
+        $query['format'] = $query['format'] ?? 'webp';
+
+        $base = ($parts['scheme'] ?? 'https').'://'.$parts['host'];
+        if (isset($parts['port'])) {
+            $base .= ':'.$parts['port'];
+        }
+
+        return $base.$parts['path'].'?'.http_build_query($query);
+    }
+}
+
+if (!function_exists('supabase_render_probe_status')) {
+    function supabase_render_probe_status(string $url, bool $headOnly = true): int
+    {
+        if (!function_exists('curl_init')) {
+            return 0;
+        }
+
+        $curl = curl_init($url);
+        if ($curl === false) {
+            return 0;
+        }
+
+        $options = [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_MAXREDIRS => 2,
+            CURLOPT_CONNECTTIMEOUT => 3,
+            CURLOPT_TIMEOUT => 5,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_USERAGENT => 'sewabus-media-probe/1.0',
+        ];
+
+        if ($headOnly) {
+            $options[CURLOPT_NOBODY] = true;
+        } else {
+            $options[CURLOPT_RANGE] = '0-0';
+        }
+
+        curl_setopt_array($curl, $options);
+        curl_exec($curl);
+        $status = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+
+        return $status;
+    }
+}
+
+if (!function_exists('supabase_render_is_supported')) {
+    function supabase_render_is_supported(string $renderUrl): bool
+    {
+        $parts = parse_url($renderUrl);
+        $host = strtolower(trim((string) ($parts['host'] ?? '')));
+
+        if ($host === '') {
+            return false;
+        }
+
+        static $runtimeCache = [];
+        if (array_key_exists($host, $runtimeCache)) {
+            return $runtimeCache[$host];
+        }
+
+        $cacheKey = 'media:supabase_render_supported:'.md5($host);
+        $ttlMinutes = max(5, (int) config('filesystems.supabase_image_render_probe_cache_minutes', 720));
+
+        $probe = static function () use ($renderUrl): bool {
+            $status = supabase_render_probe_status($renderUrl, true);
+
+            // Some gateways reject HEAD but allow GET.
+            if ($status === 405) {
+                $status = supabase_render_probe_status($renderUrl, false);
+            }
+
+            return $status >= 200 && $status < 400;
+        };
+
+        try {
+            $runtimeCache[$host] = (bool) \Illuminate\Support\Facades\Cache::remember(
+                $cacheKey,
+                now()->addMinutes($ttlMinutes),
+                $probe
+            );
+
+            return $runtimeCache[$host];
+        } catch (\Throwable) {
+            $runtimeCache[$host] = $probe();
+
+            return $runtimeCache[$host];
+        }
+    }
+}
+
 if (!function_exists('media_thumbnail_url')) {
     function media_thumbnail_url($path, int $width = 640, int $quality = 75): ?string
     {
@@ -754,31 +869,33 @@ if (!function_exists('media_thumbnail_url')) {
         $width = max(1, min(2500, $width));
         $quality = max(20, min(100, $quality));
 
+        $thumbnailPath = media_thumbnail_path($path);
+        if (is_string($thumbnailPath) && $thumbnailPath !== '') {
+            try {
+                $disk = \Illuminate\Support\Facades\Storage::disk(media_disk());
+
+                if ($disk->exists($thumbnailPath)) {
+                    return $disk->url($thumbnailPath);
+                }
+            } catch (\Throwable) {
+                // Keep original URL flow if thumbnail file checks fail.
+            }
+        }
+
         // Supabase image transform endpoint.
         if (str_contains($url, '/storage/v1/object/public/')) {
-            // Some Supabase projects reject render endpoint with 403.
-            // Keep original public object URL unless explicitly enabled.
             if (!config('filesystems.supabase_image_render', false)) {
                 return $url;
             }
 
-            $renderUrl = str_replace('/storage/v1/object/public/', '/storage/v1/render/image/public/', $url);
-
-            $parts = parse_url($renderUrl);
-            $query = [];
-            if (isset($parts['query'])) {
-                parse_str($parts['query'], $query);
-            }
-            $query['width'] = $width;
-            $query['quality'] = $quality;
-            $query['resize'] = $query['resize'] ?? 'cover';
-
-            $base = ($parts['scheme'] ?? 'https').'://'.($parts['host'] ?? '');
-            if (isset($parts['port'])) {
-                $base .= ':'.$parts['port'];
+            $renderUrl = supabase_render_url($url, $width, $quality);
+            if (!is_string($renderUrl) || $renderUrl === '') {
+                return $url;
             }
 
-            return $base.($parts['path'] ?? '').'?'.http_build_query($query);
+            // Safe fallback: if render endpoint is unavailable (for example 403),
+            // keep using public object URL so images remain visible.
+            return supabase_render_is_supported($renderUrl) ? $renderUrl : $url;
         }
 
         return $url;

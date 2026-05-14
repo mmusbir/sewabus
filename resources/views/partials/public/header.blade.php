@@ -15,7 +15,7 @@
     'sticky top-0' => $sticky,
 ])>
     <div class="max-w-7xl mx-auto flex items-center justify-between">
-        <div class="flex items-center justify-center">
+        <a href="{{ route('home') }}" class="flex items-center justify-center" aria-label="Kembali ke Beranda">
             @if($headerLogoLight || $headerLogoDark)
                 <img
                     src="{{ $headerLogoLightOptimized ?: $headerLogoDarkOptimized }}"
@@ -34,7 +34,7 @@
                 </div>
                 <h2 class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">{{ setting('header_logo_text', 'BusPariwisata') }}</h2>
             @endif
-        </div>
+        </a>
 
         <nav class="hidden md:flex items-center gap-1 rounded-full border border-slate-200/80 bg-white/70 p-1 shadow-sm shadow-slate-900/5 backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/40">
             <a @class([
