@@ -5,8 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Gallery;
 use App\Models\RentalPackage;
-use App\Models\Setting;
 use App\Models\User;
+use App\Models\VehicleBooking;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 use Throwable;
@@ -29,16 +30,19 @@ class DashboardController extends Controller
             'packages_liburan' => 0,
             'packages_sewa' => 0,
             'users_total' => 0,
+            'bookings_year_total' => 0,
+            'bookings_year_revenue' => 0,
+            'bookings_year_profit' => 0,
         ];
         $recentGalleries = collect();
         $recentPackages = collect();
-        $settingsCompletion = 0;
+        $upcomingBookings = collect();
 
         try {
             $hasGalleries = Schema::hasTable('galleries');
             $hasPackages = Schema::hasTable('rental_packages');
-            $hasSettings = Schema::hasTable('settings');
             $hasUsers = Schema::hasTable('users');
+            $hasBookings = Schema::hasTable('vehicle_bookings');
 
             $galleryCategoryCounts = $hasGalleries
                 ? Gallery::query()
@@ -76,6 +80,9 @@ class DashboardController extends Controller
                 'packages_liburan' => $hasPackages ? RentalPackage::where('type', 'liburan')->count() : 0,
                 'packages_sewa' => $hasPackages ? RentalPackage::where('type', 'sewa')->count() : 0,
                 'users_total' => $hasUsers ? User::count() : 0,
+                'bookings_year_total' => 0,
+                'bookings_year_revenue' => 0,
+                'bookings_year_profit' => 0,
             ];
 
             $recentGalleries = $hasGalleries
@@ -86,24 +93,35 @@ class DashboardController extends Controller
                 ? RentalPackage::latest()->take(5)->get()
                 : collect();
 
-            if ($hasSettings) {
-                $importantKeys = [
-                    'site_name',
-                    'header_logo_image',
-                    'footer_logo_image',
-                    'hero_title',
-                    'hero_image_1',
-                    'contact_phone',
-                    'social_whatsapp_number',
-                    'footer_map_url',
-                ];
+            if ($hasBookings) {
+                $startOfYear = now()->startOfYear()->toDateString();
+                $endOfYear = now()->endOfYear()->toDateString();
 
-                $filled = collect($importantKeys)
-                    ->filter(fn (string $key) => filled(Setting::getValue($key)))
-                    ->count();
+                $bookingsYearSummary = VehicleBooking::query()
+                    ->whereBetween('departure_date', [$startOfYear, $endOfYear])
+                    ->where('is_cancelled', false)
+                    ->selectRaw('COUNT(*) as total_bookings')
+                    ->selectRaw('COALESCE(SUM(markup_price), 0) as total_revenue')
+                    ->selectRaw('COALESCE(SUM(markup_price - deal_price), 0) as total_profit')
+                    ->first();
 
-                $settingsCompletion = (int) round(($filled / count($importantKeys)) * 100);
+                $stats['bookings_year_total'] = (int) ($bookingsYearSummary->total_bookings ?? 0);
+                $stats['bookings_year_revenue'] = (float) ($bookingsYearSummary->total_revenue ?? 0);
+                $stats['bookings_year_profit'] = (float) ($bookingsYearSummary->total_profit ?? 0);
+
+                $upcomingStart = Carbon::today()->toDateString();
+                $upcomingEnd = Carbon::today()->addDays(7)->toDateString();
+
+                $upcomingBookings = VehicleBooking::query()
+                    ->with(['gallery:id,title'])
+                    ->whereBetween('departure_date', [$upcomingStart, $upcomingEnd])
+                    ->where('is_cancelled', false)
+                    ->orderBy('departure_date')
+                    ->orderBy('pickup_time')
+                    ->limit(20)
+                    ->get();
             }
+
         } catch (Throwable $exception) {
             report($exception);
         }
@@ -112,7 +130,7 @@ class DashboardController extends Controller
             'stats' => $stats,
             'recentGalleries' => $recentGalleries,
             'recentPackages' => $recentPackages,
-            'settingsCompletion' => $settingsCompletion,
+            'upcomingBookings' => $upcomingBookings,
         ]);
     }
 }

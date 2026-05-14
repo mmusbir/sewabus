@@ -22,9 +22,25 @@
             --font-display: "Inter";
         }
 
+        html {
+            font-size: 13px;
+        }
+
+        @media (max-width: 1024px) {
+            html {
+                font-size: 13.5px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            html {
+                font-size: 14px;
+            }
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            font-size: 14px;
+            font-size: 1rem;
         }
         [x-cloak] { display: none !important; }
     </style>
@@ -92,6 +108,11 @@
                     <a href="{{ route('admin.rental-packages.index') }}" @click="closeSidebarOnMobile()" class="{{ $navBase }} {{ request()->routeIs('admin.rental-packages.*') ? $navActive : $navIdle }}" :class="sidebarCompact ? 'justify-center' : 'gap-3'" title="Paket Sewa">
                         <x-fa-icon name="route" class="fa-fw text-[20px]" />
                         <span x-show="!sidebarCompact" x-cloak>Paket Sewa</span>
+                    </a>
+
+                    <a href="{{ route('admin.bookings.index') }}" @click="closeSidebarOnMobile()" class="{{ $navBase }} {{ request()->routeIs('admin.bookings.*') ? $navActive : $navIdle }}" :class="sidebarCompact ? 'justify-center' : 'gap-3'" title="Kalender Booking">
+                        <x-fa-icon name="calendar-check" class="fa-fw text-[20px]" />
+                        <span x-show="!sidebarCompact" x-cloak>Kalender Booking</span>
                     </a>
 
                     @if(auth()->user()->canAccessSettings() || auth()->user()->canManageUsers())

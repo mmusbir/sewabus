@@ -7,6 +7,7 @@ use App\Http\Controllers\PackageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\RentalPackageController;
+use App\Http\Controllers\Admin\VehicleBookingController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SeoController as AdminSeoController;
 use App\Http\Controllers\Admin\UserManagementController;
@@ -229,6 +230,15 @@ Route::middleware(['auth', 'admin'])->group(function () {
         'update' => 'admin.rental-packages.update',
         'destroy' => 'admin.rental-packages.destroy',
     ]);
+
+    Route::get('/admin/bookings', [VehicleBookingController::class, 'index'])->name('admin.bookings.index');
+    Route::get('/admin/bookings/create', [VehicleBookingController::class, 'create'])->name('admin.bookings.create');
+    Route::post('/admin/bookings', [VehicleBookingController::class, 'store'])->name('admin.bookings.store');
+    Route::get('/admin/bookings/{vehicleBooking}/edit', [VehicleBookingController::class, 'edit'])->name('admin.bookings.edit');
+    Route::put('/admin/bookings/{vehicleBooking}', [VehicleBookingController::class, 'update'])->name('admin.bookings.update');
+    Route::patch('/admin/bookings/{vehicleBooking}/toggle-paid', [VehicleBookingController::class, 'togglePaid'])->name('admin.bookings.toggle-paid');
+    Route::patch('/admin/bookings/{vehicleBooking}/toggle-cancel', [VehicleBookingController::class, 'toggleCancel'])->name('admin.bookings.toggle-cancel');
+    Route::get('/admin/bookings/{vehicleBooking}/invoice', [VehicleBookingController::class, 'invoice'])->name('admin.bookings.invoice');
 
     Route::middleware('admin.settings')->group(function () {
         Route::get('/admin/settings', [SettingController::class, 'index'])->name('admin.settings.index');
