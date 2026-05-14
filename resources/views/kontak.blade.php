@@ -41,6 +41,8 @@
     $phoneHref = $phoneHref !== '' ? 'tel:' . $phoneHref : null;
     $emailHref = trim((string) $contactEmail) !== '' ? 'mailto:' . trim((string) $contactEmail) : null;
     $southSulawesiAreas = south_sulawesi_service_areas();
+    $featuredServiceAreas = array_slice($southSulawesiAreas, 0, 9);
+    $remainingServiceAreas = array_slice($southSulawesiAreas, 9);
 
     $footerMapValue = setting('footer_map_url');
     $footerMapSrc = null;
@@ -129,10 +131,22 @@
     <section class="mt-8 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 lg:p-6">
         <h2 class="text-xl font-black text-slate-900 dark:text-slate-100 mb-3">Cakupan Layanan Semua Kabupaten/Kota Sulawesi Selatan</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-            @foreach($southSulawesiAreas as $serviceArea)
+            @foreach($featuredServiceAreas as $serviceArea)
                 <span class="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200">{{ $serviceArea }}</span>
             @endforeach
         </div>
+        @if(count($remainingServiceAreas))
+            <details class="mt-4">
+                <summary class="cursor-pointer list-none text-sm font-bold text-primary inline-flex items-center gap-2">
+                    Lihat Semua Area
+                </summary>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 mt-4">
+                    @foreach($remainingServiceAreas as $serviceArea)
+                        <span class="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200">{{ $serviceArea }}</span>
+                    @endforeach
+                </div>
+            </details>
+        @endif
     </section>
 </main>
 

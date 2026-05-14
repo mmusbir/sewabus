@@ -9,6 +9,8 @@
     $seoKeywords = setting('seo_meta_keywords_default', 'katalog sewa bus sulawesi selatan, sewa bus makassar, sewa bus bone, sewa bus maros, sewa bus gowa, rental bus toraja');
     $seoCanonical = route('katalog.index');
     $southSulawesiAreas = south_sulawesi_service_areas();
+    $featuredServiceAreas = array_slice($southSulawesiAreas, 0, 9);
+    $remainingServiceAreas = array_slice($southSulawesiAreas, 9);
 @endphp
 <title>{{ $seoTitle }}</title>
 @include('partials.public.seo-meta', ['seoTitle' => $seoTitle, 'seoDescription' => $seoDescription, 'seoKeywords' => $seoKeywords, 'seoCanonical' => $seoCanonical])
@@ -161,10 +163,22 @@
             Tim kami melayani kebutuhan sewa bus pariwisata untuk rombongan wisata, perusahaan, sekolah, keluarga, dan komunitas dengan cakupan rute dalam kota maupun antar kabupaten/kota di Sulawesi Selatan.
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-            @foreach($southSulawesiAreas as $serviceArea)
+            @foreach($featuredServiceAreas as $serviceArea)
                 <span class="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200">{{ $serviceArea }}</span>
             @endforeach
         </div>
+        @if(count($remainingServiceAreas))
+            <details class="mt-4">
+                <summary class="cursor-pointer list-none text-sm font-bold text-primary inline-flex items-center gap-2">
+                    Lihat Semua Area
+                </summary>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 mt-4">
+                    @foreach($remainingServiceAreas as $serviceArea)
+                        <span class="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200">{{ $serviceArea }}</span>
+                    @endforeach
+                </div>
+            </details>
+        @endif
     </div>
 </section>
 </main>
