@@ -36,30 +36,30 @@
             @endif
         </div>
 
-        <nav class="hidden md:flex items-center gap-10">
+        <nav class="hidden md:flex items-center gap-1 rounded-full border border-slate-200/80 bg-white/70 p-1 shadow-sm shadow-slate-900/5 backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/40">
             <a @class([
-                'text-sm font-semibold transition-colors',
-                'text-primary' => $isHome,
-                'hover:text-primary' => !$isHome,
+                'relative rounded-full px-4 py-2 text-sm font-bold transition-all duration-200',
+                'bg-primary text-white shadow-md shadow-primary/20' => $isHome,
+                'text-slate-600 hover:bg-primary/10 hover:text-primary dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white' => !$isHome,
             ]) href="/">Beranda</a>
             <a @class([
-                'text-sm font-semibold transition-colors',
-                'text-primary' => $isKatalog,
-                'hover:text-primary' => !$isKatalog,
+                'relative rounded-full px-4 py-2 text-sm font-bold transition-all duration-200',
+                'bg-primary text-white shadow-md shadow-primary/20' => $isKatalog,
+                'text-slate-600 hover:bg-primary/10 hover:text-primary dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white' => !$isKatalog,
             ]) href="{{ route('katalog.index') }}">Armada</a>
             <a @class([
-                'text-sm font-semibold transition-colors',
-                'text-primary' => $isPackages,
-                'hover:text-primary' => !$isPackages,
+                'relative rounded-full px-4 py-2 text-sm font-bold transition-all duration-200',
+                'bg-primary text-white shadow-md shadow-primary/20' => $isPackages,
+                'text-slate-600 hover:bg-primary/10 hover:text-primary dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white' => !$isPackages,
             ]) href="{{ route('packages.index') }}">Paket Sewa</a>
             <a @class([
-                'text-sm font-semibold transition-colors',
-                'text-primary' => $isContact,
-                'hover:text-primary' => !$isContact,
+                'relative rounded-full px-4 py-2 text-sm font-bold transition-all duration-200',
+                'bg-primary text-white shadow-md shadow-primary/20' => $isContact,
+                'text-slate-600 hover:bg-primary/10 hover:text-primary dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white' => !$isContact,
             ]) href="{{ route('contact.index') }}">Kontak</a>
         </nav>
 
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3">
             <button type="button" class="js-theme-toggle hidden md:inline-flex items-center" aria-label="Toggle dark mode">
                 <span class="relative inline-flex h-8 w-16 items-center rounded-full border border-slate-200 bg-white shadow-inner transition-colors dark:border-slate-800 dark:bg-slate-900">
                     <span class="absolute left-1.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-slate-500 dark:text-slate-200">
