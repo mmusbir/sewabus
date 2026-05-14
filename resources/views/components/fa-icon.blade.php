@@ -18,6 +18,8 @@
         'bus' => '<path d="M6 17h12"/><path d="M6 17v2"/><path d="M18 17v2"/><path d="M5 6c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2v9c0 1.1-.9 2-2 2H7c-1.1 0-2-.9-2-2V6Z"/><path d="M7 9h10"/><path d="M8 14h.01"/><path d="M16 14h.01"/>',
         'circle-check' => '<path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/><path d="m8 12 3 3 5-6"/>',
         'circle-play' => '<path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/><path d="m10 8 6 4-6 4V8Z"/>',
+        'chevron-left' => '<path d="m15 18-6-6 6-6"/>',
+        'chevron-right' => '<path d="m9 18 6-6-6-6"/>',
         'clock' => '<path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/><path d="M12 7v5l3 2"/>',
         'envelope' => '<path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/>',
         'filter' => '<path d="M4 6h16"/><path d="M7 12h10"/><path d="M10 18h4"/>',
