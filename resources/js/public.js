@@ -346,7 +346,7 @@ const attachFirstInteraction = () => {
 };
 
 const prefetchPopularPages = () => {
-    ['/paket', '/katalog', '/paket-tour', '/rental-hiace', '/travel-pinrang'].forEach((path) => {
+    ['/paket', '/katalog', '/kontak', '/paket?type=liburan', '/paket?type=sewa'].forEach((path) => {
         const link = document.createElement('link');
         link.rel = 'prefetch';
         link.href = path;
