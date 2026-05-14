@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\SeoController as AdminSeoController;
 use App\Http\Controllers\Admin\UserManagementController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Cache;
 
 Route::get('/up', function () {
     return response()->json([
@@ -95,11 +96,17 @@ Route::get('/', function () {
 
     try {
         if (Schema::hasTable('galleries')) {
-            $query = \App\Models\Gallery::query()->latest()->take(3);
-            if (Schema::hasColumn('galleries', 'is_active')) {
-                $query->where('is_active', true);
-            }
-            $galleries = $query->get();
+            $galleries = Cache::remember('home:galleries:v1', now()->addMinutes(5), function () {
+                $query = \App\Models\Gallery::query()
+                    ->latest()
+                    ->take(3);
+
+                if (Schema::hasColumn('galleries', 'is_active')) {
+                    $query->where('is_active', true);
+                }
+
+                return $query->get();
+            });
         }
     } catch (\Throwable $exception) {
         report($exception);
@@ -109,7 +116,20 @@ Route::get('/', function () {
     try {
         if (Schema::hasTable('rental_packages')) {
             $buildPackageQuery = function () {
-                $query = \App\Models\RentalPackage::query()->latest()->take(3);
+                $query = \App\Models\RentalPackage::query()
+                    ->select([
+                        'id',
+                        'title',
+                        'type',
+                        'price_label',
+                        'description',
+                        'image_path',
+                        'is_active',
+                        'sort_order',
+                        'created_at',
+                    ])
+                    ->latest()
+                    ->take(3);
 
                 if (Schema::hasColumn('rental_packages', 'is_active')) {
                     $query->where('is_active', true);
@@ -123,10 +143,16 @@ Route::get('/', function () {
             };
 
             if (Schema::hasColumn('rental_packages', 'type')) {
-                $liburanPackages = $buildPackageQuery()->where('type', 'liburan')->get();
-                $sewaPackages = $buildPackageQuery()->where('type', 'sewa')->get();
+                $liburanPackages = Cache::remember('home:packages:liburan:v1', now()->addMinutes(5), function () use ($buildPackageQuery) {
+                    return $buildPackageQuery()->where('type', 'liburan')->get();
+                });
+                $sewaPackages = Cache::remember('home:packages:sewa:v1', now()->addMinutes(5), function () use ($buildPackageQuery) {
+                    return $buildPackageQuery()->where('type', 'sewa')->get();
+                });
             } else {
-                $allPackages = $buildPackageQuery()->get();
+                $allPackages = Cache::remember('home:packages:all:v1', now()->addMinutes(5), function () use ($buildPackageQuery) {
+                    return $buildPackageQuery()->get();
+                });
                 $liburanPackages = $allPackages;
                 $sewaPackages = $allPackages;
             }

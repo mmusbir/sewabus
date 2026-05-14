@@ -63,13 +63,26 @@
                 $includeItems = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $package->includes ?? ''))));
                 $badgeClasses = $package->type === 'liburan' ? 'bg-amber-500' : 'bg-emerald-600';
                 $badgeText = $package->type === 'liburan' ? 'Paket Liburan' : 'Paket Sewa';
+                $packageImage = $package->image_path ?: '/stitch_img_bus_shd.jpg';
+                $packageThumb480 = media_thumbnail_url($packageImage, 480, 72) ?? $packageImage;
+                $packageThumb640 = media_thumbnail_url($packageImage, 640, 75) ?? $packageImage;
+                $packageThumb960 = media_thumbnail_url($packageImage, 960, 76) ?? $packageImage;
+                $packageSrcset = implode(', ', [
+                    $packageThumb480 . ' 480w',
+                    $packageThumb640 . ' 640w',
+                    $packageThumb960 . ' 960w',
+                ]);
             @endphp
             <article class="bg-white dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-xl transition-shadow">
                 <div class="relative h-52 overflow-hidden">
                     <span class="absolute top-3 left-3 z-10 {{ $badgeClasses }} text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">{{ $badgeText }}</span>
                     <img
-                        src="{{ media_thumbnail_url($package->image_path ?: '/stitch_img_bus_shd.jpg', 640, 75) ?? ($package->image_path ?: '/stitch_img_bus_shd.jpg') }}"
+                        src="{{ $packageThumb640 }}"
+                        srcset="{{ $packageSrcset }}"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                         alt="{{ $package->title }}"
+                        width="960"
+                        height="540"
                         loading="lazy"
                         decoding="async"
                         class="h-full w-full object-cover"

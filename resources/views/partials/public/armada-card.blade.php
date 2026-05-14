@@ -1,6 +1,14 @@
 @php
     $coverImage = $gallery->image_path ?: ($gallery->images->first()->media_path ?? '/stitch_img_bus_shd.jpg');
-    $coverThumbnail = media_thumbnail_url($coverImage, 640, 75) ?? $coverImage;
+    $coverThumb480 = media_thumbnail_url($coverImage, 480, 72) ?? $coverImage;
+    $coverThumb640 = media_thumbnail_url($coverImage, 640, 75) ?? $coverImage;
+    $coverThumb960 = media_thumbnail_url($coverImage, 960, 76) ?? $coverImage;
+    $coverThumbnail = $coverThumb640;
+    $coverSrcset = implode(', ', [
+        $coverThumb480 . ' 480w',
+        $coverThumb640 . ' 640w',
+        $coverThumb960 . ' 960w',
+    ]);
 @endphp
 
 <div class="group bg-white dark:bg-slate-900/50 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:shadow-xl transition-all">
@@ -23,7 +31,11 @@
         </div>
         <img
             src="{{ $coverThumbnail }}"
+            srcset="{{ $coverSrcset }}"
+            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
             alt="{{ $gallery->title }}"
+            width="960"
+            height="600"
             loading="lazy"
             decoding="async"
             class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"

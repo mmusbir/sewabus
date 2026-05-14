@@ -38,7 +38,7 @@
                 <div class="sm:col-span-2 lg:col-span-1">
                     <div class="flex items-center gap-2 mb-5">
                         @if(setting('footer_logo_image'))
-                            <img src="{{ setting('footer_logo_image') }}" alt="Logo Footer" class="h-10 object-contain">
+                            <img src="{{ setting('footer_logo_image') }}" alt="Logo Footer" width="160" height="40" class="h-10 object-contain">
                         @endif
                         @if(setting('footer_logo_show_text', true) && !setting('footer_logo_image'))
                             <x-fa-icon name="bus" class="fa-fw text-primary text-3xl" />
@@ -107,7 +107,7 @@
             <div class="col-span-1 lg:col-span-1">
                 <div class="flex items-center gap-3 mb-5">
                     @if(setting('footer_logo_image'))
-                        <img src="{{ setting('footer_logo_image') }}" alt="Logo Footer" class="h-10 object-contain filter brightness-0 invert">
+                        <img src="{{ setting('footer_logo_image') }}" alt="Logo Footer" width="160" height="40" class="h-10 object-contain filter brightness-0 invert">
                     @endif
                     @if(setting('footer_logo_show_text', true) && !setting('footer_logo_image'))
                         <x-fa-icon name="bus" class="fa-fw text-3xl text-primary" />
@@ -171,9 +171,9 @@
                     @if($footerMapSrc)
                         <iframe class="w-full h-full border-0" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="{{ $footerMapSrc }}" allowfullscreen></iframe>
                     @elseif(setting('footer_map_image'))
-                        <img class="w-full h-full object-cover grayscale opacity-75 hover:grayscale-0 transition-all duration-300" src="{{ setting('footer_map_image') }}" alt="Peta lokasi kantor"/>
+                        <img class="w-full h-full object-cover grayscale opacity-75 hover:grayscale-0 transition-all duration-300" src="{{ setting('footer_map_image') }}" alt="Peta lokasi kantor" width="640" height="320" loading="lazy" decoding="async"/>
                     @else
-                        <img class="w-full h-full object-cover grayscale opacity-50" data-alt="Peta lokasi kantor pusat" data-location="Sulawesi Selatan" src="/stitch_img_map.jpg"/>
+                        <img class="w-full h-full object-cover grayscale opacity-50" data-alt="Peta lokasi kantor pusat" data-location="Sulawesi Selatan" src="/stitch_img_map.jpg" width="640" height="320" loading="lazy" decoding="async"/>
                     @endif
                 </div>
             </div>

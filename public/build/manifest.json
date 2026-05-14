@@ -1,6 +1,12 @@
 {
+  "node_modules/@vercel/analytics/dist/index.mjs": {
+    "file": "assets/index-Zt4BwSlo.js",
+    "name": "index",
+    "src": "node_modules/@vercel/analytics/dist/index.mjs",
+    "isDynamicEntry": true
+  },
   "resources/css/app.css": {
-    "file": "assets/app-C2cf1FH_.css",
+    "file": "assets/app-ao-W0Ib3.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -9,9 +15,12 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-CMY23nI8.js",
+    "file": "assets/app-CSMZxI9j.js",
     "name": "app",
     "src": "resources/js/app.js",
-    "isEntry": true
+    "isEntry": true,
+    "dynamicImports": [
+      "node_modules/@vercel/analytics/dist/index.mjs"
+    ]
   }
 }

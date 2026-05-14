@@ -18,6 +18,8 @@
                 <img
                     :src="darkMode ? @js($headerLogoDark ?: $headerLogoLight) : @js($headerLogoLight ?: $headerLogoDark)"
                     alt="Logo Header"
+                    width="160"
+                    height="40"
                     class="h-10 object-contain"
                 >
             @endif

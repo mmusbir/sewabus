@@ -9,13 +9,68 @@
         $seoDescription = setting('seo_home_description', setting('seo_meta_description_default', 'Sewa bus pariwisata untuk semua kabupaten/kota di Sulawesi Selatan. Armada lengkap, driver profesional, harga transparan untuk wisata, sekolah, kantor, dan rombongan keluarga.'));
         $seoKeywords = setting('seo_meta_keywords_default', 'sewa bus sulawesi selatan, sewa bus makassar, rental bus bone, sewa bus maros, sewa bus gowa, sewa bus toraja');
         $seoCanonical = route('home');
+
+        $heroImages = array_values(array_filter([
+            setting('hero_image_1'),
+            setting('hero_image_2'),
+            setting('hero_image_3'),
+        ]));
+
+        if (empty($heroImages)) {
+            $heroImages = [setting('hero_image', '/stitch_img_hero.jpg')];
+        }
+
+        $heroImageSources = array_map(function ($heroImage) {
+            $base = media_url($heroImage, '/stitch_img_hero.jpg') ?? '/stitch_img_hero.jpg';
+            $w640 = media_thumbnail_url($heroImage, 640, 72) ?? $base;
+            $w1024 = media_thumbnail_url($heroImage, 1024, 74) ?? $base;
+            $w1600 = media_thumbnail_url($heroImage, 1600, 76) ?? $base;
+
+            return [
+                'src' => $w1024,
+                'srcset' => implode(', ', [
+                    $w640 . ' 640w',
+                    $w1024 . ' 1024w',
+                    $w1600 . ' 1600w',
+                ]),
+                'preload' => $w1600,
+            ];
+        }, $heroImages);
+
+        $heroPreload = $heroImageSources[0] ?? null;
+        $heroCarouselIntervalMs = max(1000, ((int) setting('hero_carousel_interval_seconds', 5)) * 1000);
+        $whatsappNumber = preg_replace('/[^0-9]/', '', setting('social_whatsapp_number', ''));
+        $phoneRaw = setting('contact_phone', setting('social_whatsapp_number', ''));
+        $phoneNumber = preg_replace('/[^0-9+]/', '', $phoneRaw ?? '');
+        $whatsappCtaLink = $whatsappNumber
+            ? 'https://wa.me/' . $whatsappNumber . '?text=' . urlencode('Halo Admin, saya ingin konsultasi sewa bus.')
+            : null;
+        $phoneCtaLink = $phoneNumber ? 'tel:' . $phoneNumber : null;
+        $southSulawesiAreas = south_sulawesi_service_areas();
     @endphp
     <title>{{ $seoTitle }}</title>
     @include('partials.public.seo-meta', ['seoTitle' => $seoTitle, 'seoDescription' => $seoDescription, 'seoKeywords' => $seoKeywords, 'seoCanonical' => $seoCanonical])
+    @if($heroPreload)
+        <link
+            rel="preload"
+            as="image"
+            href="{{ $heroPreload['preload'] }}"
+            imagesrcset="{{ $heroPreload['srcset'] }}"
+            imagesizes="100vw"
+            fetchpriority="high"
+        >
+    @endif
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="icon" type="image/x-icon" href="{{ setting('favicon', '/favicon.ico') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap"
         rel="stylesheet" />
+    <link rel="prefetch" href="{{ route('packages.index') }}">
+    <link rel="prefetch" href="{{ route('katalog.index') }}">
+    <link rel="prefetch" href="{{ url('/paket-tour') }}">
+    <link rel="prefetch" href="{{ url('/rental-hiace') }}">
+    <link rel="prefetch" href="{{ url('/travel-pinrang') }}">
     @include('partials.fontawesome')
     <style>
         :root {
@@ -33,27 +88,6 @@
 </head>
 
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">
-    @php
-        $heroImages = array_values(array_filter([
-            setting('hero_image_1'),
-            setting('hero_image_2'),
-            setting('hero_image_3'),
-        ]));
-
-        if (empty($heroImages)) {
-            $heroImages = [setting('hero_image', '/stitch_img_hero.jpg')];
-        }
-
-        $heroCarouselIntervalMs = max(1000, ((int) setting('hero_carousel_interval_seconds', 5)) * 1000);
-        $whatsappNumber = preg_replace('/[^0-9]/', '', setting('social_whatsapp_number', ''));
-        $phoneRaw = setting('contact_phone', setting('social_whatsapp_number', ''));
-        $phoneNumber = preg_replace('/[^0-9+]/', '', $phoneRaw ?? '');
-        $whatsappCtaLink = $whatsappNumber
-            ? 'https://wa.me/' . $whatsappNumber . '?text=' . urlencode('Halo Admin, saya ingin konsultasi sewa bus.')
-            : null;
-        $phoneCtaLink = $phoneNumber ? 'tel:' . $phoneNumber : null;
-        $southSulawesiAreas = south_sulawesi_service_areas();
-    @endphp
     <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
         @include('partials.public.header', ['variant' => 'home'])
         <main class="flex-1">
@@ -68,13 +102,25 @@
             @endif
             <section class="relative px-4 sm:px-6 lg:px-20 py-8 sm:py-10">
                 <div class="max-w-7xl mx-auto">
-                    <div x-data="{ current: 0, total: {{ count($heroImages) }}, interval: {{ $heroCarouselIntervalMs }}, start() { if (this.total <= 1) return; setInterval(() => { this.current = (this.current + 1) % this.total }, this.interval); } }"
+                    <div x-data="{ current: 0, total: {{ count($heroImageSources) }}, interval: {{ $heroCarouselIntervalMs }}, start() { if (this.total <= 1) return; if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; setInterval(() => { this.current = (this.current + 1) % this.total }, this.interval); } }"
                         x-init="start()"
                         class="relative overflow-hidden rounded-2xl bg-slate-900 min-h-[420px] sm:min-h-[500px] flex flex-col items-center justify-center text-center p-6 sm:p-8 lg:p-16">
-                        @foreach($heroImages as $index => $heroImage)
-                            <div x-cloak x-show="current === {{ $index }}" x-transition.opacity.duration.700ms
-                                class="absolute inset-0 bg-cover bg-center opacity-60"
-                                data-alt="Tampilan depan bus pariwisata mewah di jalan raya" @style(["background-image: url('" . $heroImage . "')"])></div>
+                        @foreach($heroImageSources as $index => $heroSource)
+                            <img
+                                x-cloak
+                                x-show="current === {{ $index }}"
+                                x-transition.opacity.duration.700ms
+                                src="{{ $heroSource['src'] }}"
+                                srcset="{{ $heroSource['srcset'] }}"
+                                sizes="100vw"
+                                alt="Tampilan depan bus pariwisata untuk perjalanan rombongan"
+                                width="1600"
+                                height="900"
+                                loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
+                                fetchpriority="{{ $index === 0 ? 'high' : 'low' }}"
+                                decoding="{{ $index === 0 ? 'sync' : 'async' }}"
+                                class="absolute inset-0 h-full w-full object-cover opacity-60"
+                            >
                         @endforeach
                         <div
                             class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/40 to-transparent">
@@ -97,9 +143,9 @@
                                     {{ setting('hero_subtitle', 'Armada modern, fasilitas lengkap, dan pengemudi profesional siap menemani perjalanan wisata keluarga atau korporat Anda di seluruh Sulawesi Selatan.') }}
                                 </p>
                             @endif
-                            @if(count($heroImages) > 1)
+                            @if(count($heroImageSources) > 1)
                                 <div class="mt-8 flex items-center justify-center gap-2">
-                                    @foreach($heroImages as $index => $heroImage)
+                                    @foreach($heroImageSources as $index => $heroSource)
                                         <button type="button" class="h-2.5 w-2.5 rounded-full bg-white/40 transition-all"
                                             :class="current === {{ $index }} ? 'bg-white w-7' : 'bg-white/40'"
                                             @click="current = {{ $index }}"></button>
@@ -154,14 +200,26 @@
                         @forelse($liburanPackages ?? [] as $package)
                             @php
                                 $packageImage = $package->image_path ?: '/stitch_img_bus_shd.jpg';
-                                $packageThumbnail = media_thumbnail_url($packageImage, 640, 75) ?? $packageImage;
+                                $packageThumb480 = media_thumbnail_url($packageImage, 480, 72) ?? $packageImage;
+                                $packageThumb640 = media_thumbnail_url($packageImage, 640, 75) ?? $packageImage;
+                                $packageThumb960 = media_thumbnail_url($packageImage, 960, 76) ?? $packageImage;
+                                $packageThumbnail = $packageThumb640;
+                                $packageSrcset = implode(', ', [
+                                    $packageThumb480 . ' 480w',
+                                    $packageThumb640 . ' 640w',
+                                    $packageThumb960 . ' 960w',
+                                ]);
                             @endphp
                             <article
                                 class="group bg-white dark:bg-slate-900/60 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:shadow-xl transition-all">
                                 <div class="relative h-52 overflow-hidden">
                                     <img
                                         src="{{ $packageThumbnail }}"
+                                        srcset="{{ $packageSrcset }}"
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                                         alt="{{ $package->title }}"
+                                        width="960"
+                                        height="540"
                                         loading="lazy"
                                         decoding="async"
                                         class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
@@ -209,14 +267,26 @@
                         @forelse($sewaPackages ?? [] as $package)
                             @php
                                 $packageImage = $package->image_path ?: '/stitch_img_bus_shd.jpg';
-                                $packageThumbnail = media_thumbnail_url($packageImage, 640, 75) ?? $packageImage;
+                                $packageThumb480 = media_thumbnail_url($packageImage, 480, 72) ?? $packageImage;
+                                $packageThumb640 = media_thumbnail_url($packageImage, 640, 75) ?? $packageImage;
+                                $packageThumb960 = media_thumbnail_url($packageImage, 960, 76) ?? $packageImage;
+                                $packageThumbnail = $packageThumb640;
+                                $packageSrcset = implode(', ', [
+                                    $packageThumb480 . ' 480w',
+                                    $packageThumb640 . ' 640w',
+                                    $packageThumb960 . ' 960w',
+                                ]);
                             @endphp
                             <article
                                 class="group bg-white dark:bg-slate-900/60 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:shadow-xl transition-all">
                                 <div class="relative h-52 overflow-hidden">
                                     <img
                                         src="{{ $packageThumbnail }}"
+                                        srcset="{{ $packageSrcset }}"
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                                         alt="{{ $package->title }}"
+                                        width="960"
+                                        height="540"
                                         loading="lazy"
                                         decoding="async"
                                         class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
