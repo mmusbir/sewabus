@@ -38,7 +38,6 @@
         }, $heroImages);
 
         $heroPreload = $heroImageSources[0] ?? null;
-        $heroCarouselIntervalMs = max(1000, ((int) setting('hero_carousel_interval_seconds', 5)) * 1000);
         $whatsappNumber = preg_replace('/[^0-9]/', '', setting('social_whatsapp_number', ''));
         $phoneRaw = setting('contact_phone', setting('social_whatsapp_number', ''));
         $phoneNumber = preg_replace('/[^0-9+]/', '', $phoneRaw ?? '');
@@ -63,11 +62,6 @@
     <link rel="icon" type="image/x-icon" href="{{ setting('favicon', '/favicon.ico') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @include('partials.public.plus-jakarta-fonts')
-    <link rel="prefetch" href="{{ route('packages.index') }}">
-    <link rel="prefetch" href="{{ route('katalog.index') }}">
-    <link rel="prefetch" href="{{ url('/paket-tour') }}">
-    <link rel="prefetch" href="{{ url('/rental-hiace') }}">
-    <link rel="prefetch" href="{{ url('/travel-pinrang') }}">
     @include('partials.fontawesome')
     <style>
         :root {
@@ -99,26 +93,22 @@
             @endif
             <section class="relative px-4 sm:px-6 lg:px-20 py-8 sm:py-10">
                 <div class="max-w-7xl mx-auto">
-                    <div x-data="{ current: 0, total: {{ count($heroImageSources) }}, interval: {{ $heroCarouselIntervalMs }}, start() { if (this.total <= 1) return; if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; setInterval(() => { this.current = (this.current + 1) % this.total }, this.interval); } }"
-                        x-init="start()"
+                    <div
                         class="relative overflow-hidden rounded-2xl bg-slate-900 min-h-[420px] sm:min-h-[500px] flex flex-col items-center justify-center text-center p-6 sm:p-8 lg:p-16">
-                        @foreach($heroImageSources as $index => $heroSource)
+                        @if($heroPreload)
                             <img
-                                x-cloak
-                                x-show="current === {{ $index }}"
-                                x-transition.opacity.duration.700ms
-                                src="{{ $heroSource['src'] }}"
-                                srcset="{{ $heroSource['srcset'] }}"
+                                src="{{ $heroPreload['src'] }}"
+                                srcset="{{ $heroPreload['srcset'] }}"
                                 sizes="100vw"
                                 alt="Tampilan depan bus pariwisata untuk perjalanan rombongan"
                                 width="1600"
                                 height="900"
-                                loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
-                                fetchpriority="{{ $index === 0 ? 'high' : 'low' }}"
-                                decoding="{{ $index === 0 ? 'sync' : 'async' }}"
+                                loading="eager"
+                                fetchpriority="high"
+                                decoding="sync"
                                 class="absolute inset-0 h-full w-full object-cover opacity-60"
                             >
-                        @endforeach
+                        @endif
                         <div
                             class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/40 to-transparent">
                         </div>
@@ -140,15 +130,7 @@
                                     {{ setting('hero_subtitle', 'Armada modern, fasilitas lengkap, dan pengemudi profesional siap menemani perjalanan wisata keluarga atau korporat Anda di seluruh Sulawesi Selatan.') }}
                                 </p>
                             @endif
-                            @if(count($heroImageSources) > 1)
-                                <div class="mt-8 flex items-center justify-center gap-2">
-                                    @foreach($heroImageSources as $index => $heroSource)
-                                        <button type="button" class="h-2.5 w-2.5 rounded-full bg-white/40 transition-all"
-                                            :class="current === {{ $index }} ? 'bg-white w-7' : 'bg-white/40'"
-                                            @click="current = {{ $index }}"></button>
-                                    @endforeach
-                                </div>
-                            @endif
+                            <div class="mt-8 h-2.5" aria-hidden="true"></div>
                         </div>
                     </div>
                 </div>
