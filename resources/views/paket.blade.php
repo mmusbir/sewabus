@@ -4,15 +4,18 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 @php
-    $seoTitle = setting('seo_packages_title', setting('seo_meta_title_default', setting('site_name', 'Cahaya Bone | Bus Parawisata')) . ' - Paket Sewa');
-    $seoDescription = setting('seo_packages_description', setting('seo_meta_description_default', 'Pilih paket sewa dan paket liburan bus pariwisata sesuai kebutuhan.'));
+    $seoTitle = setting('seo_packages_title', setting('seo_meta_title_default', setting('site_name', 'Sewa Bus Sulawesi Selatan')) . ' - Paket Sewa Bus');
+    $seoDescription = setting('seo_packages_description', setting('seo_meta_description_default', 'Pilih paket sewa bus dan paket liburan untuk semua kabupaten/kota Sulawesi Selatan. Harga fleksibel sesuai rute, durasi, dan kebutuhan rombongan.'));
+    $seoKeywords = setting('seo_meta_keywords_default', 'paket sewa bus sulawesi selatan, sewa bus wisata, paket bus rombongan makassar, rental bus bone');
     $seoCanonical = route('packages.index');
+    $southSulawesiAreas = south_sulawesi_service_areas();
+    $whatsappNumber = preg_replace('/[^0-9]/', '', setting('social_whatsapp_number', ''));
 @endphp
 <title>{{ $seoTitle }}</title>
-@include('partials.public.seo-meta', ['seoTitle' => $seoTitle, 'seoDescription' => $seoDescription, 'seoCanonical' => $seoCanonical])
+@include('partials.public.seo-meta', ['seoTitle' => $seoTitle, 'seoDescription' => $seoDescription, 'seoKeywords' => $seoKeywords, 'seoCanonical' => $seoCanonical])
 <link rel="icon" type="image/x-icon" href="{{ setting('favicon', '/favicon.ico') }}">
 @vite(['resources/css/app.css', 'resources/js/app.js'])
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 @include('partials.fontawesome')
 <style>
         :root {
@@ -20,11 +23,11 @@
             --color-secondary-green: 1 128 61;
             --color-background-light: 248 246 246;
             --color-background-dark: 33 22 17;
-            --font-display: "Space Grotesk";
+            --font-display: "Plus Jakarta Sans";
         }
 
         body {
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
     </style>
 </head>
@@ -38,7 +41,7 @@
         </div>
     @endif
     <div class="mb-10">
-        <h1 class="text-4xl font-black text-slate-900 dark:text-slate-100 mb-3">Paket Sewa & Liburan</h1>
+        <h1 class="text-3xl sm:text-4xl font-black text-slate-900 dark:text-slate-100 mb-3">Paket Sewa Bus Sulawesi Selatan</h1>
         <p class="text-slate-600 dark:text-slate-400 max-w-3xl">Pilih paket perjalanan sesuai kebutuhan. Semua paket dapat disesuaikan dengan jumlah peserta, rute, dan fasilitas armada.</p>
     </div>
 
@@ -62,9 +65,15 @@
                 $badgeText = $package->type === 'liburan' ? 'Paket Liburan' : 'Paket Sewa';
             @endphp
             <article class="bg-white dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-xl transition-shadow">
-                <div class="relative h-52">
+                <div class="relative h-52 overflow-hidden">
                     <span class="absolute top-3 left-3 z-10 {{ $badgeClasses }} text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">{{ $badgeText }}</span>
-                    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('{{ $package->image_path ?: '/stitch_img_bus_shd.jpg' }}')"></div>
+                    <img
+                        src="{{ media_thumbnail_url($package->image_path ?: '/stitch_img_bus_shd.jpg', 640, 75) ?? ($package->image_path ?: '/stitch_img_bus_shd.jpg') }}"
+                        alt="{{ $package->title }}"
+                        loading="lazy"
+                        decoding="async"
+                        class="h-full w-full object-cover"
+                    >
                 </div>
                 <div class="p-5">
                     <h2 class="text-xl font-bold mb-2 text-slate-900 dark:text-slate-100">{{ $package->title }}</h2>
@@ -89,10 +98,16 @@
                         </ul>
                     @endif
 
-                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', setting('social_whatsapp_number', '')) }}?text={{ urlencode('Halo Admin, saya tertarik dengan ' . $package->title) }}" target="_blank" class="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
-                        Konsultasi Paket
-                        <x-fa-icon name="arrow-right" class="fa-fw text-sm" />
-                    </a>
+                    @if($whatsappNumber)
+                        <a href="https://wa.me/{{ $whatsappNumber }}?text={{ urlencode('Halo Admin, saya tertarik dengan ' . $package->title) }}" target="_blank" rel="noopener" class="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+                            Konsultasi Paket
+                            <x-fa-icon name="arrow-right" class="fa-fw text-sm" />
+                        </a>
+                    @else
+                        <button type="button" disabled class="w-full bg-primary/70 text-white/70 font-bold py-3 rounded-lg cursor-not-allowed flex items-center justify-center gap-2">
+                            Kontak Belum Tersedia
+                        </button>
+                    @endif
                 </div>
             </article>
         @empty
@@ -108,6 +123,17 @@
         </div>
     @endif
 </main>
+
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+    <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 lg:p-6">
+        <h2 class="text-xl font-black text-slate-900 dark:text-slate-100 mb-3">Area Paket Sewa Bus di Semua Kabupaten/Kota Sulawesi Selatan</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+            @foreach($southSulawesiAreas as $serviceArea)
+                <span class="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200">{{ $serviceArea }}</span>
+            @endforeach
+        </div>
+    </div>
+</section>
 
 @include('partials.public.footer')
 </body>

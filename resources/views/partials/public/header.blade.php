@@ -9,7 +9,7 @@
 @endphp
 
 <header x-data="{ open: false, darkMode: false, init() { const saved = localStorage.getItem('theme'); this.darkMode = saved ? saved === 'dark' : false; this.applyTheme(); }, applyTheme() { document.documentElement.classList.toggle('dark', this.darkMode); localStorage.setItem('theme', this.darkMode ? 'dark' : 'light'); } }" x-init="init()" x-effect="document.documentElement.classList.toggle('overflow-hidden', open); document.body.classList.toggle('overflow-hidden', open)" @class([
-    'z-50 w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md px-6 lg:px-20 py-4',
+    'z-50 w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md px-4 sm:px-6 lg:px-20 py-4',
     'sticky top-0' => $sticky,
 ])>
     <div class="max-w-7xl mx-auto flex items-center justify-between">

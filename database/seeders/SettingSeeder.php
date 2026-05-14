@@ -13,7 +13,7 @@ class SettingSeeder extends Seeder
     public function run(): void
     {
         $settings = [
-            'site_name' => 'Cahaya Bone | Bus Parawisata',
+            'site_name' => 'Sewa Bus Sulawesi Selatan',
             'favicon' => '/favicon.ico',
             'header_logo_text' => 'BusPariwisata',
             'footer_logo_text' => 'BusPariwisata',
@@ -23,15 +23,15 @@ class SettingSeeder extends Seeder
                     'label' => 'Cahaya Bone',
                 ],
             ], JSON_UNESCAPED_UNICODE),
-            'footer_description' => 'Penyedia jasa transportasi bus pariwisata dengan pengalaman lebih dari 70 tahun. Mengutamakan keselamatan dan kenyamanan.',
-            'hero_title' => 'Sewa Bus Pariwisata Terbaik untuk Perjalanan Anda',
-            'hero_subtitle' => 'Armada modern, fasilitas lengkap, dan pengemudi profesional siap menemani perjalanan wisata keluarga atau korporat Anda ke seluruh Indonesia.',
+            'footer_description' => 'Layanan sewa bus pariwisata untuk semua kabupaten/kota Sulawesi Selatan dengan armada lengkap dan layanan profesional.',
+            'hero_title' => 'Sewa Bus Pariwisata di Semua Kabupaten Sulawesi Selatan',
+            'hero_subtitle' => 'Armada modern, fasilitas lengkap, dan pengemudi profesional siap menemani perjalanan wisata keluarga atau korporat Anda di seluruh Sulawesi Selatan.',
             'hero_image' => '/stitch_img_hero.jpg',
             'social_facebook_url' => '#',
             'social_instagram_url' => '#',
             'social_twitter_url' => '#',
             'social_whatsapp_number' => '62812345678',
-            'contact_address' => 'Jl. Pariwisata No. 123, Jakarta Selatan',
+            'contact_address' => 'Sulawesi Selatan, Indonesia',
             'contact_phone' => '(021) 1234 5678',
             'contact_email' => 'info@buspariwisata.co.id',
         ];

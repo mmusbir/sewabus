@@ -4,16 +4,17 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     @php
-        $seoTitle = ($gallery->title . ' - ') . setting('seo_katalog_title', setting('seo_meta_title_default', setting('site_name', 'Cahaya Bone | Bus Parawisata')));
-        $seoDescription = $gallery->description ?: setting('seo_katalog_description', setting('seo_meta_description_default', 'Detail armada bus pariwisata.'));
+        $seoTitle = ($gallery->title . ' - ') . setting('seo_katalog_title', setting('seo_meta_title_default', setting('site_name', 'Sewa Bus Sulawesi Selatan')));
+        $seoDescription = $gallery->description ?: setting('seo_katalog_description', setting('seo_meta_description_default', 'Detail armada sewa bus untuk semua kabupaten/kota Sulawesi Selatan.'));
+        $seoKeywords = setting('seo_meta_keywords_default', 'detail armada sewa bus sulawesi selatan, rental bus makassar, sewa bus rombongan sulsel');
         $seoImage = $gallery->image_path ?: setting('seo_og_image', setting('hero_image_1', setting('hero_image', '/stitch_img_hero.jpg')));
         $seoCanonical = route('katalog.show', $gallery);
     @endphp
     <title>{{ $seoTitle }}</title>
-    @include('partials.public.seo-meta', ['seoTitle' => $seoTitle, 'seoDescription' => $seoDescription, 'seoCanonical' => $seoCanonical, 'seoImage' => $seoImage])
+    @include('partials.public.seo-meta', ['seoTitle' => $seoTitle, 'seoDescription' => $seoDescription, 'seoKeywords' => $seoKeywords, 'seoCanonical' => $seoCanonical, 'seoImage' => $seoImage])
     <link rel="icon" type="image/x-icon" href="{{ setting('favicon', '/favicon.ico') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
     @include('partials.fontawesome')
     <style>
         :root {
@@ -21,11 +22,11 @@
             --color-secondary-green: 1 128 61;
             --color-background-light: 248 246 246;
             --color-background-dark: 33 22 17;
-            --font-display: "Space Grotesk";
+            --font-display: "Plus Jakarta Sans";
         }
 
         body {
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
     </style>
 </head>
@@ -47,6 +48,7 @@
     $whatsappLink = $whatsappNumber
         ? "https://wa.me/{$whatsappNumber}?text=" . urlencode("Halo Admin, saya tertarik dengan {$gallery->title}. Bisa dibantu detail dan harga?")
         : null;
+    $southSulawesiAreas = south_sulawesi_service_areas();
 @endphp
 
 <main x-data="{ previewOpen: false, previewImage: null }" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -134,7 +136,7 @@
 
             <div class="flex flex-col sm:flex-row gap-4">
                 @if($whatsappLink)
-                    <a href="{{ $whatsappLink }}" target="_blank" class="bg-primary text-white px-6 py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+                    <a href="{{ $whatsappLink }}" target="_blank" rel="noopener" class="bg-primary text-white px-6 py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
                         <x-fa-icon name="whatsapp" style="brands" class="fa-fw text-sm" />
                         Pesan via WhatsApp
                     </a>
@@ -143,6 +145,12 @@
                     Lihat Armada Lainnya
                     <x-fa-icon name="arrow-right" class="fa-fw text-sm" />
                 </a>
+            </div>
+            <div class="mt-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-4">
+                <p class="text-sm text-slate-600 dark:text-slate-300 leading-6">
+                    Armada ini siap melayani perjalanan di semua kabupaten/kota Sulawesi Selatan, termasuk
+                    {{ implode(', ', array_slice($southSulawesiAreas, 0, 8)) }}, dan wilayah lainnya sesuai kebutuhan rute Anda.
+                </p>
             </div>
         </div>
     </div>

@@ -19,17 +19,17 @@
         <div class="grid grid-cols-1 gap-6">
             <div class="space-y-2">
                 <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Default Meta Title</label>
-                <input type="text" name="seo_meta_title_default" value="{{ old('seo_meta_title_default', $settings['seo_meta_title_default'] ?? setting('site_name', 'Cahaya Bone')) }}" class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm">
+                <input type="text" name="seo_meta_title_default" value="{{ old('seo_meta_title_default', $settings['seo_meta_title_default'] ?? setting('site_name', 'Sewa Bus Sulawesi Selatan')) }}" class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm">
                 <p class="text-xs text-slate-500">Disarankan 50-60 karakter.</p>
             </div>
             <div class="space-y-2">
                 <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Default Meta Description</label>
-                <textarea name="seo_meta_description_default" rows="3" class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm">{{ old('seo_meta_description_default', $settings['seo_meta_description_default'] ?? 'Layanan sewa bus pariwisata terpercaya dengan armada lengkap dan harga kompetitif.') }}</textarea>
+                <textarea name="seo_meta_description_default" rows="3" class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm">{{ old('seo_meta_description_default', $settings['seo_meta_description_default'] ?? 'Sewa bus pariwisata untuk semua kabupaten/kota Sulawesi Selatan dengan armada lengkap dan harga transparan.') }}</textarea>
                 <p class="text-xs text-slate-500">Disarankan 140-160 karakter.</p>
             </div>
             <div class="space-y-2">
                 <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Default Keywords</label>
-                <input type="text" name="seo_meta_keywords_default" value="{{ old('seo_meta_keywords_default', $settings['seo_meta_keywords_default'] ?? 'sewa bus pariwisata, rental bus, bus wisata') }}" class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm">
+                <input type="text" name="seo_meta_keywords_default" value="{{ old('seo_meta_keywords_default', $settings['seo_meta_keywords_default'] ?? 'sewa bus sulawesi selatan, sewa bus makassar, rental bus bone, bus wisata sulsel') }}" class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm">
                 <p class="text-xs text-slate-500">Pisahkan dengan koma.</p>
             </div>
             <div class="space-y-2">

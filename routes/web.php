@@ -19,6 +19,61 @@ Route::get('/up', function () {
     ]);
 });
 
+Route::get('/sitemap.xml', function () {
+    $entries = collect([
+        [
+            'loc' => route('home'),
+            'lastmod' => now()->toAtomString(),
+            'changefreq' => 'daily',
+            'priority' => '1.0',
+        ],
+        [
+            'loc' => route('katalog.index'),
+            'lastmod' => now()->toAtomString(),
+            'changefreq' => 'daily',
+            'priority' => '0.9',
+        ],
+        [
+            'loc' => route('packages.index'),
+            'lastmod' => now()->toAtomString(),
+            'changefreq' => 'weekly',
+            'priority' => '0.8',
+        ],
+        [
+            'loc' => route('contact.index'),
+            'lastmod' => now()->toAtomString(),
+            'changefreq' => 'monthly',
+            'priority' => '0.7',
+        ],
+    ]);
+
+    try {
+        if (Schema::hasTable('galleries')) {
+            $query = \App\Models\Gallery::query();
+            if (Schema::hasColumn('galleries', 'is_active')) {
+                $query->where('is_active', true);
+            }
+
+            $query->latest('updated_at')
+                ->get(['id', 'updated_at'])
+                ->each(function (\App\Models\Gallery $gallery) use ($entries) {
+                    $entries->push([
+                        'loc' => route('katalog.show', $gallery),
+                        'lastmod' => optional($gallery->updated_at)->toAtomString() ?? now()->toAtomString(),
+                        'changefreq' => 'weekly',
+                        'priority' => '0.8',
+                    ]);
+                });
+        }
+    } catch (\Throwable $exception) {
+        report($exception);
+    }
+
+    return response()
+        ->view('sitemap', ['entries' => $entries], 200)
+        ->header('Content-Type', 'application/xml');
+})->name('sitemap');
+
 Route::get('/', function () {
     $galleries = collect();
     $liburanPackages = collect();

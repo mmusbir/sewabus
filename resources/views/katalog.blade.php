@@ -4,15 +4,17 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 @php
-    $seoTitle = setting('seo_katalog_title', setting('seo_meta_title_default', setting('site_name', 'Cahaya Bone | Bus Parawisata')) . ' - Katalog');
-    $seoDescription = setting('seo_katalog_description', setting('seo_meta_description_default', 'Lihat katalog armada bus pariwisata lengkap untuk berbagai kebutuhan perjalanan.'));
+    $seoTitle = setting('seo_katalog_title', setting('seo_meta_title_default', setting('site_name', 'Sewa Bus Sulawesi Selatan')) . ' - Katalog Armada Semua Kabupaten');
+    $seoDescription = setting('seo_katalog_description', setting('seo_meta_description_default', 'Katalog armada sewa bus untuk semua kabupaten/kota di Sulawesi Selatan. Pilih kapasitas kursi, fasilitas, dan jenis bus sesuai kebutuhan rombongan Anda.'));
+    $seoKeywords = setting('seo_meta_keywords_default', 'katalog sewa bus sulawesi selatan, sewa bus makassar, sewa bus bone, sewa bus maros, sewa bus gowa, rental bus toraja');
     $seoCanonical = route('katalog.index');
+    $southSulawesiAreas = south_sulawesi_service_areas();
 @endphp
 <title>{{ $seoTitle }}</title>
-@include('partials.public.seo-meta', ['seoTitle' => $seoTitle, 'seoDescription' => $seoDescription, 'seoCanonical' => $seoCanonical])
+@include('partials.public.seo-meta', ['seoTitle' => $seoTitle, 'seoDescription' => $seoDescription, 'seoKeywords' => $seoKeywords, 'seoCanonical' => $seoCanonical])
 <link rel="icon" type="image/x-icon" href="{{ setting('favicon', '/favicon.ico') }}">
 @vite(['resources/css/app.css', 'resources/js/app.js'])
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 @include('partials.fontawesome')
 <style>
         :root {
@@ -20,11 +22,11 @@
             --color-secondary-green: 1 128 61;
             --color-background-light: 248 246 246;
             --color-background-dark: 33 22 17;
-            --font-display: "Space Grotesk";
+            --font-display: "Plus Jakarta Sans";
         }
 
         body {
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
     </style>
 </head>
@@ -37,23 +39,48 @@
 </div>
 @endif
 <div class="mb-8">
-<h2 class="text-4xl font-black text-slate-900 dark:text-slate-100 mb-2">Katalog Semua Armada</h2>
+<h1 class="text-3xl sm:text-4xl font-black text-slate-900 dark:text-slate-100 mb-2">Katalog Sewa Bus Semua Kabupaten Sulawesi Selatan</h1>
 <p class="text-slate-600 dark:text-slate-400 max-w-2xl">Temukan pilihan armada bus pariwisata terbaik dengan berbagai kapasitas dan fasilitas untuk menunjang kenyamanan perjalanan Anda.</p>
 </div>
 <div class="flex flex-col lg:flex-row gap-8">
-<aside class="w-full lg:w-72 flex-shrink-0">
-    <form method="GET" action="{{ route('katalog.index') }}" class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 sticky top-24 space-y-6">
-        @if($searchTerm !== '')
-            <input type="hidden" name="q" value="{{ $searchTerm }}">
-        @endif
+<aside class="w-full lg:w-72 flex-shrink-0" x-data="{ showFilter: false }">
+    <button
+        type="button"
+        class="lg:hidden mb-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-sm font-bold text-slate-800 dark:text-slate-100"
+        @click="showFilter = !showFilter"
+        :aria-expanded="showFilter"
+        aria-controls="katalog-filter-panel"
+    >
+        <x-fa-icon name="sliders" class="fa-fw text-primary" />
+        Filter &amp; Cari Armada
+    </button>
+    <form
+        method="GET"
+        action="{{ route('katalog.index') }}"
+        id="katalog-filter-panel"
+        class="hidden lg:block bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200 dark:border-slate-800 lg:sticky lg:top-24 space-y-6"
+        :class="showFilter ? '!block' : ''"
+    >
         @if($selectedCategory !== 'all')
             <input type="hidden" name="category" value="{{ $selectedCategory }}">
         @endif
 
         <div>
-            <h3 class="font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
-                <x-fa-icon name="filter" class="fa-fw text-primary" /> Filter
-            </h3>
+            <h2 class="font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+                <x-fa-icon name="filter" class="fa-fw text-primary" /> Filter Armada
+            </h2>
+            <label for="catalog-search" class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-2 block">Cari Armada</label>
+            <input
+                id="catalog-search"
+                name="q"
+                type="search"
+                value="{{ $searchTerm }}"
+                placeholder="Contoh: medium bus, wifi, toraja"
+                class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:border-primary focus:ring-primary"
+            />
+        </div>
+
+        <div>
             <p class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3">Fasilitas</p>
             <div class="space-y-2">
                 @foreach($facilityOptions as $facilityKey => $facilityConfig)
@@ -130,13 +157,15 @@
 </div>
 <section class="mt-10">
     <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 lg:p-6">
-        <h3 class="text-xl font-black text-slate-900 dark:text-slate-100 mb-3">Layanan Sewa Bus untuk Seluruh Sulawesi Selatan & Sulawesi Barat</h3>
+        <h2 class="text-xl font-black text-slate-900 dark:text-slate-100 mb-3">Layanan Sewa Bus untuk Semua Kabupaten/Kota Sulawesi Selatan</h2>
         <p class="text-sm text-slate-600 dark:text-slate-400 leading-6 mb-4">
-            Cahaya Bone melayani kebutuhan sewa bus pariwisata untuk rombongan wisata, perusahaan, sekolah, keluarga, dan komunitas dengan cakupan rute dalam kota maupun antar kabupaten/kota.
+            Tim kami melayani kebutuhan sewa bus pariwisata untuk rombongan wisata, perusahaan, sekolah, keluarga, dan komunitas dengan cakupan rute dalam kota maupun antar kabupaten/kota di Sulawesi Selatan.
         </p>
-        <p class="text-sm text-slate-600 dark:text-slate-400 leading-6">
-            Area layanan kami mencakup Makassar, Parepare, Palopo, Bantaeng, Barru, Bone, Bulukumba, Enrekang, Gowa, Jeneponto, Kepulauan Selayar, Luwu, Luwu Timur, Luwu Utara, Maros, Pangkep, Pinrang, Sidrap, Sinjai, Soppeng, Takalar, Tana Toraja, Toraja Utara, Wajo, serta wilayah Sulawesi Barat seperti Mamuju, Mamuju Tengah, Pasangkayu, Majene, Polewali Mandar, dan Mamasa.
-        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+            @foreach($southSulawesiAreas as $serviceArea)
+                <span class="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200">{{ $serviceArea }}</span>
+            @endforeach
+        </div>
     </div>
 </section>
 </main>

@@ -1,15 +1,17 @@
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     @php
-        $seoTitle = setting('seo_home_title', setting('seo_meta_title_default', setting('site_name', 'Multibus | Bus Parawisata')));
-        $seoDescription = setting('seo_home_description', setting('seo_meta_description_default', 'Layanan sewa bus pariwisata terpercaya dengan armada lengkap dan harga kompetitif.'));
+        $seoTitle = setting('seo_home_title', setting('seo_meta_title_default', setting('site_name', 'Sewa Bus Sulawesi Selatan') . ' | Sewa Bus Semua Kabupaten Sulawesi Selatan'));
+        $seoDescription = setting('seo_home_description', setting('seo_meta_description_default', 'Sewa bus pariwisata untuk semua kabupaten/kota di Sulawesi Selatan. Armada lengkap, driver profesional, harga transparan untuk wisata, sekolah, kantor, dan rombongan keluarga.'));
+        $seoKeywords = setting('seo_meta_keywords_default', 'sewa bus sulawesi selatan, sewa bus makassar, rental bus bone, sewa bus maros, sewa bus gowa, sewa bus toraja');
         $seoCanonical = route('home');
     @endphp
     <title>{{ $seoTitle }}</title>
-    @include('partials.public.seo-meta', ['seoTitle' => $seoTitle, 'seoDescription' => $seoDescription, 'seoCanonical' => $seoCanonical])
+    @include('partials.public.seo-meta', ['seoTitle' => $seoTitle, 'seoDescription' => $seoDescription, 'seoKeywords' => $seoKeywords, 'seoCanonical' => $seoCanonical])
     <link rel="icon" type="image/x-icon" href="{{ setting('favicon', '/favicon.ico') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap"
@@ -50,12 +52,13 @@
             ? 'https://wa.me/' . $whatsappNumber . '?text=' . urlencode('Halo Admin, saya ingin konsultasi sewa bus.')
             : null;
         $phoneCtaLink = $phoneNumber ? 'tel:' . $phoneNumber : null;
+        $southSulawesiAreas = south_sulawesi_service_areas();
     @endphp
     <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
         @include('partials.public.header', ['variant' => 'home'])
         <main class="flex-1">
             @if(!empty($databaseUnavailable))
-                <section class="px-6 lg:px-20 pt-6">
+                <section class="px-4 sm:px-6 lg:px-20 pt-6">
                     <div
                         class="max-w-7xl mx-auto rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
                         Data armada dan paket sementara tidak dapat dimuat karena koneksi database sedang bermasalah. Konten utama
@@ -63,11 +66,11 @@
                     </div>
                 </section>
             @endif
-            <section class="relative px-6 lg:px-20 py-10">
+            <section class="relative px-4 sm:px-6 lg:px-20 py-8 sm:py-10">
                 <div class="max-w-7xl mx-auto">
                     <div x-data="{ current: 0, total: {{ count($heroImages) }}, interval: {{ $heroCarouselIntervalMs }}, start() { if (this.total <= 1) return; setInterval(() => { this.current = (this.current + 1) % this.total }, this.interval); } }"
                         x-init="start()"
-                        class="relative overflow-hidden rounded-xl bg-slate-900 min-h-[500px] flex flex-col items-center justify-center text-center p-8 lg:p-16">
+                        class="relative overflow-hidden rounded-2xl bg-slate-900 min-h-[420px] sm:min-h-[500px] flex flex-col items-center justify-center text-center p-6 sm:p-8 lg:p-16">
                         @foreach($heroImages as $index => $heroImage)
                             <div x-cloak x-show="current === {{ $index }}" x-transition.opacity.duration.700ms
                                 class="absolute inset-0 bg-cover bg-center opacity-60"
@@ -85,13 +88,13 @@
                                 </span>
                             </span>
                             @if(setting('hero_show_title', true))
-                                <h1 class="text-4xl lg:text-6xl font-black text-white leading-tight mb-6">
-                                    {{ setting('hero_title', 'Sewa Bus Pariwisata Terbaik untuk Perjalanan Anda') }}
+                                <h1 class="text-3xl sm:text-4xl lg:text-6xl font-black text-white leading-tight mb-5 sm:mb-6">
+                                    {{ setting('hero_title', 'Sewa Bus Pariwisata di Semua Kabupaten Sulawesi Selatan') }}
                                 </h1>
                             @endif
                             @if(setting('hero_show_subtitle', true))
-                                <p class="text-lg text-slate-200 mb-10 leading-relaxed">
-                                    {{ setting('hero_subtitle', 'Armada modern, fasilitas lengkap, dan pengemudi profesional siap menemani perjalanan wisata keluarga atau korporat Anda ke seluruh Indonesia.') }}
+                                <p class="text-base sm:text-lg text-slate-200 mb-8 sm:mb-10 leading-relaxed">
+                                    {{ setting('hero_subtitle', 'Armada modern, fasilitas lengkap, dan pengemudi profesional siap menemani perjalanan wisata keluarga atau korporat Anda di seluruh Sulawesi Selatan.') }}
                                 </p>
                             @endif
                             @if(count($heroImages) > 1)
@@ -107,7 +110,7 @@
                     </div>
                 </div>
             </section>
-            <section class="px-6 lg:px-20 py-16 bg-white dark:bg-background-dark">
+            <section class="px-4 sm:px-6 lg:px-20 py-12 sm:py-16 bg-white dark:bg-background-dark">
                 <div class="max-w-7xl mx-auto">
                     <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
                         <div class="max-w-2xl">
@@ -133,7 +136,7 @@
                     </div>
                 </div>
             </section>
-            <section class="px-6 lg:px-20 py-16 bg-background-light dark:bg-background-dark/40">
+            <section class="px-4 sm:px-6 lg:px-20 py-12 sm:py-16 bg-background-light dark:bg-background-dark/40">
                 <div class="max-w-7xl mx-auto">
                     <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
                         <div class="max-w-2xl">
@@ -186,7 +189,7 @@
                     </div>
                 </div>
             </section>
-            <section class="px-6 lg:px-20 py-20 bg-background-light dark:bg-background-dark/50">
+            <section class="px-4 sm:px-6 lg:px-20 py-14 sm:py-20 bg-background-light dark:bg-background-dark/50">
                 <div class="max-w-7xl mx-auto">
                     <div class="text-center mb-16">
                         <h2 class="text-4xl font-black text-slate-900 dark:text-slate-100 mb-4">Mengapa Memilih Layanan
@@ -229,7 +232,7 @@
                     </div>
                 </div>
             </section>
-            <section class="px-6 lg:px-20 py-16">
+            <section class="px-4 sm:px-6 lg:px-20 py-12 sm:py-16">
                 <div
                     class="max-w-7xl mx-auto bg-primary rounded-2xl p-10 lg:p-20 flex flex-col lg:flex-row items-center justify-between gap-10 text-white relative overflow-hidden">
                     <div class="absolute right-0 top-0 opacity-10">
@@ -240,67 +243,55 @@
                         <p class="text-white/80 text-lg mb-0 leading-relaxed">Tim admin kami tersedia 24/7 untuk
                             membantu reservasi dan konsultasi rute perjalanan Anda agar lebih efisien.</p>
                     </div>
-                    <div class="relative z-10 flex flex-col sm:flex-row gap-3">
+                    <div class="relative z-10 flex w-full flex-col sm:flex-row gap-3">
                         @if($whatsappCtaLink)
                             <a href="{{ $whatsappCtaLink }}" target="_blank" rel="noopener"
-                                class="bg-white text-primary px-6 py-3 rounded-lg font-bold text-base hover:bg-slate-100 transition-colors inline-flex items-center justify-center gap-2 min-w-[220px]">
+                                class="bg-white text-primary px-6 py-3 rounded-lg font-bold text-base hover:bg-slate-100 transition-colors inline-flex items-center justify-center gap-2 w-full sm:w-auto sm:min-w-[220px]">
                                 <x-fa-icon name="whatsapp" style="brands" class="fa-fw text-[20px]" /> Hubungi via WhatsApp
                             </a>
                         @else
                             <button type="button" disabled
-                                class="bg-white/70 text-primary/70 px-6 py-3 rounded-lg font-bold text-base inline-flex items-center justify-center gap-2 min-w-[220px] cursor-not-allowed">
+                                class="bg-white/70 text-primary/70 px-6 py-3 rounded-lg font-bold text-base inline-flex items-center justify-center gap-2 w-full sm:w-auto sm:min-w-[220px] cursor-not-allowed">
                                 <x-fa-icon name="whatsapp" style="brands" class="fa-fw text-[20px]" /> Hubungi via WhatsApp
                             </button>
                         @endif
                         @if($phoneCtaLink)
                             <a href="{{ $phoneCtaLink }}"
-                                class="bg-secondary text-white px-6 py-3 rounded-lg font-bold text-base hover:bg-secondary/90 transition-colors inline-flex items-center justify-center gap-2 min-w-[220px]">
+                                class="bg-secondary text-white px-6 py-3 rounded-lg font-bold text-base hover:bg-secondary/90 transition-colors inline-flex items-center justify-center gap-2 w-full sm:w-auto sm:min-w-[220px]">
                                 <x-fa-icon name="phone" class="fa-fw text-[20px]" /> Telepon Langsung
                             </a>
                         @else
                             <button type="button" disabled
-                                class="bg-secondary/70 text-white/70 px-6 py-3 rounded-lg font-bold text-base inline-flex items-center justify-center gap-2 min-w-[220px] cursor-not-allowed">
+                                class="bg-secondary/70 text-white/70 px-6 py-3 rounded-lg font-bold text-base inline-flex items-center justify-center gap-2 w-full sm:w-auto sm:min-w-[220px] cursor-not-allowed">
                                 <x-fa-icon name="phone" class="fa-fw text-[20px]" /> Telepon Langsung
                             </button>
                         @endif
                     </div>
                 </div>
             </section>
-            <section class="px-6 lg:px-20 py-14 bg-background-light dark:bg-background-dark/50">
+            <section class="px-4 sm:px-6 lg:px-20 py-12 sm:py-14 bg-background-light dark:bg-background-dark/50">
                 <div class="max-w-7xl mx-auto">
                     <div
                         class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 lg:p-8">
-                        <h2 class="text-2xl lg:text-3xl font-black text-slate-900 dark:text-slate-100 mb-4">Area Layanan
-                            Sewa Bus Sulawesi Selatan &amp; Sulawesi Barat</h2>
+                        <h2 class="text-2xl lg:text-3xl font-black text-slate-900 dark:text-slate-100 mb-4">
+                            Area Layanan Sewa Bus Semua Kabupaten/Kota Sulawesi Selatan
+                        </h2>
                         <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
-                            Multibus melayani sewa bus pariwisata untuk perjalanan wisata, ziarah, kunjungan sekolah,
-                            acara kantor, dan antar-jemput rombongan di seluruh wilayah Sulawesi Selatan dan Sulawesi
-                            Barat. Layanan tersedia untuk keberangkatan dalam kota, antar kabupaten/kota, hingga
-                            perjalanan lintas provinsi sesuai kebutuhan Anda.
+                            Layanan sewa bus kami tersedia untuk seluruh wilayah Sulawesi Selatan. Anda bisa memesan
+                            bus wisata untuk keberangkatan dalam kota, antar kabupaten/kota, hingga perjalanan lintas
+                            provinsi sesuai kebutuhan rombongan.
                         </p>
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div
-                                class="rounded-xl border border-slate-200 dark:border-slate-800 p-5 bg-slate-50 dark:bg-slate-800/40">
-                                <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-3">Cakupan Sulawesi
-                                    Selatan</h3>
-                                <p class="text-sm text-slate-600 dark:text-slate-400 leading-6">
-                                    Makassar, Parepare, Palopo, Bantaeng, Barru, Bone, Bulukumba, Enrekang, Gowa,
-                                    Jeneponto, Kepulauan Selayar, Luwu, Luwu Timur, Luwu Utara, Maros, Pangkajene dan
-                                    Kepulauan (Pangkep), Pinrang, Sidenreng Rappang (Sidrap), Sinjai, Soppeng, Takalar,
-                                    Tana Toraja, Toraja Utara, dan Wajo.
-                                </p>
-                            </div>
-                            <div
-                                class="rounded-xl border border-slate-200 dark:border-slate-800 p-5 bg-slate-50 dark:bg-slate-800/40">
-                                <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-3">Cakupan Sulawesi
-                                    Barat</h3>
-                                <p class="text-sm text-slate-600 dark:text-slate-400 leading-6">
-                                    Mamuju, Mamuju Tengah, Pasangkayu, Majene, Polewali Mandar, dan Mamasa. Tim kami
-                                    siap membantu rekomendasi rute, pilihan armada, serta estimasi biaya perjalanan
-                                    untuk setiap daerah tujuan.
-                                </p>
-                            </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+                            @foreach($southSulawesiAreas as $serviceArea)
+                                <div class="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 px-4 py-3 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                    {{ $serviceArea }}
+                                </div>
+                            @endforeach
                         </div>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-6">
+                            Butuh rute luar Sulawesi Selatan? Tim kami siap bantu rencana perjalanan ke Sulawesi Barat
+                            dan antar provinsi dengan armada serta estimasi biaya yang sesuai.
+                        </p>
                     </div>
                 </div>
             </section>

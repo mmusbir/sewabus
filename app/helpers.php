@@ -12,6 +12,38 @@ if (!function_exists('setting')) {
     }
 }
 
+if (!function_exists('south_sulawesi_service_areas')) {
+    function south_sulawesi_service_areas(): array
+    {
+        return [
+            'Kota Makassar',
+            'Kota Parepare',
+            'Kota Palopo',
+            'Kabupaten Bantaeng',
+            'Kabupaten Barru',
+            'Kabupaten Bone',
+            'Kabupaten Bulukumba',
+            'Kabupaten Enrekang',
+            'Kabupaten Gowa',
+            'Kabupaten Jeneponto',
+            'Kabupaten Kepulauan Selayar',
+            'Kabupaten Luwu',
+            'Kabupaten Luwu Timur',
+            'Kabupaten Luwu Utara',
+            'Kabupaten Maros',
+            'Kabupaten Pangkajene dan Kepulauan',
+            'Kabupaten Pinrang',
+            'Kabupaten Sidenreng Rappang',
+            'Kabupaten Sinjai',
+            'Kabupaten Soppeng',
+            'Kabupaten Takalar',
+            'Kabupaten Tana Toraja',
+            'Kabupaten Toraja Utara',
+            'Kabupaten Wajo',
+        ];
+    }
+}
+
 if (!function_exists('default_gallery_categories')) {
     function default_gallery_categories(): array
     {

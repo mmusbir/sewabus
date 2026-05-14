@@ -76,7 +76,7 @@
                     <ul class="space-y-3 text-sm text-slate-600 leading-6">
                         <li class="flex items-start gap-3">
                             <x-fa-icon name="location-dot" class="fa-fw text-primary text-sm mt-1" />
-                            <span>{{ setting('contact_address', 'Jl. Pariwisata No. 123, Jakarta Selatan') }}</span>
+                            <span>{{ setting('contact_address', 'Sulawesi Selatan, Indonesia') }}</span>
                         </li>
                         <li class="flex items-center gap-3">
                             <x-fa-icon name="phone" class="fa-fw text-primary text-sm" />
@@ -137,7 +137,7 @@
                 <ul class="space-y-3 text-sm text-slate-400 leading-6">
                     <li class="flex gap-3">
                         <x-fa-icon name="location-dot" class="fa-fw text-primary text-sm" />
-                        {{ setting('contact_address', 'Jl. Pariwisata No. 123, Jakarta Selatan') }}
+                        {{ setting('contact_address', 'Sulawesi Selatan, Indonesia') }}
                     </li>
                     <li class="flex gap-3">
                         <x-fa-icon name="phone" class="fa-fw text-primary text-sm" />
@@ -173,7 +173,7 @@
                     @elseif(setting('footer_map_image'))
                         <img class="w-full h-full object-cover grayscale opacity-75 hover:grayscale-0 transition-all duration-300" src="{{ setting('footer_map_image') }}" alt="Peta lokasi kantor"/>
                     @else
-                        <img class="w-full h-full object-cover grayscale opacity-50" data-alt="Peta lokasi kantor pusat" data-location="Jakarta" src="/stitch_img_map.jpg"/>
+                        <img class="w-full h-full object-cover grayscale opacity-50" data-alt="Peta lokasi kantor pusat" data-location="Sulawesi Selatan" src="/stitch_img_map.jpg"/>
                     @endif
                 </div>
             </div>
@@ -185,8 +185,8 @@
 @endif
 
 @if($whatsappNumber)
-    <a href="{{ $whatsappHref }}" target="_blank" rel="noopener" class="fixed bottom-6 right-6 z-[60] inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-3 text-sm font-bold text-white shadow-xl shadow-emerald-900/20 hover:bg-emerald-700 transition-colors">
+    <a href="{{ $whatsappHref }}" target="_blank" rel="noopener" aria-label="Hubungi via WhatsApp" class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[60] inline-flex items-center gap-2 rounded-full bg-emerald-600 px-3.5 sm:px-5 py-3 text-sm font-bold text-white shadow-xl shadow-emerald-900/20 hover:bg-emerald-700 transition-colors">
         <x-fa-icon name="whatsapp" style="brands" class="text-base" />
-        Hubungi Kami
+        <span class="hidden sm:inline">Hubungi Kami</span>
     </a>
 @endif
