@@ -13,6 +13,9 @@ class RentalPackage extends Model
         'duration',
         'description',
         'includes',
+        'itinerary',
+        'excludes',
+        'terms_conditions',
         'image_path',
         'is_active',
         'sort_order',
@@ -21,6 +24,7 @@ class RentalPackage extends Model
     protected $casts = [
         'is_active' => 'boolean',
         'sort_order' => 'integer',
+        'itinerary' => 'array',
     ];
 
     public function getImagePathAttribute(?string $value): ?string
