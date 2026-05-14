@@ -42,6 +42,15 @@
         ->filter()
         ->unique()
         ->values();
+    $galleryPreviewItems = $thumbnailItems
+        ->take(6)
+        ->values()
+        ->map(fn ($imageItem, $imageIndex) => [
+            'src' => $imageItem,
+            'title' => $gallery->title,
+            'index' => $imageIndex,
+        ])
+        ->all();
     $videoItem = $gallery->video?->media_path;
     $whatsappNumber = preg_replace('/[^0-9]/', '', setting('social_whatsapp_number', ''));
     $whatsappLink = $whatsappNumber
@@ -59,7 +68,7 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden" data-armada-gallery data-armada-images='@json($galleryPreviewItems)'>
             <div class="relative aspect-[16/10]">
                 <div class="absolute top-4 inset-x-4 z-10 flex items-start justify-between gap-2">
                     <span @class([
@@ -77,12 +86,59 @@
                         </span>
                     @endif
                 </div>
-                <button type="button" class="w-full h-full bg-cover bg-center cursor-zoom-in" style="background-image: url('{{ $coverImage }}')" data-preview-src="{{ $coverImage }}" aria-label="Preview gambar utama armada"></button>
+                <button
+                    type="button"
+                    class="group relative h-full w-full cursor-zoom-in overflow-hidden"
+                    data-preview-open
+                    data-preview-src="{{ $coverImage }}"
+                    data-preview-title="{{ $gallery->title }}"
+                    data-preview-index="0"
+                    aria-label="Preview gambar utama armada"
+                >
+                    <img
+                        data-gallery-main-image
+                        src="{{ $coverImage }}"
+                        alt="{{ $gallery->title }}"
+                        width="960"
+                        height="600"
+                        class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        loading="eager"
+                        fetchpriority="high"
+                        decoding="async"
+                    >
+                    <span class="absolute bottom-4 left-4 rounded-full bg-black/55 px-3 py-1.5 text-xs font-bold text-white backdrop-blur-md">
+                        Ketuk untuk lihat besar
+                    </span>
+                </button>
             </div>
             @if($thumbnailItems->count() > 1)
                 <div class="grid grid-cols-3 gap-2 p-3 border-t border-slate-200 dark:border-slate-800">
-                    @foreach($thumbnailItems->take(6) as $imageItem)
-                        <button type="button" class="aspect-[4/3] rounded-lg border border-slate-200 dark:border-slate-700 bg-cover bg-center cursor-zoom-in" style="background-image: url('{{ $imageItem }}')" data-preview-src="{{ $imageItem }}" aria-label="Preview gambar armada"></button>
+                    @foreach($thumbnailItems->take(6) as $imageIndex => $imageItem)
+                        <button
+                            type="button"
+                            @class([
+                                'group aspect-[4/3] overflow-hidden rounded-lg border bg-slate-100 transition dark:bg-slate-800',
+                                'cursor-pointer hover:border-primary' => $imageIndex !== 0,
+                                'cursor-pointer border-primary ring-2 ring-primary/25 shadow-[0_0_0_1px_rgba(225,106,55,0.08)]' => $imageIndex === 0,
+                                'border-slate-200 dark:border-slate-700' => $imageIndex !== 0,
+                            ])
+                            data-gallery-thumb
+                            data-gallery-src="{{ $imageItem }}"
+                            data-gallery-title="{{ $gallery->title }}"
+                            data-preview-index="{{ $imageIndex }}"
+                            aria-pressed="{{ $imageIndex === 0 ? 'true' : 'false' }}"
+                            aria-label="Preview gambar armada {{ $imageIndex + 1 }}"
+                        >
+                            <img
+                                src="{{ $imageItem }}"
+                                alt="{{ $gallery->title }} - gambar {{ $imageIndex + 1 }}"
+                                width="320"
+                                height="240"
+                                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                loading="lazy"
+                                decoding="async"
+                            >
+                        </button>
                     @endforeach
                 </div>
             @endif
@@ -154,14 +210,28 @@
         </div>
     </div>
 
-    <div
-        data-preview-modal
-        class="fixed inset-0 z-[10000] hidden bg-black/80 backdrop-blur-sm items-center justify-center p-4"
-    >
-        <button type="button" data-preview-close class="absolute top-4 right-4 rounded-full bg-white/20 hover:bg-white/30 text-white p-2" aria-label="Tutup preview gambar">
-            <x-fa-icon name="xmark" class="fa-fw" />
-        </button>
-        <img data-preview-image src="" alt="Preview Armada" class="max-h-[90vh] max-w-[92vw] rounded-xl border border-white/20 shadow-2xl object-contain">
+    <div data-preview-modal class="fixed inset-0 z-[10000] hidden h-[100dvh] items-center justify-center bg-slate-950/95 p-3 backdrop-blur-md sm:p-6">
+        <div class="flex h-full w-full max-w-6xl flex-col">
+            <div class="mb-3 flex items-center justify-between gap-3 text-white">
+                <div class="min-w-0">
+                    <p data-preview-caption class="truncate text-sm font-bold sm:text-base">{{ $gallery->title }}</p>
+                    <p data-preview-count class="text-xs text-white/60">1 / {{ max(1, count($galleryPreviewItems)) }}</p>
+                </div>
+                <button type="button" data-preview-close class="inline-flex size-11 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/15 transition hover:bg-white/20" aria-label="Tutup preview gambar">
+                    <x-fa-icon name="xmark" class="fa-fw text-lg" />
+                </button>
+            </div>
+            <div class="relative min-h-0 flex-1 overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl">
+                <img data-preview-image src="" alt="Preview Armada" class="h-full w-full object-contain">
+                <button type="button" data-preview-prev class="absolute left-3 top-1/2 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/45 text-white ring-1 ring-white/15 backdrop-blur-md transition hover:bg-black/65 sm:left-5 sm:size-12" aria-label="Gambar sebelumnya">
+                    <x-fa-icon name="chevron-left" class="fa-fw text-xl" />
+                </button>
+                <button type="button" data-preview-next class="absolute right-3 top-1/2 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/45 text-white ring-1 ring-white/15 backdrop-blur-md transition hover:bg-black/65 sm:right-5 sm:size-12" aria-label="Gambar berikutnya">
+                    <x-fa-icon name="chevron-right" class="fa-fw text-xl" />
+                </button>
+            </div>
+            <p class="mt-3 text-center text-xs text-white/55 sm:hidden">Geser kiri/kanan untuk pindah gambar</p>
+        </div>
     </div>
 </main>
 
