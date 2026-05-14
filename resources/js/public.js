@@ -67,10 +67,11 @@ const initMobileMenu = () => {
         document.documentElement.classList.toggle('overflow-hidden', open);
         document.body.classList.toggle('overflow-hidden', open);
         toggle.setAttribute('aria-expanded', String(open));
+        menu.setAttribute('aria-hidden', String(!open));
 
         if (open) {
             window.setTimeout(() => {
-                panel?.querySelector('a, button')?.focus?.();
+                panel?.querySelector('nav a, button')?.focus?.();
             }, 0);
         }
     };
@@ -84,7 +85,7 @@ const initMobileMenu = () => {
     });
 
     menu.addEventListener('click', (event) => {
-        if (event.target === menu) {
+        if (panel && !panel.contains(event.target)) {
             setOpen(false);
         }
     });
