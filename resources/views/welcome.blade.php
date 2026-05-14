@@ -195,6 +195,65 @@
                     </div>
                 </div>
             </section>
+            <section class="px-4 sm:px-6 lg:px-20 py-12 sm:py-16 bg-white dark:bg-background-dark">
+                <div class="max-w-7xl mx-auto">
+                    <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+                        <div class="max-w-2xl">
+                            <h2 class="text-3xl font-extrabold text-slate-900 dark:text-slate-100 mb-4">Paket Sewa
+                                Pilihan</h2>
+                            <p class="text-slate-600 dark:text-slate-400">Lihat paket sewa reguler yang cocok untuk
+                                perjalanan dinas, antar jemput rombongan, dan kebutuhan transportasi komunitas.</p>
+                        </div>
+                        <a class="text-primary font-bold flex items-center gap-2 hover:underline"
+                            href="{{ route('packages.index', ['type' => 'sewa']) }}">
+                            Lihat Semua Paket Sewa <x-fa-icon name="arrow-right" class="fa-fw" />
+                        </a>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        @forelse($sewaPackages ?? [] as $package)
+                            @php
+                                $packageImage = $package->image_path ?: '/stitch_img_bus_shd.jpg';
+                                $packageThumbnail = media_thumbnail_url($packageImage, 640, 75) ?? $packageImage;
+                            @endphp
+                            <article
+                                class="group bg-white dark:bg-slate-900/60 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:shadow-xl transition-all">
+                                <div class="relative h-52 overflow-hidden">
+                                    <span
+                                        class="absolute top-3 left-3 z-10 bg-emerald-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                                        Paket Sewa
+                                    </span>
+                                    <img
+                                        src="{{ $packageThumbnail }}"
+                                        alt="{{ $package->title }}"
+                                        loading="lazy"
+                                        decoding="async"
+                                        class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    >
+                                </div>
+                                <div class="p-5">
+                                    <h3 class="text-lg font-bold mb-2 text-slate-900 dark:text-slate-100">{{ $package->title }}</h3>
+                                    @if(filled($package->price_label))
+                                        <p class="mb-3 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+                                            <x-fa-icon name="wallet" class="fa-fw text-[11px]" />
+                                            {{ $package->price_label }}
+                                        </p>
+                                    @endif
+                                    <p class="text-slate-500 dark:text-slate-400 text-sm mb-4 line-clamp-2">{{ $package->description ?: 'Deskripsi paket belum tersedia.' }}</p>
+                                    <a href="{{ route('packages.index', ['type' => 'sewa']) }}"
+                                        class="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+                                        Lihat Paket
+                                        <x-fa-icon name="arrow-right" class="fa-fw text-sm" />
+                                    </a>
+                                </div>
+                            </article>
+                        @empty
+                            <div class="col-span-full text-center py-12 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+                                <p class="text-slate-500 dark:text-slate-400">Belum ada paket sewa aktif yang tersedia.</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </section>
             <section class="px-4 sm:px-6 lg:px-20 py-14 sm:py-20 bg-background-light dark:bg-background-dark/50">
                 <div class="max-w-7xl mx-auto">
                     <div class="text-center mb-16">

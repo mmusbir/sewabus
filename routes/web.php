@@ -77,6 +77,7 @@ Route::get('/sitemap.xml', function () {
 Route::get('/', function () {
     $galleries = collect();
     $liburanPackages = collect();
+    $sewaPackages = collect();
     $databaseUnavailable = false;
 
     try {
@@ -94,28 +95,35 @@ Route::get('/', function () {
 
     try {
         if (Schema::hasTable('rental_packages')) {
-            $query = \App\Models\RentalPackage::query()->latest()->take(3);
+            $buildPackageQuery = function () {
+                $query = \App\Models\RentalPackage::query()->latest()->take(3);
 
-            if (Schema::hasColumn('rental_packages', 'is_active')) {
-                $query->where('is_active', true);
-            }
+                if (Schema::hasColumn('rental_packages', 'is_active')) {
+                    $query->where('is_active', true);
+                }
+
+                if (Schema::hasColumn('rental_packages', 'sort_order')) {
+                    $query->orderBy('sort_order');
+                }
+
+                return $query;
+            };
 
             if (Schema::hasColumn('rental_packages', 'type')) {
-                $query->where('type', 'liburan');
+                $liburanPackages = $buildPackageQuery()->where('type', 'liburan')->get();
+                $sewaPackages = $buildPackageQuery()->where('type', 'sewa')->get();
+            } else {
+                $allPackages = $buildPackageQuery()->get();
+                $liburanPackages = $allPackages;
+                $sewaPackages = $allPackages;
             }
-
-            if (Schema::hasColumn('rental_packages', 'sort_order')) {
-                $query->orderBy('sort_order');
-            }
-
-            $liburanPackages = $query->get();
         }
     } catch (\Throwable $exception) {
         report($exception);
         $databaseUnavailable = true;
     }
 
-    return view('welcome', compact('galleries', 'liburanPackages', 'databaseUnavailable'));
+    return view('welcome', compact('galleries', 'liburanPackages', 'sewaPackages', 'databaseUnavailable'));
 })->name('home');
 
 Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog.index');
