@@ -53,9 +53,32 @@
         ->values()
         ->all();
     $packageImage = $package->image_path ?: '/stitch_img_bus_shd.jpg';
-    $image480 = media_thumbnail_url($packageImage, 480, 72) ?? $packageImage;
-    $image768 = media_thumbnail_url($packageImage, 768, 74) ?? $packageImage;
-    $image1280 = media_thumbnail_url($packageImage, 1280, 78) ?? $packageImage;
+    $packageGalleryItems = collect([
+        [
+            'src' => $packageImage,
+            'label' => 'Foto Paket Utama',
+            'title' => $package->title . ' - Foto Paket Utama',
+        ],
+    ])->merge(
+        collect($liburanGalleryItems)->map(fn (array $item) => [
+            'src' => $item['url'],
+            'label' => $item['label'],
+            'title' => $package->title . ' - ' . $item['label'],
+        ])
+    )->filter(fn (array $item) => filled($item['src']))
+        ->unique('src')
+        ->values();
+    $packagePreviewItems = $packageGalleryItems
+        ->map(fn (array $item, int $index) => [
+            'src' => $item['src'],
+            'title' => $item['title'],
+            'index' => $index,
+        ])
+        ->all();
+    $packageMainImage = $packageGalleryItems->first()['src'] ?? '/stitch_img_bus_shd.jpg';
+    $image480 = media_thumbnail_url($packageMainImage, 480, 72) ?? $packageMainImage;
+    $image768 = media_thumbnail_url($packageMainImage, 768, 74) ?? $packageMainImage;
+    $image1280 = media_thumbnail_url($packageMainImage, 1280, 78) ?? $packageMainImage;
 @endphp
 <title>{{ $seoTitle }}</title>
 @include('partials.public.seo-meta', ['seoTitle' => $seoTitle, 'seoDescription' => $seoDescription, 'seoKeywords' => $seoKeywords, 'seoCanonical' => $seoCanonical, 'seoImage' => $seoImage])
@@ -131,36 +154,72 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-7 lg:gap-10 items-center">
                 <div class="detail-reveal lg:col-span-7">
                     <div class="relative overflow-hidden rounded-2xl border border-white/70 bg-white shadow-2xl shadow-slate-900/10 dark:border-slate-800 dark:bg-slate-900 dark:shadow-black/20">
-                        <div class="relative aspect-[16/10]">
-                            <span class="absolute top-4 left-4 z-10 {{ $packageTypeBadgeClass }} text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg shadow-black/15">{{ $packageTypeLabel }}</span>
-                            <img
-                                src="{{ $image768 }}"
-                                srcset="{{ $image480 }} 480w, {{ $image768 }} 768w, {{ $image1280 }} 1280w"
-                                sizes="(max-width: 1024px) 100vw, 58vw"
-                                alt="{{ $package->title }}"
-                                width="1280"
-                                height="800"
-                                class="h-full w-full object-cover"
-                                decoding="async"
-                                fetchpriority="high"
+                        <div class="relative aspect-[16/10]" data-armada-gallery data-armada-images='@json($packagePreviewItems)'>
+                            <button
+                                type="button"
+                                class="group relative h-full w-full cursor-zoom-in overflow-hidden"
+                                data-preview-open
+                                data-preview-src="{{ $packageMainImage }}"
+                                data-preview-title="{{ $package->title }}"
+                                data-preview-index="0"
+                                data-preview-items='@json($packagePreviewItems)'
+                                aria-label="Preview foto paket"
                             >
-                            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/75 via-slate-950/20 to-transparent p-4 sm:p-5">
-                                <div class="grid grid-cols-3 gap-2 text-white">
-                                    <div class="rounded-lg bg-white/15 px-3 py-2 backdrop-blur-md">
-                                        <p class="text-[10px] font-bold uppercase text-white/70">Durasi</p>
-                                        <p class="mt-1 text-sm font-black">{{ $package->duration ?: '-' }}</p>
-                                    </div>
-                                    <div class="rounded-lg bg-white/15 px-3 py-2 backdrop-blur-md">
-                                        <p class="text-[10px] font-bold uppercase text-white/70">Include</p>
-                                        <p class="mt-1 text-sm font-black">{{ count($includeItems) }} item</p>
-                                    </div>
-                                    <div class="rounded-lg bg-white/15 px-3 py-2 backdrop-blur-md">
-                                        <p class="text-[10px] font-bold uppercase text-white/70">Itinerary</p>
-                                        <p class="mt-1 text-sm font-black">{{ count($itineraryItems) }} day</p>
-                                    </div>
-                                </div>
-                            </div>
+                                <span class="absolute top-4 left-4 z-10 {{ $packageTypeBadgeClass }} text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg shadow-black/15">{{ $packageTypeLabel }}</span>
+                                <img
+                                    data-gallery-main-image
+                                    src="{{ $image768 }}"
+                                    srcset="{{ $image480 }} 480w, {{ $image768 }} 768w, {{ $image1280 }} 1280w"
+                                    sizes="(max-width: 1024px) 100vw, 58vw"
+                                    alt="{{ $package->title }}"
+                                    width="1280"
+                                    height="800"
+                                    class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    decoding="async"
+                                    fetchpriority="high"
+                                >
+                                <span class="absolute bottom-4 left-4 rounded-full bg-black/55 px-3 py-1.5 text-xs font-bold text-white backdrop-blur-md">
+                                    Ketuk untuk lihat besar
+                                </span>
+                            </button>
                         </div>
+                        @if($packageGalleryItems->count() > 1)
+                            <div class="grid grid-cols-3 gap-2 border-t border-slate-200 p-3 dark:border-slate-800">
+                                @foreach($packageGalleryItems->take(6) as $imageIndex => $galleryItem)
+                                    @php
+                                        $thumbImage = media_thumbnail_url($galleryItem['src'], 320, 74) ?? $galleryItem['src'];
+                                    @endphp
+                                    <button
+                                        type="button"
+                                        @class([
+                                            'group aspect-[4/3] overflow-hidden rounded-lg border bg-slate-100 transition dark:bg-slate-800',
+                                            'cursor-pointer hover:border-primary' => $imageIndex !== 0,
+                                            'cursor-pointer border-primary ring-2 ring-primary/25 shadow-[0_0_0_1px_rgba(225,106,55,0.08)]' => $imageIndex === 0,
+                                            'border-slate-200 dark:border-slate-700' => $imageIndex !== 0,
+                                        ])
+                                        data-gallery-thumb
+                                        data-gallery-src="{{ $galleryItem['src'] }}"
+                                        data-gallery-title="{{ $galleryItem['title'] }}"
+                                        data-preview-index="{{ $imageIndex }}"
+                                        data-preview-open
+                                        data-preview-src="{{ $galleryItem['src'] }}"
+                                        data-preview-title="{{ $galleryItem['title'] }}"
+                                        aria-pressed="{{ $imageIndex === 0 ? 'true' : 'false' }}"
+                                        aria-label="Preview foto paket {{ $imageIndex + 1 }}"
+                                    >
+                                        <img
+                                            src="{{ $thumbImage }}"
+                                            alt="{{ $galleryItem['label'] }}"
+                                            width="320"
+                                            height="240"
+                                            class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                            loading="lazy"
+                                            decoding="async"
+                                        >
+                                    </button>
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -231,10 +290,12 @@
             </div>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/50 p-5">
-            <div class="mb-4 inline-flex size-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
-                <x-fa-icon name="circle-check" class="fa-fw" />
-            </div>
-            <h3 class="text-lg font-black text-slate-900 dark:text-slate-100 mb-3">Yang Sudah Termasuk</h3>
+            <h3 class="mb-3 inline-flex items-center gap-2 text-lg font-black text-slate-900 dark:text-slate-100">
+                <span class="inline-flex size-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+                    <x-fa-icon name="circle-check" class="fa-fw" />
+                </span>
+                Yang Sudah Termasuk
+            </h3>
             @if(count($includeItems))
                 <ul class="space-y-2">
                     @foreach($includeItems as $includeItem)
@@ -250,15 +311,17 @@
         </div>
 
         <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/50 p-5">
-            <div class="mb-4 inline-flex size-10 items-center justify-center rounded-lg bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300">
-                <x-fa-icon name="circle-xmark" style="regular" class="fa-fw" />
-            </div>
-            <h3 class="text-lg font-black text-slate-900 dark:text-slate-100 mb-3">Yang Tidak Termasuk</h3>
+            <h3 class="mb-3 inline-flex items-center gap-2 text-lg font-black text-slate-900 dark:text-slate-100">
+                <span class="inline-flex size-8 items-center justify-center rounded-lg bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300">
+                    <x-fa-icon name="xmark" class="fa-fw" />
+                </span>
+                Yang Tidak Termasuk
+            </h3>
             @if(count($excludeItems))
                 <ul class="space-y-2">
                     @foreach($excludeItems as $excludeItem)
                         <li class="text-sm text-slate-600 dark:text-slate-300 flex items-start gap-2">
-                            <x-fa-icon name="circle-xmark" style="regular" class="fa-fw text-rose-500 text-sm mt-0.5" />
+                            <x-fa-icon name="xmark" class="fa-fw text-rose-500 text-sm mt-0.5" />
                             <span>{{ $excludeItem }}</span>
                         </li>
                     @endforeach
@@ -269,15 +332,17 @@
         </div>
 
         <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/50 p-5">
-            <div class="mb-4 inline-flex size-10 items-center justify-center rounded-lg bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300">
-                <x-fa-icon name="circle-info" class="fa-fw" />
-            </div>
-            <h3 class="text-lg font-black text-slate-900 dark:text-slate-100 mb-3">Syarat &amp; Ketentuan</h3>
+            <h3 class="mb-3 inline-flex items-center gap-2 text-lg font-black text-slate-900 dark:text-slate-100">
+                <span class="inline-flex size-8 items-center justify-center rounded-lg bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300">
+                    <x-fa-icon name="file" class="fa-fw" />
+                </span>
+                Syarat &amp; Ketentuan
+            </h3>
             @if(count($termItems))
                 <ul class="space-y-2">
                     @foreach($termItems as $termItem)
                         <li class="text-sm text-slate-600 dark:text-slate-300 flex items-start gap-2">
-                            <x-fa-icon name="circle-info" class="fa-fw text-sky-500 text-sm mt-0.5" />
+                            <x-fa-icon name="file" class="fa-fw text-sky-500 text-sm mt-0.5" />
                             <span>{{ $termItem }}</span>
                         </li>
                     @endforeach
@@ -289,39 +354,6 @@
             </div>
         </div>
     </section>
-
-    @if($package->type === 'liburan' && count($liburanGalleryItems))
-        <section class="bg-background-light py-8 sm:py-10 dark:bg-background-dark/60">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="mb-5 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
-                    <div>
-                        <p class="text-xs font-black uppercase tracking-wide text-primary">Dokumentasi paket</p>
-                        <h2 class="mt-1 text-2xl font-black text-slate-950 dark:text-white">Foto Unit & Penginapan</h2>
-                    </div>
-                    <p class="max-w-xl text-sm text-slate-500 dark:text-slate-400">Galeri ini khusus paket liburan untuk memberi gambaran unit kendaraan dan penginapan.</p>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    @foreach($liburanGalleryItems as $galleryItem)
-                        @php
-                            $galleryThumb = media_thumbnail_url($galleryItem['url'], 640, 76) ?? $galleryItem['url'];
-                        @endphp
-                        <figure class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
-                            <img
-                                src="{{ $galleryThumb }}"
-                                alt="{{ $galleryItem['label'] }}"
-                                width="640"
-                                height="420"
-                                class="h-40 w-full object-cover"
-                                loading="lazy"
-                                decoding="async"
-                            >
-                            <figcaption class="px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200">{{ $galleryItem['label'] }}</figcaption>
-                        </figure>
-                    @endforeach
-                </div>
-            </div>
-        </section>
-    @endif
 
     @if(count($itineraryItems))
         <section id="itinerary-paket" class="bg-background-light py-8 sm:py-10 dark:bg-background-dark/60">
@@ -351,6 +383,30 @@
             </div>
         </section>
     @endif
+
+    <div data-preview-modal class="fixed inset-0 z-[10000] hidden h-[100dvh] items-center justify-center bg-slate-950/95 p-3 backdrop-blur-md sm:p-6">
+        <div class="flex h-full w-full max-w-6xl flex-col">
+            <div class="mb-3 flex items-center justify-between gap-3 text-white">
+                <div class="min-w-0">
+                    <p data-preview-caption class="truncate text-sm font-bold sm:text-base">{{ $package->title }}</p>
+                    <p data-preview-count class="text-xs text-white/60">1 / {{ max(1, count($packagePreviewItems)) }}</p>
+                </div>
+                <button type="button" data-preview-close class="inline-flex size-11 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/15 transition hover:bg-white/20" aria-label="Tutup preview gambar">
+                    <x-fa-icon name="xmark" class="fa-fw text-lg" />
+                </button>
+            </div>
+            <div class="relative min-h-0 flex-1 overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl">
+                <img data-preview-image src="" alt="Preview Paket" class="h-full w-full object-contain">
+                <button type="button" data-preview-prev class="absolute left-3 top-1/2 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/45 text-white ring-1 ring-white/15 backdrop-blur-md transition hover:bg-black/65 sm:left-5 sm:size-12" aria-label="Gambar sebelumnya">
+                    <x-fa-icon name="chevron-left" class="fa-fw text-xl" />
+                </button>
+                <button type="button" data-preview-next class="absolute right-3 top-1/2 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/45 text-white ring-1 ring-white/15 backdrop-blur-md transition hover:bg-black/65 sm:right-5 sm:size-12" aria-label="Gambar berikutnya">
+                    <x-fa-icon name="chevron-right" class="fa-fw text-xl" />
+                </button>
+            </div>
+            <p class="mt-3 text-center text-xs text-white/55 sm:hidden">Geser kiri/kanan untuk pindah gambar</p>
+        </div>
+    </div>
 
     @if($relatedPackages->isNotEmpty())
         <section id="paket-lainnya" class="bg-white py-8 sm:py-10 dark:bg-background-dark">
