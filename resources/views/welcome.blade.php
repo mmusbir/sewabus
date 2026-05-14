@@ -173,6 +173,12 @@
                                 </div>
                                 <div class="p-5">
                                     <h3 class="text-lg font-bold mb-2 text-slate-900 dark:text-slate-100">{{ $package->title }}</h3>
+                                    @if(filled($package->price_label))
+                                        <p class="mb-3 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+                                            <x-fa-icon name="wallet" class="fa-fw text-[11px]" />
+                                            {{ $package->price_label }}
+                                        </p>
+                                    @endif
                                     <p class="text-slate-500 dark:text-slate-400 text-sm mb-4 line-clamp-2">{{ $package->description ?: 'Deskripsi paket belum tersedia.' }}</p>
                                     <a href="{{ route('packages.index', ['type' => 'liburan']) }}"
                                         class="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
