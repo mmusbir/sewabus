@@ -46,6 +46,8 @@
             : null;
         $phoneCtaLink = $phoneNumber ? 'tel:' . $phoneNumber : null;
         $southSulawesiAreas = south_sulawesi_service_areas();
+        $featuredServiceAreas = array_slice($southSulawesiAreas, 0, 9);
+        $remainingServiceAreas = array_slice($southSulawesiAreas, 9);
     @endphp
     <title>{{ $seoTitle }}</title>
     @include('partials.public.seo-meta', ['seoTitle' => $seoTitle, 'seoDescription' => $seoDescription, 'seoKeywords' => $seoKeywords, 'seoCanonical' => $seoCanonical])
@@ -387,12 +389,26 @@
                             provinsi sesuai kebutuhan rombongan.
                         </p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-                            @foreach($southSulawesiAreas as $serviceArea)
+                            @foreach($featuredServiceAreas as $serviceArea)
                                 <div class="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 px-4 py-3 text-sm font-semibold text-slate-700 dark:text-slate-200">
                                     {{ $serviceArea }}
                                 </div>
                             @endforeach
                         </div>
+                        @if(count($remainingServiceAreas))
+                            <details class="mt-4">
+                                <summary class="cursor-pointer list-none text-sm font-bold text-primary inline-flex items-center gap-2">
+                                    Lihat Semua Area
+                                </summary>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 mt-4">
+                                    @foreach($remainingServiceAreas as $serviceArea)
+                                        <div class="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 px-4 py-3 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                            {{ $serviceArea }}
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </details>
+                        @endif
                         <p class="text-sm text-slate-500 dark:text-slate-400 mt-6">
                             Butuh rute luar Sulawesi Selatan? Tim kami siap bantu rencana perjalanan ke Sulawesi Barat
                             dan antar provinsi dengan armada serta estimasi biaya yang sesuai.
