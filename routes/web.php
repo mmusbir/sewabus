@@ -19,6 +19,19 @@ Route::get('/up', function () {
     ]);
 });
 
+Route::get('/robots.txt', function () {
+    $content = implode("\n", [
+        'User-agent: *',
+        'Disallow:',
+        '',
+        'Sitemap: ' . url('/sitemap.xml'),
+    ]);
+
+    return response($content, 200, [
+        'Content-Type' => 'text/plain; charset=UTF-8',
+    ]);
+})->name('robots');
+
 Route::get('/sitemap.xml', function () {
     $entries = collect([
         [

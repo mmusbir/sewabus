@@ -159,10 +159,6 @@
                             <article
                                 class="group bg-white dark:bg-slate-900/60 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:shadow-xl transition-all">
                                 <div class="relative h-52 overflow-hidden">
-                                    <span
-                                        class="absolute top-3 left-3 z-10 bg-amber-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                                        Paket Liburan
-                                    </span>
                                     <img
                                         src="{{ $packageThumbnail }}"
                                         alt="{{ $package->title }}"
@@ -218,10 +214,6 @@
                             <article
                                 class="group bg-white dark:bg-slate-900/60 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:shadow-xl transition-all">
                                 <div class="relative h-52 overflow-hidden">
-                                    <span
-                                        class="absolute top-3 left-3 z-10 bg-emerald-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                                        Paket Sewa
-                                    </span>
                                     <img
                                         src="{{ $packageThumbnail }}"
                                         alt="{{ $package->title }}"
