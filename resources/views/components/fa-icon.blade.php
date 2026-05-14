@@ -37,21 +37,26 @@
         'brands:facebook-f' => '<path d="M14 8h3V4h-3c-3 0-5 2-5 5v3H6v4h3v6h4v-6h3l1-4h-4V9c0-.6.4-1 1-1Z"/>',
         'brands:instagram' => '<path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Z"/><path d="M16 11.4A4 4 0 1 1 12.6 8 4 4 0 0 1 16 11.4Z"/><path d="M17.5 6.5h.01"/>',
         'brands:tiktok' => '<path d="M14 3v10.5a4.5 4.5 0 1 1-4.5-4.5"/><path d="M14 3c.5 3 2.5 5 5 5"/>',
-        'brands:whatsapp' => '<path d="M20 11.5a8 8 0 0 1-11.7 7.1L4 20l1.4-4.1A8 8 0 1 1 20 11.5Z"/><path d="M9 8c.5 4 3 6 7 7"/><path d="M9 8h2l1 2-1 1"/><path d="M14 14l1-1 2 1v2"/>',
+        'brands:whatsapp' => [
+            'mode' => 'fill',
+            'svg' => '<path d="M19.1 4.9A10.7 10.7 0 0 0 12 2C6.5 2 2 6.4 2 12c0 1.8.5 3.6 1.4 5.2L2 22l5-1.3c1.5.8 3.2 1.3 5 1.3h0c5.5 0 10-4.4 10-10a9.9 9.9 0 0 0-2.9-7.1ZM12 20.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3a8.2 8.2 0 0 1-1.3-4.4c0-4.6 3.8-8.4 8.4-8.4 2.2 0 4.3.9 5.9 2.5A8.3 8.3 0 0 1 20.4 12c0 4.6-3.8 8.3-8.4 8.3Zm4.6-6.2c-.2-.1-1.3-.6-1.5-.7-.2-.1-.3-.1-.5.1-.1.2-.6.7-.7.9-.1.1-.2.1-.4 0a6.8 6.8 0 0 1-2-1.3 7.5 7.5 0 0 1-1.4-1.7c-.1-.2 0-.3.1-.4.1-.1.2-.2.3-.4l.2-.3c.1-.1.1-.2 0-.4l-.7-1.6c-.2-.5-.4-.4-.5-.4h-.5c-.2 0-.4.1-.5.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.3c.1.2 1.6 2.5 3.9 3.4.6.3 1 .4 1.4.5.6.2 1.2.2 1.6.1.5-.1 1.3-.5 1.5-1 .2-.5.2-1 .2-1.1 0-.1-.2-.2-.4-.3Z"/>',
+        ],
     ];
 
-    $svg = $icons[$key] ?? null;
+    $icon = $icons[$key] ?? null;
+    $svg = is_array($icon) ? ($icon['svg'] ?? null) : $icon;
+    $mode = is_array($icon) ? ($icon['mode'] ?? 'stroke') : 'stroke';
 @endphp
 
 @if ($svg)
     <svg
         {{ $attributes->class(['inline-block', 'h-[1em]', 'w-[1em]', 'shrink-0', 'align-[-0.125em]'])->merge([
             'viewBox' => '0 0 24 24',
-            'fill' => 'none',
-            'stroke' => 'currentColor',
-            'stroke-width' => '2',
-            'stroke-linecap' => 'round',
-            'stroke-linejoin' => 'round',
+            'fill' => $mode === 'fill' ? 'currentColor' : 'none',
+            'stroke' => $mode === 'fill' ? 'none' : 'currentColor',
+            'stroke-width' => $mode === 'fill' ? null : '2',
+            'stroke-linecap' => $mode === 'fill' ? null : 'round',
+            'stroke-linejoin' => $mode === 'fill' ? null : 'round',
             'aria-hidden' => 'true',
             'focusable' => 'false',
         ]) }}

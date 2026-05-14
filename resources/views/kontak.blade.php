@@ -102,12 +102,12 @@
             <p class="text-sm text-slate-600 dark:text-slate-400 mb-6">Klik tombol berikut untuk langsung terhubung dengan admin via WhatsApp.</p>
             @if($whatsappHref)
                 <a href="{{ $whatsappHref }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors">
-                    <x-fa-icon name="whatsapp" style="brands" class="fa-fw text-sm" />
+                    <x-fa-icon name="whatsapp" style="brands" class="fa-fw text-base" />
                     Chat via WhatsApp
                 </a>
             @else
                 <button type="button" disabled class="inline-flex items-center gap-2 bg-primary/70 text-white/70 px-6 py-3 rounded-lg font-bold cursor-not-allowed">
-                    <x-fa-icon name="whatsapp" style="brands" class="fa-fw text-sm" />
+                    <x-fa-icon name="whatsapp" style="brands" class="fa-fw text-base" />
                     Nomor WhatsApp Belum Tersedia
                 </button>
             @endif

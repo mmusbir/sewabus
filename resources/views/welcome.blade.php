@@ -352,12 +352,12 @@
                         @if($whatsappCtaLink)
                             <a href="{{ $whatsappCtaLink }}" target="_blank" rel="noopener"
                                 class="bg-white text-primary px-6 py-3 rounded-lg font-bold text-base hover:bg-slate-100 transition-colors inline-flex items-center justify-center gap-2 w-full sm:w-auto sm:min-w-[220px]">
-                                <x-fa-icon name="whatsapp" style="brands" class="fa-fw text-[20px]" /> Hubungi via WhatsApp
+                                <x-fa-icon name="whatsapp" style="brands" class="fa-fw text-[22px]" /> Hubungi via WhatsApp
                             </a>
                         @else
                             <button type="button" disabled
                                 class="bg-white/70 text-primary/70 px-6 py-3 rounded-lg font-bold text-base inline-flex items-center justify-center gap-2 w-full sm:w-auto sm:min-w-[220px] cursor-not-allowed">
-                                <x-fa-icon name="whatsapp" style="brands" class="fa-fw text-[20px]" /> Hubungi via WhatsApp
+                                <x-fa-icon name="whatsapp" style="brands" class="fa-fw text-[22px]" /> Hubungi via WhatsApp
                             </button>
                         @endif
                         @if($phoneCtaLink)

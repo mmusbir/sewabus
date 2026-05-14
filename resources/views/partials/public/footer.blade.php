@@ -188,7 +188,7 @@
 
 @if($whatsappNumber)
     <a href="{{ $whatsappHref }}" target="_blank" rel="noopener" aria-label="Hubungi via WhatsApp" class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[60] inline-flex items-center gap-2 rounded-full bg-emerald-600 px-3.5 sm:px-5 py-3 text-sm font-bold text-white shadow-xl shadow-emerald-900/20 hover:bg-emerald-700 transition-colors">
-        <x-fa-icon name="whatsapp" style="brands" class="text-base" />
+        <x-fa-icon name="whatsapp" style="brands" class="text-lg" />
         <span class="hidden sm:inline">Hubungi Kami</span>
     </a>
 @endif

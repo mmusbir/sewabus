@@ -194,7 +194,7 @@
             <div class="flex flex-col sm:flex-row gap-4">
                 @if($whatsappLink)
                     <a href="{{ $whatsappLink }}" target="_blank" rel="noopener" class="bg-primary text-white px-6 py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
-                        <x-fa-icon name="whatsapp" style="brands" class="fa-fw text-sm" />
+                        <x-fa-icon name="whatsapp" style="brands" class="fa-fw text-base" />
                         Pesan via WhatsApp
                     </a>
                 @endif
