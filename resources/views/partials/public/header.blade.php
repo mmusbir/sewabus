@@ -2,6 +2,8 @@
     $sticky = $sticky ?? true;
     $headerLogoLight = setting('header_logo_image');
     $headerLogoDark = setting('header_logo_image_dark');
+    $headerLogoLightOptimized = media_thumbnail_url($headerLogoLight, 320, 82) ?? $headerLogoLight;
+    $headerLogoDarkOptimized = media_thumbnail_url($headerLogoDark, 320, 82) ?? $headerLogoDark;
     $isHome = request()->routeIs('home');
     $isKatalog = request()->routeIs('katalog.*');
     $isPackages = request()->routeIs('packages.*');
@@ -16,7 +18,7 @@
         <div class="flex items-center justify-center">
             @if($headerLogoLight || $headerLogoDark)
                 <img
-                    :src="darkMode ? @js($headerLogoDark ?: $headerLogoLight) : @js($headerLogoLight ?: $headerLogoDark)"
+                    :src="darkMode ? @js($headerLogoDarkOptimized ?: $headerLogoLightOptimized) : @js($headerLogoLightOptimized ?: $headerLogoDarkOptimized)"
                     alt="Logo Header"
                     width="160"
                     height="40"

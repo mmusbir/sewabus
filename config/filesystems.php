@@ -7,7 +7,7 @@ $env = static fn (string $key, mixed $default = null): mixed => is_string($value
 return [
 
     'media_disk' => $env('MEDIA_DISK', 'public'),
-    'supabase_image_render' => filter_var($env('SUPABASE_IMAGE_RENDER', false), FILTER_VALIDATE_BOOLEAN),
+    'supabase_image_render' => filter_var($env('SUPABASE_IMAGE_RENDER', true), FILTER_VALIDATE_BOOLEAN),
 
     /*
     |--------------------------------------------------------------------------

@@ -60,12 +60,9 @@
             fetchpriority="high"
         >
     @endif
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="icon" type="image/x-icon" href="{{ setting('favicon', '/favicon.ico') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap"
-        rel="stylesheet" />
+    @include('partials.public.plus-jakarta-fonts')
     <link rel="prefetch" href="{{ route('packages.index') }}">
     <link rel="prefetch" href="{{ route('katalog.index') }}">
     <link rel="prefetch" href="{{ url('/paket-tour') }}">

@@ -1,6 +1,8 @@
 @php
     $variant = $variant ?? 'home';
     $galleryCategories = gallery_category_list();
+    $footerLogoImage = setting('footer_logo_image');
+    $footerLogoImageOptimized = media_thumbnail_url($footerLogoImage, 320, 82) ?? $footerLogoImage;
     $whatsappNumber = preg_replace('/[^0-9]/', '', setting('social_whatsapp_number', ''));
     $whatsappHref = $whatsappNumber ? "https://wa.me/{$whatsappNumber}" : '#';
     $socialLinks = [
@@ -37,10 +39,10 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 mb-14">
                 <div class="sm:col-span-2 lg:col-span-1">
                     <div class="flex items-center gap-2 mb-5">
-                        @if(setting('footer_logo_image'))
-                            <img src="{{ setting('footer_logo_image') }}" alt="Logo Footer" width="160" height="40" class="h-10 object-contain">
+                        @if($footerLogoImage)
+                            <img src="{{ $footerLogoImageOptimized }}" alt="Logo Footer" width="160" height="40" class="h-10 object-contain">
                         @endif
-                        @if(setting('footer_logo_show_text', true) && !setting('footer_logo_image'))
+                        @if(setting('footer_logo_show_text', true) && !$footerLogoImage)
                             <x-fa-icon name="bus" class="fa-fw text-primary text-3xl" />
                             <h2 class="text-lg font-bold tracking-tight text-slate-900">{{ setting('footer_logo_text', 'BusPariwisata') }}</h2>
                         @endif
@@ -106,10 +108,10 @@
         <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
             <div class="col-span-1 lg:col-span-1">
                 <div class="flex items-center gap-3 mb-5">
-                    @if(setting('footer_logo_image'))
-                        <img src="{{ setting('footer_logo_image') }}" alt="Logo Footer" width="160" height="40" class="h-10 object-contain filter brightness-0 invert">
+                    @if($footerLogoImage)
+                        <img src="{{ $footerLogoImageOptimized }}" alt="Logo Footer" width="160" height="40" class="h-10 object-contain filter brightness-0 invert">
                     @endif
-                    @if(setting('footer_logo_show_text', true) && !setting('footer_logo_image'))
+                    @if(setting('footer_logo_show_text', true) && !$footerLogoImage)
                         <x-fa-icon name="bus" class="fa-fw text-3xl text-primary" />
                         <h2 class="text-lg font-extrabold tracking-tight text-white">{{ setting('footer_logo_text', 'BusPariwisata') }}</h2>
                     @endif

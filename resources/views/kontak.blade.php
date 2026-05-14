@@ -13,7 +13,7 @@
 @include('partials.public.seo-meta', ['seoTitle' => $seoTitle, 'seoDescription' => $seoDescription, 'seoKeywords' => $seoKeywords, 'seoCanonical' => $seoCanonical])
 <link rel="icon" type="image/x-icon" href="{{ setting('favicon', '/favicon.ico') }}">
 @vite(['resources/css/app.css', 'resources/js/app.js'])
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+@include('partials.public.plus-jakarta-fonts')
 @include('partials.fontawesome')
 <style>
         :root {
