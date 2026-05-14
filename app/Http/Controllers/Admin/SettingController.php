@@ -67,7 +67,7 @@ class SettingController extends Controller
     {
         $data = $request->validate([
             'site_name' => 'nullable|string',
-            'favicon' => 'nullable|image|mimes:ico,png,jpg,jpeg|max:1024',
+            'favicon' => 'nullable|file|mimes:ico,png,jpg,jpeg|mimetypes:image/x-icon,image/vnd.microsoft.icon,image/png,image/jpeg|max:1024',
             'header_logo_text' => 'nullable|string',
             'header_logo_image' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:2048',
             'header_logo_image_dark' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:2048',
@@ -98,6 +98,8 @@ class SettingController extends Controller
             'contact_email' => 'nullable|email',
         ], [
             'favicon.max' => 'Favicon maksimal 1 MB.',
+            'favicon.mimes' => 'Favicon harus berformat ICO/PNG/JPG/JPEG.',
+            'favicon.mimetypes' => 'Favicon tidak dikenali. Gunakan file ICO/PNG/JPG/JPEG yang valid.',
             'header_logo_image.max' => 'Logo navbar maksimal 2 MB.',
             'header_logo_image_dark.max' => 'Logo navbar mode malam maksimal 2 MB.',
             'footer_logo_image.max' => 'Logo footer maksimal 2 MB.',
