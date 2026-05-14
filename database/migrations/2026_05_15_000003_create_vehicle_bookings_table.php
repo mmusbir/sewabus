@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('service_type_note')->nullable();
             $table->string('po_key')->nullable()->index();
             $table->foreignId('gallery_id')->nullable()->constrained('galleries')->nullOnDelete();
+            $table->unsignedInteger('booked_unit_count')->default(1);
             $table->decimal('deal_price', 14, 2)->default(0);
             $table->decimal('markup_price', 14, 2)->default(0);
             $table->decimal('dp_amount', 14, 2)->default(0);

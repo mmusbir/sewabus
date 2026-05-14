@@ -82,28 +82,37 @@
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
         <section class="xl:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100">Armada Terbaru</h3>
-                <a href="{{ route('admin.galleries.index') }}" class="text-sm font-semibold text-primary hover:underline">Lihat Semua</a>
+                <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100">Bookingan Terbaru</h3>
+                <a href="{{ route('admin.bookings.index') }}" class="text-sm font-semibold text-primary hover:underline">Lihat Semua</a>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead>
                         <tr class="border-b border-slate-200 dark:border-slate-800">
-                            <th class="py-2.5 text-xs font-bold text-slate-500 uppercase tracking-wide">Armada</th>
-                            <th class="py-2.5 text-xs font-bold text-slate-500 uppercase tracking-wide">Kategori</th>
-                            <th class="py-2.5 text-xs font-bold text-slate-500 uppercase tracking-wide">Update</th>
+                            <th class="py-2.5 text-xs font-bold text-slate-500 uppercase tracking-wide">Kode</th>
+                            <th class="py-2.5 text-xs font-bold text-slate-500 uppercase tracking-wide">Customer</th>
+                            <th class="py-2.5 text-xs font-bold text-slate-500 uppercase tracking-wide">Tanggal</th>
+                            <th class="py-2.5 text-xs font-bold text-slate-500 uppercase tracking-wide">Layanan</th>
+                            <th class="py-2.5 text-xs font-bold text-slate-500 uppercase tracking-wide">Unit</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($recentGalleries as $gallery)
+                        @forelse($recentBookings as $booking)
                             <tr class="border-b border-slate-100 dark:border-slate-800 last:border-0">
-                                <td class="py-3 text-sm font-semibold text-slate-800 dark:text-slate-100">{{ $gallery->title }}</td>
-                                <td class="py-3 text-sm text-slate-600 dark:text-slate-300">{{ gallery_category_label($gallery->category, $gallery->category) }}</td>
-                                <td class="py-3 text-sm text-slate-500">{{ $gallery->updated_at?->diffForHumans() }}</td>
+                                <td class="py-3 text-sm font-semibold text-slate-800 dark:text-slate-100">{{ $booking->booking_code }}</td>
+                                <td class="py-3 text-sm text-slate-600 dark:text-slate-300">
+                                    <p class="font-semibold">{{ $booking->customer_name }}</p>
+                                    <p class="text-xs text-slate-500">{{ $booking->customer_phone }}</p>
+                                </td>
+                                <td class="py-3 text-sm text-slate-600 dark:text-slate-300">
+                                    {{ optional($booking->departure_date)->format('d M Y') }}
+                                </td>
+                                <td class="py-3 text-sm text-slate-600 dark:text-slate-300">{{ $booking->service_type }}</td>
+                                <td class="py-3 text-sm text-slate-500">{{ $booking->gallery?->title ?? '-' }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="3" class="py-6 text-sm text-slate-500 text-center">Belum ada data armada.</td>
+                                <td colspan="5" class="py-6 text-sm text-slate-500 text-center">Belum ada data booking terbaru.</td>
                             </tr>
                         @endforelse
                     </tbody>

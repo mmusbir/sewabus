@@ -10,10 +10,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class VehicleBookingController extends Controller
 {
-    private const SERVICE_TYPES = ['2D1N', 'DROP OFF', 'HALFDAY', 'FULLDAY', 'DLL'];
+    private const SERVICE_TYPES = ['2D1N', '3D2N', '4D3N', '5D4N', 'DROP OFF', 'HALFDAY', 'FULLDAY'];
 
     public function index(Request $request)
     {
@@ -60,6 +61,83 @@ class VehicleBookingController extends Controller
             'poOptions' => gallery_po_list(),
             'galleries' => $this->getAvailableGalleries(),
             'serviceTypes' => self::SERVICE_TYPES,
+        ]);
+    }
+
+    public function exportCsv(): StreamedResponse
+    {
+        $fileName = 'booking-report-'.now()->format('Ymd-His').'.csv';
+
+        $bookings = VehicleBooking::query()
+            ->with(['gallery:id,title,po_key'])
+            ->orderBy('departure_date')
+            ->orderBy('id')
+            ->get();
+
+        return response()->streamDownload(function () use ($bookings) {
+            $handle = fopen('php://output', 'wb');
+            if ($handle === false) {
+                return;
+            }
+
+            // UTF-8 BOM agar karakter Indonesia terbaca baik di Excel.
+            fwrite($handle, "\xEF\xBB\xBF");
+
+            fputcsv($handle, [
+                'Kode Booking',
+                'Nama Customer',
+                'No HP',
+                'Berangkat Dari',
+                'Tujuan',
+                'Titik Penjemputan',
+                'Jam Penjemputan',
+                'Tanggal Berangkat',
+                'Tanggal Pulang',
+                'Jenis Layanan',
+                'PO',
+                'Unit Kendaraan',
+                'Jumlah Unit Dibooking',
+                'Harga Deal',
+                'Harga Markup',
+                'DP Customer',
+                'DP Pemilik PO',
+                'Sisa Pembayaran',
+                'Status',
+                'Dibuat Pada',
+            ]);
+
+            foreach ($bookings as $booking) {
+                $status = $booking->is_cancelled
+                    ? 'Dibatalkan'
+                    : ($booking->is_paid ? 'Lunas' : 'Belum Lunas');
+
+                fputcsv($handle, [
+                    $booking->booking_code,
+                    $booking->customer_name,
+                    $booking->customer_phone,
+                    $booking->departure_from,
+                    $booking->destination,
+                    $booking->pickup_location,
+                    $booking->pickup_time,
+                    optional($booking->departure_date)->format('Y-m-d'),
+                    optional($booking->return_date)->format('Y-m-d'),
+                    $booking->service_type,
+                    filled($booking->po_key) ? gallery_po_label($booking->po_key, $booking->po_key) : '',
+                    $booking->gallery?->title ?? '',
+                    (int) $booking->booked_unit_count,
+                    (float) $booking->deal_price,
+                    (float) $booking->markup_price,
+                    (float) $booking->dp_amount,
+                    (float) $booking->owner_dp_amount,
+                    (float) $booking->remaining_amount,
+                    $status,
+                    optional($booking->created_at)->format('Y-m-d H:i:s'),
+                ]);
+            }
+
+            fclose($handle);
+        }, $fileName, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
     }
 
@@ -219,9 +297,9 @@ class VehicleBookingController extends Controller
             'departure_date' => ['required', 'date', 'after_or_equal:today'],
             'return_date' => ['required', 'date', 'after_or_equal:departure_date'],
             'service_type' => ['required', Rule::in(self::SERVICE_TYPES)],
-            'service_type_note' => ['nullable', 'string', 'max:255'],
             'po_key' => ['nullable', 'string', Rule::in(gallery_po_keys())],
             'gallery_id' => ['nullable', 'integer', 'exists:galleries,id'],
+            'booked_unit_count' => ['required', 'integer', 'min:1', 'max:999'],
             'deal_price' => ['required', 'numeric', 'min:0'],
             'markup_price' => ['required', 'numeric', 'min:0'],
             'dp_amount' => ['nullable', 'numeric', 'min:0', 'lte:markup_price'],
@@ -234,15 +312,14 @@ class VehicleBookingController extends Controller
             'pickup_time.date_format' => 'Jam penjemputan harus menggunakan format HH:MM.',
         ]);
 
-        if (($validated['service_type'] ?? '') !== 'DLL') {
-            $validated['service_type_note'] = null;
-        }
+        $validated['service_type_note'] = null;
 
         $validated['customer_name'] = trim((string) $validated['customer_name']);
         $validated['customer_phone'] = trim((string) $validated['customer_phone']);
         $validated['departure_from'] = trim((string) $validated['departure_from']);
         $validated['destination'] = trim((string) $validated['destination']);
         $validated['pickup_location'] = trim((string) $validated['pickup_location']);
+        $validated['booked_unit_count'] = max(1, (int) $validated['booked_unit_count']);
         $validated['dp_amount'] = $validated['dp_amount'] ?? 0;
         $validated['owner_dp_amount'] = $validated['owner_dp_amount'] ?? 0;
 

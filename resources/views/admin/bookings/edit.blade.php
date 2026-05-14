@@ -36,21 +36,10 @@
             return;
         }
 
-        const serviceTypeField = form.querySelector('[data-service-type]');
-        const serviceNoteWrapper = form.querySelector('[data-service-note-wrapper]');
         const departureDateField = form.querySelector('[data-departure-date]');
         const returnDateField = form.querySelector('[data-return-date]');
-        if (!serviceTypeField || !serviceNoteWrapper) {
-            return;
-        }
-
-        const toggleServiceNote = () => {
-            const show = serviceTypeField.value === 'DLL';
-            serviceNoteWrapper.classList.toggle('hidden', !show);
-        };
-
-        serviceTypeField.addEventListener('change', toggleServiceNote);
-        toggleServiceNote();
+        const poSelect = form.querySelector('[data-po-select]');
+        const unitSelect = form.querySelector('[data-unit-select]');
 
         if (departureDateField && returnDateField) {
             const syncReturnDateMin = () => {
@@ -66,6 +55,63 @@
 
             departureDateField.addEventListener('change', syncReturnDateMin);
             syncReturnDateMin();
+        }
+
+        if (poSelect && unitSelect) {
+            const allUnitOptions = Array.from(unitSelect.options).map((option) => ({
+                value: option.value,
+                label: option.textContent,
+                poKey: option.dataset.poKey || '',
+                selected: option.selected,
+            }));
+
+            const renderUnitOptions = (selectedPoKey, keepCurrentValue = true) => {
+                const currentValue = keepCurrentValue ? unitSelect.value : '';
+                const filtered = allUnitOptions.filter((option) => {
+                    if (option.value === '') {
+                        return true;
+                    }
+
+                    if (!selectedPoKey) {
+                        return true;
+                    }
+
+                    return option.poKey === selectedPoKey;
+                });
+
+                unitSelect.innerHTML = '';
+                filtered.forEach((optionData) => {
+                    const option = document.createElement('option');
+                    option.value = optionData.value;
+                    option.textContent = optionData.label;
+                    option.dataset.poKey = optionData.poKey;
+                    unitSelect.appendChild(option);
+                });
+
+                if (keepCurrentValue && filtered.some((option) => option.value === currentValue)) {
+                    unitSelect.value = currentValue;
+                }
+            };
+
+            poSelect.addEventListener('change', () => {
+                renderUnitOptions(poSelect.value, true);
+            });
+
+            unitSelect.addEventListener('change', () => {
+                const selectedOption = unitSelect.options[unitSelect.selectedIndex];
+                if (!selectedOption) {
+                    return;
+                }
+
+                const poKey = selectedOption.dataset.poKey || '';
+                if (!poSelect.value && poKey) {
+                    poSelect.value = poKey;
+                    renderUnitOptions(poSelect.value, true);
+                    unitSelect.value = selectedOption.value;
+                }
+            });
+
+            renderUnitOptions(poSelect.value, true);
         }
     });
 </script>

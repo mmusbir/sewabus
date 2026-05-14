@@ -22,10 +22,16 @@
                 <h3 class="text-base sm:text-lg font-bold">Data Booking Terbaru</h3>
                 <p class="text-xs text-slate-500 mt-1">Pantau jadwal, status pembayaran, dan aksi booking dalam satu halaman.</p>
             </div>
-            <a href="{{ route('admin.bookings.create') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-white text-sm font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
-                <x-fa-icon name="plus" class="fa-fw text-sm" />
-                Tambah Booking
-            </a>
+            <div class="flex flex-col sm:flex-row gap-2">
+                <a href="{{ route('admin.bookings.export-csv') }}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 px-4 py-2.5 text-sm font-bold hover:border-primary hover:text-primary transition-colors">
+                    <x-fa-icon name="file-csv" class="fa-fw text-sm" />
+                    Export CSV
+                </a>
+                <a href="{{ route('admin.bookings.create') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-white text-sm font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
+                    <x-fa-icon name="plus" class="fa-fw text-sm" />
+                    Tambah Booking
+                </a>
+            </div>
         </div>
 
         <div class="mt-5 grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -135,13 +141,11 @@
                             </td>
                             <td class="py-3 px-3 text-xs align-top">
                                 {{ $booking->service_type }}
-                                @if($booking->service_type === 'DLL' && filled($booking->service_type_note))
-                                    <p class="text-[11px] text-slate-500">{{ $booking->service_type_note }}</p>
-                                @endif
                             </td>
                             <td class="py-3 px-3 text-xs align-top">
                                 <p>{{ filled($booking->po_key) ? gallery_po_label($booking->po_key, $booking->po_key) : '-' }}</p>
                                 <p class="text-slate-500">{{ $booking->gallery?->title ?? '-' }}</p>
+                                <p class="text-slate-500">Unit Dibooking: {{ number_format((int) $booking->booked_unit_count) }}</p>
                             </td>
                             <td class="py-3 px-3 text-xs align-top">
                                 <p>Harga PO: Rp {{ number_format((float) $booking->deal_price, 0, ',', '.') }}</p>

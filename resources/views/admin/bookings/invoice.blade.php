@@ -213,12 +213,7 @@
                 </tr>
                 <tr>
                     <th>Jenis Layanan</th>
-                    <td>
-                        {{ $booking->service_type }}
-                        @if($booking->service_type === 'DLL' && filled($booking->service_type_note))
-                            <div class="muted">{{ $booking->service_type_note }}</div>
-                        @endif
-                    </td>
+                    <td>{{ $booking->service_type }}</td>
                 </tr>
                 <tr>
                     <th>PO Yang Dipilih</th>
@@ -227,6 +222,10 @@
                 <tr>
                     <th>Unit Kendaraan</th>
                     <td>{{ $booking->gallery?->title ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Jumlah Unit Dibooking</th>
+                    <td>{{ number_format((int) $booking->booked_unit_count) }} Unit</td>
                 </tr>
             </tbody>
         </table>

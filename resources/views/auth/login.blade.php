@@ -18,7 +18,11 @@
         <section class="w-full max-w-md rounded-2xl bg-white p-5 sm:p-6 shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
             <div class="mb-6 text-center">
                 <a href="{{ route('home') }}" class="inline-flex items-center justify-center text-primary">
-                    <x-fa-icon name="bus" class="fa-fw text-4xl" />
+                    @if(setting('header_logo_image'))
+                        <img src="{{ setting('header_logo_image') }}" alt="Logo Header" class="h-10 object-contain max-w-[180px]">
+                    @else
+                        <x-fa-icon name="bus" class="fa-fw text-4xl" />
+                    @endif
                 </a>
                 <h1 class="mt-3 text-xl font-extrabold text-slate-900">Login Panel</h1>
                 <p class="mt-1 text-sm text-slate-500">Halaman ini khusus untuk akses panel admin.</p>

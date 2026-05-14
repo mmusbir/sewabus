@@ -34,7 +34,7 @@ class DashboardController extends Controller
             'bookings_year_revenue' => 0,
             'bookings_year_profit' => 0,
         ];
-        $recentGalleries = collect();
+        $recentBookings = collect();
         $recentPackages = collect();
         $upcomingBookings = collect();
 
@@ -85,15 +85,19 @@ class DashboardController extends Controller
                 'bookings_year_profit' => 0,
             ];
 
-            $recentGalleries = $hasGalleries
-                ? Gallery::latest()->take(5)->get()
-                : collect();
-
             $recentPackages = $hasPackages
                 ? RentalPackage::latest()->take(5)->get()
                 : collect();
 
             if ($hasBookings) {
+                $recentBookings = VehicleBooking::query()
+                    ->with(['gallery:id,title'])
+                    ->where('is_cancelled', false)
+                    ->latest('created_at')
+                    ->latest('id')
+                    ->limit(8)
+                    ->get();
+
                 $startOfYear = now()->startOfYear()->toDateString();
                 $endOfYear = now()->endOfYear()->toDateString();
 
@@ -128,7 +132,7 @@ class DashboardController extends Controller
 
         return view('admin.dashboard', [
             'stats' => $stats,
-            'recentGalleries' => $recentGalleries,
+            'recentBookings' => $recentBookings,
             'recentPackages' => $recentPackages,
             'upcomingBookings' => $upcomingBookings,
         ]);

@@ -232,6 +232,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     ]);
 
     Route::get('/admin/bookings', [VehicleBookingController::class, 'index'])->name('admin.bookings.index');
+    Route::get('/admin/bookings/export/csv', [VehicleBookingController::class, 'exportCsv'])->name('admin.bookings.export-csv');
     Route::get('/admin/bookings/create', [VehicleBookingController::class, 'create'])->name('admin.bookings.create');
     Route::post('/admin/bookings', [VehicleBookingController::class, 'store'])->name('admin.bookings.store');
     Route::get('/admin/bookings/{vehicleBooking}/edit', [VehicleBookingController::class, 'edit'])->name('admin.bookings.edit');

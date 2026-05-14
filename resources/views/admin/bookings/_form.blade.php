@@ -79,27 +79,31 @@
     <section class="rounded-xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 bg-slate-50/60 dark:bg-slate-900/40 space-y-4">
         <h4 class="text-sm font-bold text-slate-700 dark:text-slate-200">Layanan & Unit</h4>
 
-        <div>
-            <label class="text-xs font-semibold text-slate-500">Jenis Layanan</label>
-            <select name="service_type" class="mt-1 w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" required data-service-type>
-                <option value="">Pilih layanan</option>
-                @foreach($serviceTypes as $serviceType)
-                    <option value="{{ $serviceType }}" {{ old('service_type', $booking->service_type ?? '') === $serviceType ? 'selected' : '' }}>{{ $serviceType }}</option>
-                @endforeach
-            </select>
-            @error('service_type') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="text-xs font-semibold text-slate-500">Jenis Layanan</label>
+                <select name="service_type" class="mt-1 w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" required data-service-type>
+                    <option value="">Pilih layanan</option>
+                    @foreach($serviceTypes as $serviceType)
+                        <option value="{{ $serviceType }}" {{ old('service_type', $booking->service_type ?? '') === $serviceType ? 'selected' : '' }}>{{ $serviceType }}</option>
+                    @endforeach
+                </select>
+                <p class="mt-1 text-[11px] text-slate-500">Pilih durasi/jenis operasional layanan.</p>
+                @error('service_type') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
 
-        <div data-service-note-wrapper class="{{ old('service_type', $booking->service_type ?? '') === 'DLL' ? '' : 'hidden' }}">
-            <label class="text-xs font-semibold text-slate-500">Keterangan DLL</label>
-            <input type="text" name="service_type_note" value="{{ old('service_type_note', $booking->service_type_note ?? '') }}" class="mt-1 w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" placeholder="Contoh: Antar jemput event">
-            @error('service_type_note') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            <div>
+                <label class="text-xs font-semibold text-slate-500">Jumlah Unit Dibooking</label>
+                <input type="number" min="1" max="999" step="1" name="booked_unit_count" value="{{ old('booked_unit_count', $booking->booked_unit_count ?? 1) }}" class="mt-1 w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" required>
+                <p class="mt-1 text-[11px] text-slate-500">Total unit kendaraan untuk booking ini.</p>
+                @error('booked_unit_count') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label class="text-xs font-semibold text-slate-500">PO Yang Dipilih</label>
-                <select name="po_key" class="mt-1 w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm">
+                <select name="po_key" class="mt-1 w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" data-po-select>
                     <option value="">Pilih PO</option>
                     @foreach($poOptions as $poOption)
                         <option value="{{ $poOption['key'] }}" {{ old('po_key', $booking->po_key ?? '') === $poOption['key'] ? 'selected' : '' }}>
@@ -107,19 +111,21 @@
                         </option>
                     @endforeach
                 </select>
+                <p class="mt-1 text-[11px] text-slate-500">Saat PO dipilih, daftar unit otomatis difilter.</p>
                 @error('po_key') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
 
             <div>
                 <label class="text-xs font-semibold text-slate-500">Unit Kendaraan Yang Dipilih</label>
-                <select name="gallery_id" class="mt-1 w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm">
+                <select name="gallery_id" class="mt-1 w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" data-unit-select>
                     <option value="">Pilih Unit</option>
                     @foreach($galleries as $gallery)
-                        <option value="{{ $gallery->id }}" {{ (string) old('gallery_id', $booking->gallery_id ?? '') === (string) $gallery->id ? 'selected' : '' }}>
+                        <option value="{{ $gallery->id }}" data-po-key="{{ $gallery->po_key }}" {{ (string) old('gallery_id', $booking->gallery_id ?? '') === (string) $gallery->id ? 'selected' : '' }}>
                             {{ $gallery->title }}{{ filled($gallery->po_key) ? ' - '.gallery_po_label($gallery->po_key, $gallery->po_key) : '' }}
                         </option>
                     @endforeach
                 </select>
+                <p class="mt-1 text-[11px] text-slate-500">Pilih unit, PO akan menyesuaikan bila belum dipilih.</p>
                 @error('gallery_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
         </div>

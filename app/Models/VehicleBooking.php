@@ -21,6 +21,7 @@ class VehicleBooking extends Model
         'service_type_note',
         'po_key',
         'gallery_id',
+        'booked_unit_count',
         'deal_price',
         'markup_price',
         'dp_amount',
@@ -32,6 +33,7 @@ class VehicleBooking extends Model
     protected $casts = [
         'departure_date' => 'date',
         'return_date' => 'date',
+        'booked_unit_count' => 'integer',
         'deal_price' => 'decimal:2',
         'markup_price' => 'decimal:2',
         'dp_amount' => 'decimal:2',
