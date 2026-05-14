@@ -60,15 +60,16 @@
         </nav>
 
         <div class="flex items-center gap-3">
-            <button type="button" class="js-theme-toggle hidden md:inline-flex items-center" aria-label="Toggle dark mode" aria-pressed="false">
-                <span class="relative inline-flex h-10 w-20 items-center rounded-full border border-slate-200 bg-white p-1 shadow-inner transition-colors dark:border-slate-800 dark:bg-slate-900">
-                    <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 inline-flex size-4 items-center justify-center text-slate-500 dark:text-slate-200">
-                        <x-fa-icon name="sun" style="regular" class="fa-fw text-[12px] leading-none" />
+            <button type="button" class="js-theme-toggle hidden md:inline-flex items-center active:scale-95 transition-transform" aria-label="Toggle dark mode" aria-pressed="false">
+                <span data-theme-track class="relative inline-flex h-8 w-[52px] items-center rounded-full border border-slate-200 bg-slate-300 p-0.5 shadow-inner transition-colors duration-300 dark:border-slate-700">
+                    <span data-theme-knob class="pointer-events-none relative inline-flex size-7 translate-x-0 transform items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(15,23,42,0.25)] transition-transform duration-300 ease-out">
+                        <span data-theme-icon-sun class="absolute inline-flex items-center justify-center text-amber-500 opacity-100 scale-100 transition duration-200">
+                            <x-fa-icon name="sun" style="regular" class="fa-fw text-[12px] leading-none" />
+                        </span>
+                        <span data-theme-icon-moon class="absolute inline-flex items-center justify-center text-sky-600 opacity-0 scale-75 transition duration-200">
+                            <x-fa-icon name="moon" style="regular" class="fa-fw text-[12px] leading-none" />
+                        </span>
                     </span>
-                    <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 inline-flex size-4 items-center justify-center text-slate-400 dark:text-slate-200">
-                        <x-fa-icon name="moon" style="regular" class="fa-fw text-[12px] leading-none" />
-                    </span>
-                    <span data-theme-knob class="pointer-events-none inline-block size-8 translate-x-0 transform rounded-full bg-white shadow-[0_2px_10px_rgba(15,23,42,0.16)] transition-transform duration-200 dark:bg-slate-200"></span>
                 </span>
             </button>
             <button type="button" data-menu-toggle class="md:hidden inline-flex size-11 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-900 shadow-sm transition hover:border-primary hover:text-primary dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-100" aria-label="Toggle menu" aria-expanded="false">
@@ -114,15 +115,16 @@
                 ]) href="{{ route('contact.index') }}" data-menu-close>Kontak</a>
             </nav>
             <div class="border-t border-slate-200/70 px-4 py-4 dark:border-slate-800">
-                <button type="button" class="js-theme-toggle inline-flex w-full items-center justify-center" aria-label="Toggle dark mode" aria-pressed="false">
-                    <span class="relative inline-flex h-10 w-20 items-center rounded-full border border-slate-200 bg-white p-1 shadow-inner transition-colors dark:border-slate-800 dark:bg-slate-900">
-                        <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 inline-flex size-4 items-center justify-center text-slate-500 dark:text-slate-200">
-                            <x-fa-icon name="sun" style="regular" class="fa-fw text-[12px] leading-none" />
+                <button type="button" class="js-theme-toggle inline-flex w-full items-center justify-center active:scale-95 transition-transform" aria-label="Toggle dark mode" aria-pressed="false">
+                    <span data-theme-track class="relative inline-flex h-8 w-[52px] items-center rounded-full border border-slate-200 bg-slate-300 p-0.5 shadow-inner transition-colors duration-300 dark:border-slate-700">
+                        <span data-theme-knob class="pointer-events-none relative inline-flex size-7 translate-x-0 transform items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(15,23,42,0.25)] transition-transform duration-300 ease-out">
+                            <span data-theme-icon-sun class="absolute inline-flex items-center justify-center text-amber-500 opacity-100 scale-100 transition duration-200">
+                                <x-fa-icon name="sun" style="regular" class="fa-fw text-[12px] leading-none" />
+                            </span>
+                            <span data-theme-icon-moon class="absolute inline-flex items-center justify-center text-sky-600 opacity-0 scale-75 transition duration-200">
+                                <x-fa-icon name="moon" style="regular" class="fa-fw text-[12px] leading-none" />
+                            </span>
                         </span>
-                        <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 inline-flex size-4 items-center justify-center text-slate-400 dark:text-slate-200">
-                            <x-fa-icon name="moon" style="regular" class="fa-fw text-[12px] leading-none" />
-                        </span>
-                        <span data-theme-knob class="pointer-events-none inline-block size-8 translate-x-0 transform rounded-full bg-white shadow-[0_2px_10px_rgba(15,23,42,0.16)] transition-transform duration-200 dark:bg-slate-200"></span>
                     </span>
                 </button>
             </div>

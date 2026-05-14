@@ -33,8 +33,27 @@ const applyTheme = (isDark) => {
     });
 
     document.querySelectorAll('[data-theme-knob]').forEach((knob) => {
-        knob.classList.toggle('translate-x-11', isDark);
+        knob.classList.toggle('translate-x-[20px]', isDark);
         knob.classList.toggle('translate-x-0', !isDark);
+    });
+
+    document.querySelectorAll('[data-theme-track]').forEach((track) => {
+        track.classList.toggle('bg-slate-300', !isDark);
+        track.classList.toggle('bg-slate-700', isDark);
+    });
+
+    document.querySelectorAll('[data-theme-icon-sun]').forEach((icon) => {
+        icon.classList.toggle('opacity-100', !isDark);
+        icon.classList.toggle('scale-100', !isDark);
+        icon.classList.toggle('opacity-0', isDark);
+        icon.classList.toggle('scale-75', isDark);
+    });
+
+    document.querySelectorAll('[data-theme-icon-moon]').forEach((icon) => {
+        icon.classList.toggle('opacity-100', isDark);
+        icon.classList.toggle('scale-100', isDark);
+        icon.classList.toggle('opacity-0', !isDark);
+        icon.classList.toggle('scale-75', !isDark);
     });
 
     document.querySelectorAll('.js-theme-toggle').forEach((button) => {
