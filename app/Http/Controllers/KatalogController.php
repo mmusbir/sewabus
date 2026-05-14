@@ -10,10 +10,13 @@ use Throwable;
 
 class KatalogController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, ?string $poKey = null)
     {
         $categoryConfigs = gallery_category_list();
         $categoryTabs = gallery_category_tabs();
+        $poOptions = collect(gallery_po_list())
+            ->mapWithKeys(fn (array $po) => [$po['key'] => $po['label']])
+            ->all();
         $facilityOptions = catalog_facilities();
         $databaseUnavailable = false;
 
@@ -29,6 +32,10 @@ class KatalogController extends Controller
         $selectedCategory = $request->query('category', 'all');
         if (!array_key_exists($selectedCategory, $categoryTabs)) {
             $selectedCategory = 'all';
+        }
+        $selectedPoKey = normalize_gallery_po_key($poKey);
+        if ($selectedPoKey === '') {
+            $selectedPoKey = null;
         }
 
         $selectedFacilities = array_values(array_filter(
@@ -51,6 +58,14 @@ class KatalogController extends Controller
 
             if ($selectedCategory !== 'all') {
                 $query->where('category', $selectedCategory);
+            }
+
+            if ($selectedPoKey !== null) {
+                if (Schema::hasColumn('galleries', 'po_key')) {
+                    $query->where('po_key', $selectedPoKey);
+                } else {
+                    $query->whereRaw('1 = 0');
+                }
             }
 
             if ($selectedSeats) {
@@ -95,14 +110,21 @@ class KatalogController extends Controller
         return view('katalog', compact(
             'galleries',
             'categoryTabs',
+            'poOptions',
             'facilityOptions',
             'seatOptions',
             'selectedCategory',
+            'selectedPoKey',
             'selectedFacilities',
             'selectedSeats',
             'searchTerm',
             'databaseUnavailable'
         ));
+    }
+
+    public function indexByPo(Request $request, string $poKey)
+    {
+        return $this->index($request, $poKey);
     }
 
     public function show(Gallery $gallery)

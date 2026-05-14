@@ -7,10 +7,14 @@
     $seoTitle = setting('seo_katalog_title', setting('seo_meta_title_default', setting('site_name', 'Sewa Bus Sulawesi Selatan')) . ' - Katalog Armada Semua Kabupaten');
     $seoDescription = setting('seo_katalog_description', setting('seo_meta_description_default', 'Katalog armada sewa bus untuk semua kabupaten/kota di Sulawesi Selatan. Pilih kapasitas kursi, fasilitas, dan jenis bus sesuai kebutuhan rombongan Anda.'));
     $seoKeywords = setting('seo_meta_keywords_default', 'katalog sewa bus sulawesi selatan, sewa bus makassar, sewa bus bone, sewa bus maros, sewa bus gowa, rental bus toraja');
-    $seoCanonical = route('katalog.index');
+    $seoCanonical = $selectedPoKey
+        ? route('katalog.po', ['poKey' => $selectedPoKey])
+        : route('katalog.index');
     $southSulawesiAreas = south_sulawesi_service_areas();
     $featuredServiceAreas = array_slice($southSulawesiAreas, 0, 9);
     $remainingServiceAreas = array_slice($southSulawesiAreas, 9);
+    $routeBase = $selectedPoKey ? 'katalog.po' : 'katalog.index';
+    $routeBaseParams = $selectedPoKey ? ['poKey' => $selectedPoKey] : [];
 @endphp
 <title>{{ $seoTitle }}</title>
 @include('partials.public.seo-meta', ['seoTitle' => $seoTitle, 'seoDescription' => $seoDescription, 'seoKeywords' => $seoKeywords, 'seoCanonical' => $seoCanonical])
@@ -57,7 +61,7 @@
     </button>
     <form
         method="GET"
-        action="{{ route('katalog.index') }}"
+        action="{{ route($routeBase, $routeBaseParams) }}"
         id="katalog-filter-panel"
         data-filter-panel
         class="hidden lg:block bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-slate-200 dark:border-slate-800 lg:sticky lg:top-24 space-y-6"
@@ -79,6 +83,34 @@
                 placeholder="Contoh: medium bus, wifi, toraja"
                 class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:border-primary focus:ring-primary"
             />
+        </div>
+
+        <div>
+            <p class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3">PO Bus</p>
+            <div class="flex flex-wrap gap-2">
+                @php
+                    $poAllQuery = request()->except('page');
+                @endphp
+                <a href="{{ route('katalog.index', $poAllQuery) }}" @class([
+                    'inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-bold transition-colors',
+                    'border-primary bg-primary text-white' => $selectedPoKey === null,
+                    'border-slate-300 bg-white text-slate-700 hover:border-primary hover:text-primary dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200' => $selectedPoKey !== null,
+                ])>
+                    Semua PO
+                </a>
+                @foreach($poOptions as $poKey => $poLabel)
+                    @php
+                        $poQuery = request()->except('page');
+                    @endphp
+                    <a href="{{ route('katalog.po', ['poKey' => $poKey] + $poQuery) }}" @class([
+                        'inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-bold transition-colors',
+                        'border-primary bg-primary text-white' => $selectedPoKey === $poKey,
+                        'border-slate-300 bg-white text-slate-700 hover:border-primary hover:text-primary dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200' => $selectedPoKey !== $poKey,
+                    ])>
+                        {{ $poLabel }}
+                    </a>
+                @endforeach
+            </div>
         </div>
 
         <div>
@@ -109,7 +141,7 @@
             <button type="submit" class="flex-1 bg-primary text-white font-bold py-2.5 rounded-lg hover:bg-primary/90 transition-colors">
                 Terapkan
             </button>
-            <a href="{{ route('katalog.index') }}" class="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold py-2.5 rounded-lg text-center hover:border-primary hover:text-primary transition-colors">
+            <a href="{{ route($routeBase, $routeBaseParams) }}" class="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold py-2.5 rounded-lg text-center hover:border-primary hover:text-primary transition-colors">
                 Reset
             </a>
         </div>
@@ -128,7 +160,7 @@
                     $tabQuery['category'] = $categoryKey;
                 }
             @endphp
-            <a href="{{ route('katalog.index', $tabQuery) }}" @class([
+            <a href="{{ route($routeBase, $routeBaseParams + $tabQuery) }}" @class([
                 'px-6 py-3 text-sm whitespace-nowrap border-b-4 transition-colors',
                 'font-bold text-primary border-primary' => $selectedCategory === $categoryKey,
                 'font-medium text-slate-500 dark:text-slate-400 border-transparent hover:text-primary' => $selectedCategory !== $categoryKey,
@@ -144,7 +176,7 @@
         @empty
             <div class="col-span-full text-center py-12 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
                 <p class="text-slate-500 dark:text-slate-400 mb-3">Tidak ada armada yang cocok dengan filter saat ini.</p>
-                <a href="{{ route('katalog.index') }}" class="text-primary font-bold hover:underline">Tampilkan Semua Armada</a>
+                <a href="{{ route($routeBase, $routeBaseParams) }}" class="text-primary font-bold hover:underline">Tampilkan Semua Armada</a>
             </div>
         @endforelse
     </div>

@@ -188,7 +188,8 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog.index');
-Route::get('/katalog/{gallery}', [KatalogController::class, 'show'])->name('katalog.show');
+Route::get('/katalog/{gallery}', [KatalogController::class, 'show'])->whereNumber('gallery')->name('katalog.show');
+Route::get('/katalog/{poKey}', [KatalogController::class, 'indexByPo'])->where('poKey', '[a-z0-9-]+')->name('katalog.po');
 Route::get('/paket', [PackageController::class, 'index'])->name('packages.index');
 Route::get('/paket/{rentalPackage}', [PackageController::class, 'show'])->name('packages.show');
 Route::get('/kontak', [ContactController::class, 'index'])->name('contact.index');
