@@ -79,8 +79,8 @@
 </header>
 
 <div data-mobile-menu class="fixed inset-0 z-[10020] hidden md:hidden bg-slate-950/45 backdrop-blur-sm" aria-hidden="true">
-    <div class="flex min-h-[100dvh] items-center justify-center px-4 py-8">
-        <div data-mobile-menu-panel class="max-h-[85dvh] w-full max-w-sm overflow-auto rounded-[28px] border border-white/70 bg-white shadow-2xl shadow-slate-950/20 dark:border-slate-800 dark:bg-background-dark">
+    <div class="relative min-h-[100dvh] w-full px-4 py-8">
+        <div data-mobile-menu-panel class="absolute left-1/2 top-1/2 max-h-[85dvh] w-[min(100%,24rem)] -translate-x-1/2 -translate-y-1/2 overflow-auto rounded-[28px] border border-white/70 bg-white shadow-2xl shadow-slate-950/20 dark:border-slate-800 dark:bg-background-dark">
             <div class="flex items-center justify-between border-b border-slate-200/70 px-5 py-4 dark:border-slate-800">
                 <div>
                     <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Menu</p>
@@ -90,24 +90,24 @@
                     <x-fa-icon name="xmark" class="fa-fw" />
                 </button>
             </div>
-            <nav class="grid gap-2 px-4 py-4 text-lg font-extrabold text-slate-800 dark:text-slate-100">
+            <nav class="grid gap-2 px-4 py-4 text-lg font-extrabold text-slate-800 dark:text-slate-100 text-center">
                 <a @class([
-                    'flex min-h-14 w-full items-center rounded-2xl px-4 py-3 text-left transition active:scale-[0.99] touch-manipulation',
+                    'flex min-h-14 w-full items-center justify-center rounded-2xl px-4 py-3 transition active:scale-[0.99] touch-manipulation',
                     'bg-primary text-white shadow-lg shadow-primary/20' => $isHome,
                     'bg-slate-50 hover:bg-slate-100 dark:bg-slate-900/50 dark:hover:bg-slate-800/80' => !$isHome,
                 ]) href="/" data-menu-close>Beranda</a>
                 <a @class([
-                    'flex min-h-14 w-full items-center rounded-2xl px-4 py-3 text-left transition active:scale-[0.99] touch-manipulation',
+                    'flex min-h-14 w-full items-center justify-center rounded-2xl px-4 py-3 transition active:scale-[0.99] touch-manipulation',
                     'bg-primary text-white shadow-lg shadow-primary/20' => $isKatalog,
                     'bg-slate-50 hover:bg-slate-100 dark:bg-slate-900/50 dark:hover:bg-slate-800/80' => !$isKatalog,
                 ]) href="{{ route('katalog.index') }}" data-menu-close>Armada</a>
                 <a @class([
-                    'flex min-h-14 w-full items-center rounded-2xl px-4 py-3 text-left transition active:scale-[0.99] touch-manipulation',
+                    'flex min-h-14 w-full items-center justify-center rounded-2xl px-4 py-3 transition active:scale-[0.99] touch-manipulation',
                     'bg-primary text-white shadow-lg shadow-primary/20' => $isPackages,
                     'bg-slate-50 hover:bg-slate-100 dark:bg-slate-900/50 dark:hover:bg-slate-800/80' => !$isPackages,
                 ]) href="{{ route('packages.index') }}" data-menu-close>Paket Sewa</a>
                 <a @class([
-                    'flex min-h-14 w-full items-center rounded-2xl px-4 py-3 text-left transition active:scale-[0.99] touch-manipulation',
+                    'flex min-h-14 w-full items-center justify-center rounded-2xl px-4 py-3 transition active:scale-[0.99] touch-manipulation',
                     'bg-primary text-white shadow-lg shadow-primary/20' => $isContact,
                     'bg-slate-50 hover:bg-slate-100 dark:bg-slate-900/50 dark:hover:bg-slate-800/80' => !$isContact,
                 ]) href="{{ route('contact.index') }}" data-menu-close>Kontak</a>
