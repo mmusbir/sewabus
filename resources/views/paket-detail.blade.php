@@ -13,6 +13,7 @@
     $whatsappNumber = preg_replace('/[^0-9]/', '', setting('social_whatsapp_number', ''));
     $packageTypeLabel = $package->type === 'liburan' ? 'Paket Liburan' : 'Paket Sewa';
     $packageTypeBadgeClass = $package->type === 'liburan' ? 'bg-amber-500' : 'bg-emerald-600';
+    $relatedSectionTitle = $package->type === 'liburan' ? 'Thumbnail Paket Liburan Lainnya' : 'Thumbnail Paket Sewa Lainnya';
     $includeItems = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $package->includes ?? ''))));
     $excludeItems = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $package->excludes ?? ''))));
     $termItems = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $package->terms_conditions ?? ''))));
@@ -64,13 +65,13 @@
     <nav class="mb-5 text-sm text-slate-500 dark:text-slate-400">
         <a href="{{ route('home') }}" class="hover:text-primary">Beranda</a>
         <span class="mx-2">/</span>
-        <a href="{{ route('packages.index') }}" class="hover:text-primary">Paket Sewa</a>
+        <a href="{{ route('packages.index') }}" class="hover:text-primary">Paket</a>
         <span class="mx-2">/</span>
         <span class="text-slate-700 dark:text-slate-200">{{ $package->title }}</span>
     </nav>
 
-    <section class="grid grid-cols-1 lg:grid-cols-2 gap-7 lg:gap-10 items-start">
-        <div class="rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-7 lg:gap-10 items-start">
+        <div class="lg:col-span-7 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 shadow-sm">
             <div class="relative aspect-[16/10]">
                 <span class="absolute top-4 left-4 z-10 {{ $packageTypeBadgeClass }} text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">{{ $packageTypeLabel }}</span>
                 <img
@@ -87,7 +88,7 @@
             </div>
         </div>
 
-        <div>
+        <div class="lg:col-span-5">
             <h1 class="text-3xl sm:text-4xl font-black text-slate-900 dark:text-slate-100">{{ $package->title }}</h1>
             <div class="mt-4 flex flex-wrap items-center gap-3 text-sm">
                 @if(filled($package->price_label))
@@ -105,21 +106,53 @@
             </div>
             <p class="mt-5 text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">{{ $package->description ?: 'Deskripsi paket belum tersedia.' }}</p>
 
-            <div class="mt-7 space-y-3">
+            <div class="mt-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/60 p-4">
+                <p class="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Ringkasan Cepat</p>
+                <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-sm">
+                    <div class="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-3 py-2">
+                        <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400">Durasi</p>
+                        <p class="mt-1 font-bold text-slate-800 dark:text-slate-100">{{ $package->duration ?: '-' }}</p>
+                    </div>
+                    <div class="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-3 py-2">
+                        <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400">Include</p>
+                        <p class="mt-1 font-bold text-slate-800 dark:text-slate-100">{{ count($includeItems) }} item</p>
+                    </div>
+                    <div class="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-3 py-2">
+                        <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400">Itinerary</p>
+                        <p class="mt-1 font-bold text-slate-800 dark:text-slate-100">{{ count($itineraryItems) }} day</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-5 flex flex-wrap items-center gap-2">
+                <a href="#detail-paket" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:border-primary hover:text-primary transition-colors">
+                    Include / Exclude
+                </a>
+                <a href="#itinerary-paket" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:border-primary hover:text-primary transition-colors">
+                    Itinerary
+                </a>
+                @if($relatedPackages->isNotEmpty())
+                    <a href="#paket-lainnya" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:border-primary hover:text-primary transition-colors">
+                        Paket Lainnya
+                    </a>
+                @endif
+            </div>
+
+            <div class="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 @if($whatsappNumber)
-                    <a href="https://wa.me/{{ $whatsappNumber }}?text={{ urlencode('Halo Admin, saya tertarik dengan paket ' . $package->title) }}" target="_blank" rel="noopener" class="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 font-bold text-white hover:bg-primary/90 transition-colors">
+                    <a href="https://wa.me/{{ $whatsappNumber }}?text={{ urlencode('Halo Admin, saya tertarik dengan paket ' . $package->title) }}" target="_blank" rel="noopener" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 font-bold text-white hover:bg-primary/90 transition-colors">
                         Konsultasi Paket Ini
                         <x-fa-icon name="arrow-right" class="fa-fw text-sm" />
                     </a>
                 @endif
-                <a href="{{ route('packages.index', ['type' => $package->type]) }}" class="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl border border-slate-300 dark:border-slate-700 px-5 py-3 font-semibold text-slate-700 dark:text-slate-200 hover:border-primary hover:text-primary transition-colors">
+                <a href="{{ route('packages.index', ['type' => $package->type]) }}" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 dark:border-slate-700 px-5 py-3 font-semibold text-slate-700 dark:text-slate-200 hover:border-primary hover:text-primary transition-colors">
                     Lihat Paket {{ $packageTypeLabel === 'Paket Liburan' ? 'Liburan' : 'Sewa' }} Lainnya
                 </a>
             </div>
         </div>
     </section>
 
-    <section class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <section id="detail-paket" class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-5">
             <h2 class="text-lg font-black text-slate-900 dark:text-slate-100 mb-3">Yang Sudah Termasuk</h2>
             @if(count($includeItems))
@@ -170,7 +203,7 @@
     </section>
 
     @if(count($itineraryItems))
-        <section class="mt-8 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-5 sm:p-6">
+        <section id="itinerary-paket" class="mt-8 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-5 sm:p-6">
             <h2 class="text-xl font-black text-slate-900 dark:text-slate-100 mb-4">Itinerary Perjalanan</h2>
             <div class="space-y-3">
                 @foreach($itineraryItems as $itineraryItem)
@@ -188,24 +221,23 @@
     @endif
 
     @if($relatedPackages->isNotEmpty())
-        <section class="mt-10">
-            <h2 class="text-2xl font-black text-slate-900 dark:text-slate-100 mb-5">Paket Serupa</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <section id="paket-lainnya" class="mt-8 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-5 sm:p-6">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                <h2 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100">{{ $relatedSectionTitle }}</h2>
+                <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Klik thumbnail untuk lihat detail paket</p>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 @foreach($relatedPackages as $relatedPackage)
                     @php
                         $relatedImage = $relatedPackage->image_path ?: '/stitch_img_bus_shd.jpg';
                         $relatedThumb = media_thumbnail_url($relatedImage, 640, 75) ?? $relatedImage;
                     @endphp
-                    <article class="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
-                        <img src="{{ $relatedThumb }}" alt="{{ $relatedPackage->title }}" width="640" height="400" class="h-44 w-full object-cover" loading="lazy" decoding="async">
-                        <div class="p-4">
-                            <h3 class="font-bold text-slate-900 dark:text-slate-100 mb-2">{{ $relatedPackage->title }}</h3>
-                            <a href="{{ route('packages.show', $relatedPackage) }}" class="text-sm font-bold text-primary inline-flex items-center gap-2 hover:underline">
-                                Lihat Detail
-                                <x-fa-icon name="arrow-right" class="fa-fw text-xs" />
-                            </a>
+                    <a href="{{ route('packages.show', $relatedPackage) }}" class="group rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-primary/70 hover:shadow-md transition-all">
+                        <img src="{{ $relatedThumb }}" alt="{{ $relatedPackage->title }}" width="640" height="400" class="h-28 sm:h-32 w-full object-cover" loading="lazy" decoding="async">
+                        <div class="p-2.5">
+                            <h3 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 line-clamp-2">{{ $relatedPackage->title }}</h3>
                         </div>
-                    </article>
+                    </a>
                 @endforeach
             </div>
         </section>
@@ -215,4 +247,3 @@
 @include('partials.public.footer')
 </body>
 </html>
-
