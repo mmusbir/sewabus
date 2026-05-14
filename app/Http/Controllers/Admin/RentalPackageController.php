@@ -8,6 +8,13 @@ use Illuminate\Http\Request;
 
 class RentalPackageController extends Controller
 {
+    private const LIBURAN_MEDIA_UPLOAD_MAP = [
+        'vehicle_exterior_image' => 'vehicle_exterior_image_path',
+        'vehicle_interior_image' => 'vehicle_interior_image_path',
+        'lodging_exterior_image' => 'lodging_exterior_image_path',
+        'lodging_interior_image' => 'lodging_interior_image_path',
+    ];
+
     public function index()
     {
         $packages = RentalPackage::orderBy('sort_order')->latest()->get();
@@ -28,6 +35,8 @@ class RentalPackageController extends Controller
         if ($request->hasFile('image')) {
             $validated['image_path'] = store_media($request->file('image'), 'rental-packages');
         }
+
+        $this->handleLiburanMediaUploads($request, $validated);
 
         RentalPackage::create($validated);
 
@@ -53,6 +62,15 @@ class RentalPackageController extends Controller
             $validated['image_path'] = store_media($request->file('image'), 'rental-packages');
         }
 
+        $this->handleLiburanMediaUploads($request, $validated, $rentalPackage);
+
+        if (($validated['type'] ?? $rentalPackage->type) !== 'liburan') {
+            $this->removeLiburanMedia($rentalPackage);
+            foreach (self::LIBURAN_MEDIA_UPLOAD_MAP as $column) {
+                $validated[$column] = null;
+            }
+        }
+
         $rentalPackage->update($validated);
 
         return redirect()->route('admin.rental-packages.index')
@@ -64,6 +82,8 @@ class RentalPackageController extends Controller
         if ($rentalPackage->image_path) {
             delete_media($rentalPackage->getRawOriginal('image_path'));
         }
+
+        $this->removeLiburanMedia($rentalPackage);
 
         $rentalPackage->delete();
 
@@ -90,9 +110,17 @@ class RentalPackageController extends Controller
             'sort_order' => 'nullable|integer|min:0|max:9999',
             'is_active' => 'nullable|boolean',
             'image' => $imageRule . '|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'vehicle_exterior_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:3072',
+            'vehicle_interior_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:3072',
+            'lodging_exterior_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:3072',
+            'lodging_interior_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:3072',
         ], [
             'image.required' => 'Gambar paket wajib diunggah.',
             'image.max' => 'Gambar paket maksimal 2 MB.',
+            'vehicle_exterior_image.max' => 'Foto luar unit maksimal 3 MB.',
+            'vehicle_interior_image.max' => 'Foto dalam unit maksimal 3 MB.',
+            'lodging_exterior_image.max' => 'Foto luar penginapan maksimal 3 MB.',
+            'lodging_interior_image.max' => 'Foto dalam penginapan maksimal 3 MB.',
         ]);
     }
 
@@ -120,5 +148,40 @@ class RentalPackageController extends Controller
         }
 
         return $validated;
+    }
+
+    private function handleLiburanMediaUploads(Request $request, array &$validated, ?RentalPackage $existingPackage = null): void
+    {
+        if (($validated['type'] ?? $existingPackage?->type) !== 'liburan') {
+            return;
+        }
+
+        foreach (self::LIBURAN_MEDIA_UPLOAD_MAP as $uploadField => $column) {
+            if (!$request->hasFile($uploadField)) {
+                continue;
+            }
+
+            if ($existingPackage && filled($existingPackage->getRawOriginal($column))) {
+                delete_media($existingPackage->getRawOriginal($column));
+            }
+
+            $validated[$column] = store_media($request->file($uploadField), 'rental-packages/liburan');
+        }
+    }
+
+    private function removeLiburanMedia(RentalPackage $rentalPackage): void
+    {
+        $paths = [];
+
+        foreach (self::LIBURAN_MEDIA_UPLOAD_MAP as $column) {
+            $rawPath = $rentalPackage->getRawOriginal($column);
+            if (filled($rawPath)) {
+                $paths[] = $rawPath;
+            }
+        }
+
+        if ($paths !== []) {
+            delete_media($paths);
+        }
     }
 }

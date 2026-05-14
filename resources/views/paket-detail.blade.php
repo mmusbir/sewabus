@@ -14,6 +14,24 @@
     $packageTypeLabel = $package->type === 'liburan' ? 'Paket Liburan' : 'Paket Sewa';
     $packageTypeBadgeClass = $package->type === 'liburan' ? 'bg-amber-500' : 'bg-emerald-600';
     $relatedSectionTitle = $package->type === 'liburan' ? 'Paket Liburan Lainnya' : 'Paket Sewa Lainnya';
+    $liburanGalleryItems = collect([
+        [
+            'label' => 'Unit Kendaraan - Luar',
+            'url' => $package->vehicle_exterior_image_path,
+        ],
+        [
+            'label' => 'Unit Kendaraan - Dalam',
+            'url' => $package->vehicle_interior_image_path,
+        ],
+        [
+            'label' => 'Penginapan - Luar',
+            'url' => $package->lodging_exterior_image_path,
+        ],
+        [
+            'label' => 'Penginapan - Dalam',
+            'url' => $package->lodging_interior_image_path,
+        ],
+    ])->filter(fn (array $item) => filled($item['url']))->values()->all();
     $includeItems = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $package->includes ?? ''))));
     $excludeItems = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $package->excludes ?? ''))));
     $termItems = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $package->terms_conditions ?? ''))));
@@ -271,6 +289,39 @@
             </div>
         </div>
     </section>
+
+    @if($package->type === 'liburan' && count($liburanGalleryItems))
+        <section class="bg-background-light py-8 sm:py-10 dark:bg-background-dark/60">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-5 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+                    <div>
+                        <p class="text-xs font-black uppercase tracking-wide text-primary">Dokumentasi paket</p>
+                        <h2 class="mt-1 text-2xl font-black text-slate-950 dark:text-white">Foto Unit & Penginapan</h2>
+                    </div>
+                    <p class="max-w-xl text-sm text-slate-500 dark:text-slate-400">Galeri ini khusus paket liburan untuk memberi gambaran unit kendaraan dan penginapan.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    @foreach($liburanGalleryItems as $galleryItem)
+                        @php
+                            $galleryThumb = media_thumbnail_url($galleryItem['url'], 640, 76) ?? $galleryItem['url'];
+                        @endphp
+                        <figure class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
+                            <img
+                                src="{{ $galleryThumb }}"
+                                alt="{{ $galleryItem['label'] }}"
+                                width="640"
+                                height="420"
+                                class="h-40 w-full object-cover"
+                                loading="lazy"
+                                decoding="async"
+                            >
+                            <figcaption class="px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200">{{ $galleryItem['label'] }}</figcaption>
+                        </figure>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
 
     @if(count($itineraryItems))
         <section id="itinerary-paket" class="bg-background-light py-8 sm:py-10 dark:bg-background-dark/60">

@@ -17,6 +17,10 @@ class RentalPackage extends Model
         'excludes',
         'terms_conditions',
         'image_path',
+        'vehicle_exterior_image_path',
+        'vehicle_interior_image_path',
+        'lodging_exterior_image_path',
+        'lodging_interior_image_path',
         'is_active',
         'sort_order',
     ];
@@ -28,6 +32,26 @@ class RentalPackage extends Model
     ];
 
     public function getImagePathAttribute(?string $value): ?string
+    {
+        return media_url($value);
+    }
+
+    public function getVehicleExteriorImagePathAttribute(?string $value): ?string
+    {
+        return media_url($value);
+    }
+
+    public function getVehicleInteriorImagePathAttribute(?string $value): ?string
+    {
+        return media_url($value);
+    }
+
+    public function getLodgingExteriorImagePathAttribute(?string $value): ?string
+    {
+        return media_url($value);
+    }
+
+    public function getLodgingInteriorImagePathAttribute(?string $value): ?string
     {
         return media_url($value);
     }
