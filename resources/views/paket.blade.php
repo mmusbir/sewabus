@@ -61,26 +61,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse($packages as $package)
             @php
-                $itineraryItems = collect($package->itinerary ?? [])
-                    ->map(function ($item, int $index) {
-                        $day = trim((string) data_get($item, 'day', 'Day ' . ($index + 1)));
-                        $description = trim((string) data_get($item, 'description', ''));
-
-                        if ($day === '' && $description === '') {
-                            return null;
-                        }
-
-                        return [
-                            'day' => $day !== '' ? $day : 'Day ' . ($index + 1),
-                            'description' => $description,
-                        ];
-                    })
-                    ->filter()
-                    ->values()
-                    ->all();
                 $includeItems = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $package->includes ?? ''))));
-                $excludeItems = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $package->excludes ?? ''))));
-                $termItems = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $package->terms_conditions ?? ''))));
                 $badgeClasses = $package->type === 'liburan' ? 'bg-amber-500' : 'bg-emerald-600';
                 $badgeText = $package->type === 'liburan' ? 'Paket Liburan' : 'Paket Sewa';
                 $packageImage = $package->image_path ?: '/stitch_img_bus_shd.jpg';
@@ -129,58 +110,6 @@
                                 </li>
                             @endforeach
                         </ul>
-                    @endif
-
-                    @if(count($itineraryItems) || count($excludeItems) || count($termItems))
-                        <details class="mb-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/50 p-3">
-                            <summary class="cursor-pointer text-sm font-bold text-slate-800 dark:text-slate-100">
-                                Detail Paket
-                            </summary>
-
-                            @if(count($itineraryItems))
-                                <div class="mt-3">
-                                    <h3 class="text-xs font-extrabold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">Itinerary</h3>
-                                    <div class="space-y-2">
-                                        @foreach($itineraryItems as $itineraryItem)
-                                            <div class="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-2.5">
-                                                <p class="text-xs font-bold text-primary mb-1">{{ $itineraryItem['day'] }}</p>
-                                                @if($itineraryItem['description'] !== '')
-                                                    <p class="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-line">{{ $itineraryItem['description'] }}</p>
-                                                @endif
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endif
-
-                            @if(count($excludeItems))
-                                <div class="mt-3">
-                                    <h3 class="text-xs font-extrabold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">Tidak Termasuk</h3>
-                                    <ul class="space-y-1">
-                                        @foreach($excludeItems as $excludeItem)
-                                            <li class="text-sm text-slate-600 dark:text-slate-300 flex items-start gap-2">
-                                                <x-fa-icon name="circle-xmark" style="regular" class="fa-fw text-rose-500 text-sm mt-0.5" />
-                                                <span>{{ $excludeItem }}</span>
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            @endif
-
-                            @if(count($termItems))
-                                <div class="mt-3">
-                                    <h3 class="text-xs font-extrabold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">Syarat &amp; Ketentuan</h3>
-                                    <ul class="space-y-1">
-                                        @foreach($termItems as $termItem)
-                                            <li class="text-sm text-slate-600 dark:text-slate-300 flex items-start gap-2">
-                                                <x-fa-icon name="circle-info" class="fa-fw text-sky-500 text-sm mt-0.5" />
-                                                <span>{{ $termItem }}</span>
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            @endif
-                        </details>
                     @endif
 
                     <div class="grid grid-cols-1 gap-2">
