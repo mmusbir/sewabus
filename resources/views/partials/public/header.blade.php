@@ -60,15 +60,13 @@
         </nav>
 
         <div class="flex items-center gap-3">
-            <button type="button" class="js-theme-toggle hidden md:inline-flex items-center active:scale-95 transition-transform" aria-label="Toggle dark mode" aria-pressed="false">
-                <span data-theme-track class="relative inline-flex h-8 w-[52px] items-center rounded-full border border-slate-200 bg-slate-300 p-0.5 shadow-inner transition-colors duration-300 dark:border-slate-700">
-                    <span data-theme-knob class="pointer-events-none relative inline-flex size-7 translate-x-0 transform items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(15,23,42,0.25)] transition-transform duration-300 ease-out">
-                        <span data-theme-icon-sun class="absolute inline-flex items-center justify-center text-amber-500 opacity-100 scale-100 transition duration-200">
-                            <x-fa-icon name="sun" style="regular" class="fa-fw text-[12px] leading-none" />
-                        </span>
-                        <span data-theme-icon-moon class="absolute inline-flex items-center justify-center text-sky-600 opacity-0 scale-75 transition duration-200">
-                            <x-fa-icon name="moon" style="regular" class="fa-fw text-[12px] leading-none" />
-                        </span>
+            <button type="button" class="js-theme-toggle hidden md:inline-flex size-11 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-700 shadow-sm transition hover:border-primary hover:text-primary active:scale-95 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200" aria-label="Toggle dark mode" aria-pressed="false">
+                <span class="relative inline-flex size-5 items-center justify-center">
+                    <span data-theme-icon-sun class="absolute inset-0 inline-flex items-center justify-center text-amber-500 opacity-100 scale-100 transition duration-200">
+                        <x-fa-icon name="sun" style="regular" class="fa-fw text-base leading-none" />
+                    </span>
+                    <span data-theme-icon-moon class="absolute inset-0 inline-flex items-center justify-center text-sky-400 opacity-0 scale-75 transition duration-200">
+                        <x-fa-icon name="moon" style="regular" class="fa-fw text-base leading-none" />
                     </span>
                 </span>
             </button>
@@ -81,8 +79,8 @@
 </header>
 
 <div data-mobile-menu class="fixed inset-0 z-[10020] hidden md:hidden bg-slate-950/45 backdrop-blur-sm" aria-hidden="true">
-    <div class="flex min-h-[100dvh] items-end px-3 pb-3 pt-16">
-        <div data-mobile-menu-panel class="w-full overflow-hidden rounded-[28px] border border-white/70 bg-white shadow-2xl shadow-slate-950/20 dark:border-slate-800 dark:bg-background-dark">
+    <div class="flex min-h-[100dvh] items-center justify-center px-4 py-8">
+        <div data-mobile-menu-panel class="max-h-[85dvh] w-full max-w-sm overflow-auto rounded-[28px] border border-white/70 bg-white shadow-2xl shadow-slate-950/20 dark:border-slate-800 dark:bg-background-dark">
             <div class="flex items-center justify-between border-b border-slate-200/70 px-5 py-4 dark:border-slate-800">
                 <div>
                     <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Menu</p>
@@ -115,17 +113,16 @@
                 ]) href="{{ route('contact.index') }}" data-menu-close>Kontak</a>
             </nav>
             <div class="border-t border-slate-200/70 px-4 py-4 dark:border-slate-800">
-                <button type="button" class="js-theme-toggle inline-flex w-full items-center justify-center active:scale-95 transition-transform" aria-label="Toggle dark mode" aria-pressed="false">
-                    <span data-theme-track class="relative inline-flex h-8 w-[52px] items-center rounded-full border border-slate-200 bg-slate-300 p-0.5 shadow-inner transition-colors duration-300 dark:border-slate-700">
-                        <span data-theme-knob class="pointer-events-none relative inline-flex size-7 translate-x-0 transform items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(15,23,42,0.25)] transition-transform duration-300 ease-out">
-                            <span data-theme-icon-sun class="absolute inline-flex items-center justify-center text-amber-500 opacity-100 scale-100 transition duration-200">
-                                <x-fa-icon name="sun" style="regular" class="fa-fw text-[12px] leading-none" />
-                            </span>
-                            <span data-theme-icon-moon class="absolute inline-flex items-center justify-center text-sky-600 opacity-0 scale-75 transition duration-200">
-                                <x-fa-icon name="moon" style="regular" class="fa-fw text-[12px] leading-none" />
-                            </span>
+                <button type="button" class="js-theme-toggle inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold text-slate-700 transition hover:border-primary hover:text-primary active:scale-[0.99] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200" aria-label="Toggle dark mode" aria-pressed="false">
+                    <span class="relative inline-flex size-5 shrink-0 items-center justify-center">
+                        <span data-theme-icon-sun class="absolute inset-0 inline-flex items-center justify-center text-amber-500 opacity-100 scale-100 transition duration-200">
+                            <x-fa-icon name="sun" style="regular" class="fa-fw text-base leading-none" />
+                        </span>
+                        <span data-theme-icon-moon class="absolute inset-0 inline-flex items-center justify-center text-sky-400 opacity-0 scale-75 transition duration-200">
+                            <x-fa-icon name="moon" style="regular" class="fa-fw text-base leading-none" />
                         </span>
                     </span>
+                    Mode Tampilan
                 </button>
             </div>
         </div>
