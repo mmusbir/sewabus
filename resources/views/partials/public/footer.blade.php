@@ -181,7 +181,7 @@
             </div>
         </div>
         <div class="max-w-7xl mx-auto pt-8 mt-10 border-t border-slate-800 text-center text-xs text-slate-500">
-            &copy; 2026 Multibus - Sewa Bus Pariwisata. All Rights Reserved.
+            &copy; 2026 Ragambus - Sewa Bus Pariwisata. All Rights Reserved.
         </div>
     </footer>
 @endif
